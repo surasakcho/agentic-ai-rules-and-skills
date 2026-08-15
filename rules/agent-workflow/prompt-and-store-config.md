@@ -44,7 +44,7 @@ secrets — those belong in a secret manager, not in a file that exists to be co
 
 ## How
 
-[`lib/skillconfig.py`](../../lib/skillconfig.py) implements it. Shell and Python skills both
+[`lib/skillconfig.py`](../../skills/lib/skillconfig.py) implements it. Shell and Python skills both
 use it the same way, because the **prompt goes to stderr and only the value goes to stdout**:
 
 ```bash
@@ -64,7 +64,7 @@ reviewable without anyone's machine leaking into it.
 
 A config helper that only ever succeeds is the same failure mode as a guard that never fires.
 These are the behaviours worth having, and each is pinned by
-[`test_skillconfig.py`](../../lib/test_skillconfig.py):
+[`test_skillconfig.py`](../../skills/lib/test_skillconfig.py):
 
 - **It never invents a default.** With nobody to prompt — cron, CI, a piped stdin — it exits
   **2**, prints the exact `set` command, and **writes nothing**. A machine-specific value has

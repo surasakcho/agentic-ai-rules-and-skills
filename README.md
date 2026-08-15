@@ -13,7 +13,8 @@ just opinion, and there is enough of that already.
 
 ```
 skills/           every skill — ~/.claude/skills points HERE, so discovery stays flat
-lib/              shared helpers the rules depend on (skillconfig.py)
+  lib/              helpers skills call (skillconfig.py); inside skills/ deliberately,
+                    because `..` from a junction escapes the link, not the repo
 rules/            portable rules, by task type
   analytics/        producing figures, tables and reported numbers
   research/         reproducibility, logging, provenance
