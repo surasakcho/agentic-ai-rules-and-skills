@@ -12,6 +12,7 @@ just opinion, and there is enough of that already.
 ## Layout
 
 ```
+skills/           every skill — ~/.claude/skills points HERE, so discovery stays flat
 lib/              shared helpers the rules depend on (skillconfig.py)
 rules/            portable rules, by task type
   analytics/        producing figures, tables and reported numbers
@@ -85,12 +86,33 @@ and looks exactly as authoritative as the original while doing it. And adopt sel
 `CLAUDE.md` carrying nine rules where two apply teaches the reader that most of it is
 skippable.
 
-Install the skills themselves into your agent's skills directory:
+## Installing the skills
+
+This repo is the single source of truth for both the rules and the skills, so nothing is
+copied — **point `~/.claude/skills` at `skills/`** and the agent reads them in place:
 
 ```bash
-cp -r skills/verify-outputs skills/retrieve-lessons ~/.claude/skills/
+# macOS / Linux
+ln -sfn /path/to/agentic-ai-rules-and-skills/skills ~/.claude/skills
+
+# Windows (directory junction — no admin needed)
+cmd /c mklink /J "%USERPROFILE%\.claude\skills" "C:\path\to\agentic-ai-rules-and-skills\skills"
+
 pip install -r skills/verify-outputs/requirements.txt
 ```
+
+The link points one level *into* the repo, not at its root. That is what lets Claude Code's
+flat discovery (`<name>/SKILL.md` directly under the skills dir) coexist with `rules/`,
+`lessons/` and `lib/` — they sit outside the link and are never mistaken for skills.
+
+### The bar for a skill here
+
+`skills/` holds working tools, not only exemplars, so the standard is scoped to what can
+actually fail: **a skill that ships executable code carries a self-test.** Prose-only skills
+have nothing to test and are exempt. Code-bearing skills that lack one are declared in
+[`skills/_no-selftest.txt`](skills/_no-selftest.txt), which `harvest.py --check` treats as a
+ratchet — a new one cannot land without either a test or an explicit line, and a line that is
+no longer needed fails the check so the list can only shrink.
 
 ## Contributing a rule
 

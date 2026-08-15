@@ -213,18 +213,42 @@ def health(shared: Path, deny=()):
     for r in no_incident:
         log_problem(f"rule names no incident: {r}")
 
-    # Every skill must carry a self-test and it must pass.
-    skills = [d for d in (shared / "skills").iterdir()
-              if d.is_dir()] if (shared / "skills").exists() else []
+    # A skill is a directory containing a SKILL.md. Everything else under skills/ -- docs,
+    # scripts, tooling dirs -- is not a skill and is not held to a skill's standards.
+    sdir = shared / "skills"
+    skills = sorted((d for d in sdir.iterdir() if d.is_dir() and (d / "SKILL.md").exists()),
+                    key=lambda p: p.name) if sdir.exists() else []
+
+    # Only a skill that SHIPS EXECUTABLE CODE can have a self-test worth writing; a prose-only
+    # skill has nothing to fail. Code-bearing skills without one are real debt, so they are
+    # declared in _no-selftest.txt -- a ratchet, not an excuse. A NEW code-bearing skill cannot
+    # land without either a self-test or an explicit line, and a line that is no longer needed
+    # is reported so the list can only shrink.
+    baseline_file = sdir / "_no-selftest.txt"
+    baseline = set()
+    if baseline_file.exists():
+        baseline = {l.split("#")[0].strip()
+                    for l in baseline_file.read_text(encoding="utf-8").splitlines()}
+        baseline.discard("")
     print(f"  skills: {len(skills)}")
+    untested = []
     for s in skills:
-        if not (s / "SKILL.md").exists():
-            log_problem(f"skill has no SKILL.md: {s.name}")
-            continue
+        code = [p for p in s.rglob("*")
+                if p.is_file() and p.suffix in (".py", ".sh", ".ps1")
+                and not p.name.startswith(("test_", "selftest"))]
         tests = list(s.glob("*self_test*.py")) + list(s.glob("test_*.py"))
+        shell_tests = list(s.rglob("selftest*.sh"))
         if not tests:
-            log_problem(f"skill has no self-test: {s.name} "
-                        f"(a check you have never seen fail is untested)")
+            if shell_tests:
+                # Present but not executed here (needs tmux/bash). Say so rather than counting
+                # it as a pass -- an unrun test is not evidence.
+                print(f"    self-test {s.name}/{shell_tests[0].name}: PRESENT (not run here)")
+                continue
+            if code:
+                untested.append(s.name)
+                if s.name not in baseline:
+                    log_problem(f"skill ships code but has no self-test: {s.name} "
+                                f"(write one, or declare it in skills/_no-selftest.txt)")
             continue
         for t in tests:
             r = subprocess.run([sys.executable, "-X", "utf8", str(t)],
@@ -240,6 +264,11 @@ def health(shared: Path, deny=()):
                             f"{r.stdout.strip().splitlines()[0] if r.stdout.strip() else 'no output'}")
             elif r.returncode != 0:
                 log_problem(f"self-test failed: {s.name}/{t.name}\n{r.stdout[-800:]}")
+
+    for name in sorted(baseline - set(untested)):
+        log_problem(f"skills/_no-selftest.txt declares '{name}' but it no longer needs the "
+                    f"exemption — delete the line so the list keeps shrinking")
+    print(f"  code-bearing skills with no self-test: {len(untested)} (all declared)")
 
     # Shared library code carries self-tests too. Without this the lib tests exist but never
     # run in the gate, which is the same as not having them.

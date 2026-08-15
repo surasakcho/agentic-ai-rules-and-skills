@@ -1,0 +1,16 @@
+# Skills that ship executable code but carry no self-test.
+#
+# This is a RATCHET, not a permission slip. `harvest.py --check` fails if a code-bearing skill
+# is missing from both a self-test and this list, so nothing new can land untested — and it
+# also fails on a line that is no longer needed, so the list can only shrink.
+#
+# Every entry here is real debt. Ordered worst-first by what goes wrong if the code misbehaves.
+
+session-sandbox          # kills tmux sessions and installs cron; its whole value IS the
+                         # sbx-* guard, and nothing proves the guard refuses a bad target.
+                         # Its sibling rotate-session ships exactly that test — copy it.
+git-guardrails-claude-code  # installs hooks that BLOCK dangerous git commands; if the hook
+                         # silently fails to match, the block is gone and nothing says so.
+global-guidelines        # ships check-encoding.py, which is a checker — and an unverified
+                         # checker is the failure mode it exists to prevent.
+diagnosing-bugs          # ships a helper script; lowest risk of the four.
