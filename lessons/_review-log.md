@@ -47,3 +47,4 @@ caption matches its figure, whether a convention is inside its domain.
 Not yet harvested, deliberately: that project's board-consistency checker is close to
 portable but assumes a specific Kanban markdown shape; revisit if a second project adopts the
 same board format.
+- 2026-08-15 — published rules/data-engineering/parallel-variants-same-schema.md (parallel measurements of one quantity must share an identical variable set; earned from a two-source age-structure block that differed in names, denominators, coverage and missing-value convention).
