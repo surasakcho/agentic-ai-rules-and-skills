@@ -40,7 +40,7 @@ undifferentiated is a false claim about the strength of your evidence.
 State plainly what you could not reach. **"The standard's own text is paywalled and I did not read
 it" is worth more than a citation implying you did.**
 
-## Two traps about what counts as "external"
+## Three traps about what counts as "external"
 
 **A source cached in your repo can still be external.** What matters is *who produced it*, not
 where the bytes sit. In the incident below, the strongest evidence was a registry export sitting in
@@ -50,6 +50,32 @@ a scratch directory — external to the agency under suspicion, and decisive.
 discovering that its "independent" identifier column was a reformatting of the very code in
 dispute. It contributed nothing and had to be dropped from the tally rather than counted. Verify
 provenance before you count a source, not after.
+
+**Two files from the same author are ONE source.** Independence is a property of *authorship*,
+not of filename, date, directory, or how different the two files look.
+
+> **Incident.** A reference dataset was found to agree with an older file — different name,
+> different column set, produced two weeks earlier — on the great majority of rows, including
+> every row of the disputed region. This was reported as provenance evidence: the reference had
+> "carried forward a stale intermediate rather than recomputing it." The data owner's reply:
+> *both files came from the same person's pipeline.* One producer, two outputs. The agreement
+> carried no information and the argument was void.
+>
+> **Cost:** a leg of a conclusion already described as proven, retracted after the fact.
+>
+> **Guard:** before treating agreement between two artifacts as corroboration, establish **who
+> produced each one**. Ask the data owner if you cannot tell. A second file from one source is a
+> copy, not a witness.
+
+**The self-inflicted version of the same error: a derived statistic that restates its own input.**
+In the same session, the reference file's absolute-value columns were reported as "algebraically
+derived from the older file's proportions, matching at rel ≤1e-12 on all but a handful of rows —
+the signature of a multiply-then-round rather than an independent measurement." They reproduce at
+that tolerance against the reference file's **own** proportions on **every** row, universally. The
+statistic was nothing but a restatement of the proportion agreement already reported, dressed as a
+second finding — and the "all but a handful" was simply the set of rows where the two files agreed
+at all. **Before presenting a derived statistic as corroboration, check it is not arithmetically
+implied by something you already said.**
 
 ## Reconcile populations, not just the disputed value
 
