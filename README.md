@@ -53,6 +53,11 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [agent-workflow](rules/agent-workflow/) | [Publish lessons weekly](rules/agent-workflow/publish-lessons-weekly.md) | Eleven reusable lessons that would have stayed in one repo |
 | [agent-workflow](rules/agent-workflow/) | [Sanitise before sharing](rules/agent-workflow/sanitise-before-sharing.md) | This repo's own seed pass published a collaborator's name and unpublished results |
 | [agent-workflow](rules/agent-workflow/) | [Prompt for machine-specific values](rules/agent-workflow/prompt-and-store-config.md) | Four skills hardcoding a username and another private repo's name |
+| [analytics](rules/analytics/) | [Report both sides of a comparison](rules/analytics/report-both-sides-of-a-comparison.md) | A "95.51% match" whose largest residual bucket was our own defect |
+| [data-engineering](rules/data-engineering/) | [Status fields must be earned](rules/data-engineering/status-fields-must-be-earned.md) | 206 items recorded as fetched; 3 never were, and the manifest's own hashes proved it |
+| [agent-workflow](rules/agent-workflow/) | ["I can't" is a task](rules/agent-workflow/cannot-is-a-task.md) | A dataset declared unobtainable while an unused tool sat in the session |
+| [agent-workflow](rules/agent-workflow/) | [Read the manual first](rules/agent-workflow/read-the-manual-first.md) | A new download route invented while the written procedure sat unread |
+| [agent-workflow](rules/agent-workflow/) | [Shut up and work](rules/agent-workflow/shut-up-and-work.md) | Padding that let a correctly-scoped claim read as an unscoped one |
 
 ## Skills
 
