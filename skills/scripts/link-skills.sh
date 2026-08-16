@@ -56,7 +56,15 @@ for DEST in "${DESTS[@]}"; do
       rm -rf "$target"
     fi
 
-    ln -sfn "$src" "$target"
-    echo "linked $name -> $src ($DEST)"
+    # RELATIVE (-r), not absolute, so the same farm resolves inside a container.
+    # An absolute link hardcodes this machine's $HOME -- e.g.
+    # /home/zkyhax/projects/... -- and a container has no such directory, so
+    # every link dangles and the harness reports no error, it just sees zero
+    # skills. A relative link resolves against wherever the farm itself is
+    # mounted, so bind-mounting this repo at <container-home>/projects/<repo>
+    # is enough. Verified both ways: 57/57 resolve on the host and 57/57 in a
+    # container; with absolute links the container resolves 0.
+    ln -sfnr "$src" "$target"
+    echo "linked $name -> $(readlink "$target") ($DEST)"
   done
 done
