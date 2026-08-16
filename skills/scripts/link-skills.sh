@@ -8,7 +8,17 @@ set -euo pipefail
 # Each entry is a symlink into this repo, so a `git pull` is all that's needed
 # to keep installed skills up to date.
 
-REPO="$(cd "$(dirname "$0")/.." && pwd)"
+# Walk up to the nearest ancestor that actually contains a skills/ directory,
+# rather than assuming a fixed depth. This script is committed at
+# <repo>/skills/scripts/, so the previous "$(dirname "$0")/.." resolved REPO to
+# <repo>/skills and then searched <repo>/skills/skills -- which does not exist,
+# so find errored and the script linked nothing while still exiting 0 through
+# the pipeline. Walking up works from either location.
+REPO="$(cd "$(dirname "$0")" && pwd)"
+while [ "$REPO" != "/" ] && [ ! -d "$REPO/skills" ]; do
+  REPO="$(dirname "$REPO")"
+done
+[ -d "$REPO/skills" ] || { echo "error: no skills/ dir found above $0" >&2; exit 1; }
 DESTS=("$HOME/.claude/skills" "$HOME/.agents/skills")
 
 # Collect the repo's skills once, link into every destination.
