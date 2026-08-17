@@ -69,6 +69,16 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [analytics](rules/analytics/) | [Solve the space, don't sample it](rules/analytics/solve-the-space-not-the-samples.md) | Hours of variant-testing replaced by one infeasibility certificate |
 | [data-engineering](rules/data-engineering/) | [Adjudicate with an external source](rules/data-engineering/adjudicate-with-an-external-source.md) | A repo's own comment and defect log cited as two sources for one claim |
 
+## Lessons
+
+The incident write-ups the rules were extracted from. Longer and more narrative than a rule:
+they exist so the *mechanism* survives, not just the instruction.
+
+| Lesson | The mechanism |
+|---|---|
+| [Nine silent failures](lessons/nine-silent-failures.md) | Every defect that mattered was invisible in the source and obvious in the rendered output; a remediation of 15 findings introduced 11 new defects |
+| [The numbers that cannot fail](lessons/numbers-that-cannot-fail.md) | Four defects sharing one mechanism — a typed literal has nothing to disagree with, so no gate can detect it. Two of them concealed each other |
+
 ## Skills
 
 | Skill | What it does |

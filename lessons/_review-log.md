@@ -66,3 +66,12 @@ same board format.
   literal. Sanitised: the test statistic and p-value are a collaborator's unpublished
   result and were reduced to magnitudes. Rules 27 → 28; health check green (0 broken
   links, 0 rules without a named incident, all self-tests PASS).
+- 2026-08-17 — same pass, second half: published the incident write-up
+  `lessons/numbers-that-cannot-fail.md` (four defects, one mechanism: a typed literal has
+  nothing to disagree with, so no gate can detect it — and two of them concealed each other,
+  because the statistic that would have exposed a bad population was itself hardcoded).
+  Added a Lessons section to the README, which had none, and linked both write-ups.
+  Sanitise pass also redacted a leaked username in a machine path in
+  `skills/scripts/link-skills.sh` — pre-existing, illustrative rather than functional, so
+  redacting it broke nothing. Health check now fully clean for the first time: 0 problems,
+  0 broken links, 28 rules all with a named incident, all self-tests PASS.

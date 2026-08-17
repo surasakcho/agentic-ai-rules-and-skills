@@ -8,6 +8,8 @@ where the authority comes from. [`parallel-variants-same-schema`](parallel-varia
 — the same "put the derivation in ONE function" argument, for a different failure.
 [`check-for-a-local-copy-before-refetching`](check-for-a-local-copy-before-refetching.md) — the
 authority is often already in the repo.
+**Incident write-up:** [`lessons/numbers-that-cannot-fail.md`](../../lessons/numbers-that-cannot-fail.md)
+— the full arc, including the three sibling literals this defect was tangled with.
 
 ---
 

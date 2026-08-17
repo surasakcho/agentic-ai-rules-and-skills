@@ -58,7 +58,7 @@ for DEST in "${DESTS[@]}"; do
 
     # RELATIVE (-r), not absolute, so the same farm resolves inside a container.
     # An absolute link hardcodes this machine's $HOME -- e.g.
-    # /home/zkyhax/projects/... -- and a container has no such directory, so
+    # /home/<user>/projects/... -- and a container has no such directory, so
     # every link dangles and the harness reports no error, it just sees zero
     # skills. A relative link resolves against wherever the farm itself is
     # mounted, so bind-mounting this repo at <container-home>/projects/<repo>
