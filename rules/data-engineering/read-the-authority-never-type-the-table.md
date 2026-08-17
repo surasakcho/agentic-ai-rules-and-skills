@@ -1,0 +1,146 @@
+# A typed lookup table is a defect waiting — read the authority, and fix the class not the instance
+
+**Task type:** data engineering — any code list, category crosswalk, region grouping, name→ID
+map or other reference table a pipeline classifies by.
+**Related:** [`completeness-checking`](completeness-checking.md) — the population check this
+rule needs. [`adjudicate-with-an-external-source`](adjudicate-with-an-external-source.md) —
+where the authority comes from. [`parallel-variants-same-schema`](parallel-variants-same-schema.md)
+— the same "put the derivation in ONE function" argument, for a different failure.
+[`check-for-a-local-copy-before-refetching`](check-for-a-local-copy-before-refetching.md) — the
+authority is often already in the repo.
+
+---
+
+## The rule
+
+**Reference data must be READ from a committed source file, never typed into code. When you
+find a typed one that is wrong, delete the literal — do not correct it.**
+
+Two failures compound, and the second is what keeps the bug alive.
+
+## Failure one: a typed table cannot fail
+
+A hand-written lookup has no source to disagree with, so nothing can detect that it is
+incomplete. And incompleteness is the dangerous shape: a **wrong** entry usually produces a
+visibly wrong answer, while a **missing** entry produces a slightly different one.
+
+The mechanism is always the same three steps:
+
+1. The lookup is applied with something that yields a null for an unknown key — `.map()`,
+   `.get()`, `dict.get`, a `LEFT JOIN`.
+2. Every consumer downstream is a `groupby`, `crosstab`, `PIVOT` or aggregate that **silently
+   discards nulls**.
+3. The output keeps its exact shape — same number of groups, same columns, no warning — and
+   only the numbers quietly change.
+
+Nothing in the pipeline is *broken*. That is the problem.
+
+## Failure two: patching the instance
+
+On discovering three codes missing, the obvious move is to add three codes. That is not a fix;
+it is the same defect with a later expiry date. The question is not *"which entries are
+missing?"* but ***"where should this table have come from?"*** — and the answer is usually
+already in the repo, sometimes read by a different script for a different purpose.
+
+## What to do, in order
+
+1. **Search for the authority before writing any literal.** A codebase that processes
+   administrative, geographic or catalogue data almost certainly already holds the roster or
+   crosswalk. Grep for it.
+2. **Read it at runtime and assert its shape** — row count, no duplicate keys, no unmapped
+   category values. A source that silently lost rows otherwise yields a table that looks
+   complete, because every row *in it* maps fine.
+3. **Assert the classifier covers the population, using the consuming dataset's own keys** —
+   not the table's. This is the check that actually fires.
+4. **Refuse to fall back.** No `try: read_authority() except: use_literal()`. A fallback
+   literal is precisely how a stale hand-written copy survives and gets used.
+5. **Put the derivation in ONE importable place**, so a second consumer has no excuse to
+   retype it — and give it a self-test that **replays the original defect** and proves the
+   guard raises.
+6. **Log the source** of the authority, and never let two copies of the same table coexist.
+
+## The tell
+
+You are typing a list of codes, identifiers or category names into a source file, and you are
+getting them **from your own knowledge rather than from a file you just read**. Stop and go
+find the file.
+
+## The incident
+
+A pipeline over ~7,600 sub-national administrative units grouped them into four regions by a
+literal keyed on the 2-digit parent-area code:
+
+```python
+REGIONS = {
+    "North": [50, 51, 52, 53, 54, 55, 56, 57, 58, 63, 64, 65, 66, 67],
+    ...
+}
+P2R = {p: r for r, ps in REGIONS.items() for p in ps}
+```
+
+`63` through `67` are present. **`60`, `61` and `62` are not** — and they appear in no other
+region either. Three real parent areas, **277 units, 3.7% of the frame**, mapped to `NaN`.
+
+Every consumer was `df.region` inside a `groupby` or `crosstab`, so those 277 rows were dropped
+from **every** regional statistic — the period × region crosstab, the per-region medians, and a
+Kruskal–Wallis test across regions. All of it fed two slides of a stakeholder handoff.
+
+**No gate caught it.** Four separate checks were green before and after: the deck's own number
+screen, the pipeline's completeness audit, the terrain validator and the board checker.
+
+**Why the code list looked plausible.** Three of the four region lists were written as
+contiguous runs whose gaps are *dead code space* — identifiers that do not exist. Only the
+North list's gap contained live ones:
+
+| list | gap | codes skipped | real areas in the gap |
+|---|---|---|---|
+| South | 87–89 | 87, 88, 89 | **none** — dead codes |
+| North | 59–62 | 59, 60, 61, 62 | **60, 61, 62** ← three real |
+| Northeast | — | generated by `range()` | n/a |
+
+So the author's method — *list the runs, skip the gaps* — was right three times by luck of the
+identifier space, and wrong once.
+
+**The authority was in the repo the whole time.** A committed workbook carried a `REGION_4`
+column giving all four regions for all 77 parent areas; its provenance was already logged in a
+research note, and **another script already read that same workbook** for a different purpose.
+The literal was a duplicate of a table that already existed, and it disagreed with it. Checked
+after the fix: the corrected map matches the workbook **exactly on all four regions**, and the
+original's only error was those three codes.
+
+**A second, compounding typed value in the same file.** The statistic that would have exposed
+the bad population was itself hardcoded — the test statistic and p-value were literals in the
+output dict, and the figure title read `"falls 7x faster"` as a string — while the deck's own
+title slide asserted *"every figure is measured, not quoted from notes."* Two typed values
+covering for each other: the population was wrong, and the number that would have moved
+**could not move**. Recomputed on the complete population the test statistic shifted by ~6%,
+the p-value by five orders of magnitude, and the headline ratio had been understated by ~10%.
+(Magnitudes only — the statistics themselves are a collaborator's unpublished result and are
+not the transferable part.)
+
+**What it cost, and the honest part.** The defect had shipped in published figures. It surfaced
+only because an unrelated verification task required recomputing a stated number from source,
+which meant rebuilding the classifier — and counting rows. Reading the stated value instead of
+recomputing it would have found nothing.
+
+**And the first fix was wrong too.** I added the three missing codes to the literal — patching
+the instance — in a commit whose own message criticised an earlier fix for *"removing the
+instances but not the class."* The real fix deleted the literal: a small module reads the
+workbook, asserts the expected area count and a full partition, exposes an `assert_covers()`
+guard, refuses any fallback, and ships a self-test that replays the missing three codes and
+proves the guard raises. Verified behaviour-preserving — byte-identical output.
+
+## Guard
+
+- A literal list of codes or category names in source, with no file behind it, is a finding.
+- `assert_covers(consuming_dataset_keys)` — and prove it can fail.
+- No fallback path from "authority unreadable" to "use the literal".
+- One importable definition, with a self-test that replays the original defect.
+
+---
+
+*Earned from:* a hand-typed 4-region grouping that omitted three parent-area codes, silently
+dropping 3.7% of the frame from every regional statistic in a stakeholder handoff, while the
+authoritative crosswalk sat committed in the same repo and was already read by another script.
+Compounded by the relevant test statistic being hardcoded, so it could not reveal its own
+population was incomplete.
