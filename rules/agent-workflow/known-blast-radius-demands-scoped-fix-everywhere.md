@@ -23,7 +23,7 @@ known to touch 5 rows out of 7,583.
 
 ## The incident
 
-A frame correction changed the identity of roughly 5 of 7,583 tambons (administrative units) in
+A frame correction changed the identity of roughly 5 of 7,583 administrative units in
 one project — about 0.07% of the total. The affected codes were enumerable directly from the
 correction's own definition, known exactly before any downstream file was touched.
 
@@ -35,7 +35,7 @@ splice the unaffected rows back in from the previous committed output.
 For the other **ten**, the same question was never re-asked, so it was never re-answered. Each
 was simply re-run in full — the only mode each script's `__main__` supported — because
 "rebuild file X" defaulted to whatever X already did. **Two of the ten took over two hours of
-combined wall-clock/CPU time** computing national, multi-year zonal statistics for 7,578 tambons
+combined wall-clock/CPU time** computing national, multi-year zonal statistics for 7,578 units
 whose values were already known to be unchanged, to produce output that differed from the
 previous version at fewer than 5 rows — confirmed **after the fact** by a diff against the
 previous committed version, when the diff's shape had already been fully known **before** either
