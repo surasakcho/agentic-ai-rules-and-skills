@@ -75,3 +75,14 @@ same board format.
   `skills/scripts/link-skills.sh` — pre-existing, illustrative rather than functional, so
   redacting it broke nothing. Health check now fully clean for the first time: 0 problems,
   0 broken links, 28 rules all with a named incident, all self-tests PASS.
+- 2026-08-17 — third off-cycle pass today, user-requested. Published
+  `rules/data-engineering/agree-the-output-contract-first.md`: output structure is a
+  DECISION, not a fact, so it must be asked rather than checked or assumed — the explicit
+  exception to "don't ask what you can check", and the rule states that boundary because
+  the two otherwise appear to conflict. Earned from a derived dataset built on four
+  unstated structural assumptions, three of which became remediation commits after the
+  work was declared finished (including a period-matching rule that mis-dated 136 units,
+  one by five periods). Also names the cost that does NOT show up as a rebuild: a column
+  layout that shipped as an unagreed guess and was never challenged. Rules 28 → 29;
+  health check green.
+
