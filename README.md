@@ -54,6 +54,7 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [coding](rules/coding/) | [Scratch code lives outside the repo](rules/coding/scratch-code-lives-outside-the-repo.md) | 150+ undeleted probe scripts, none of them the reusable tool the task actually needed |
 | [agent-workflow](rules/agent-workflow/) | [Delegation and supervision](rules/agent-workflow/delegation-and-supervision.md) | Agent findings taken at face value and later disproved |
 | [agent-workflow](rules/agent-workflow/) | [Publish lessons weekly](rules/agent-workflow/publish-lessons-weekly.md) | Eleven reusable lessons that would have stayed in one repo |
+| [agent-workflow](rules/agent-workflow/) | [Retrieve lessons weekly](rules/agent-workflow/retrieve-lessons-weekly.md) | Nine rules published outward, the retrieval never once run inward |
 | [agent-workflow](rules/agent-workflow/) | [Sanitise before sharing](rules/agent-workflow/sanitise-before-sharing.md) | This repo's own seed pass published a collaborator's name and unpublished results |
 | [agent-workflow](rules/agent-workflow/) | [Prompt for machine-specific values](rules/agent-workflow/prompt-and-store-config.md) | Four skills hardcoding a username and another private repo's name |
 | [analytics](rules/analytics/) | [Report both sides of a comparison](rules/analytics/report-both-sides-of-a-comparison.md) | A "95.51% match" whose largest residual bucket was our own defect |
