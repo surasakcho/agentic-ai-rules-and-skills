@@ -82,7 +82,7 @@ rest was assumed.** Every assumption was wrong or had to be redone:
 
 | assumed | had to be redone as | cost |
 |---|---|---|
-| covariates from each unit's **latest** period | each unit's **source-matched** period | **136 units mis-dated**, one by five periods; full rebuild |
+| covariates from each unit's **latest** period | each unit's **source-matched** period | **136 units mis-dated across 2 groups** — 48 by five periods, 88 by one; full rebuild |
 | the file written with the platform-default line ending | explicit LF, plus an attribute pinning it | committed bytes ≠ working-tree bytes, so a quoted hash described neither; two commits |
 | one combined documentation package covering both datasets | **one package per dataset** | a 400-line generator refactored after the fact |
 | column layout chosen by the implementer | survived — but was never agreed | an unverified guess that happened to be acceptable |
@@ -109,5 +109,5 @@ wanted this."
 
 *Earned from:* a derived dataset built on four unstated structural assumptions, three of which
 became remediation commits after the work was declared finished — including a period-matching
-rule that mis-dated 136 units, one of them by five periods. The two structural questions that
+rule that mis-dated 136 units across 2 groups -- 48 by five periods and 88 by one, the larger of the two being the one every later summary dropped. The two structural questions that
 were actually asked were each settled in a sentence.

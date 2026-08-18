@@ -69,6 +69,7 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [agent-workflow](rules/agent-workflow/) | ["Almost done" needs a denominator](rules/agent-workflow/eta-needs-a-denominator.md) | "Not worth interrupting" said about a job that was 20% done, not checked until asked |
 | [analytics](rules/analytics/) | [Solve the space, don't sample it](rules/analytics/solve-the-space-not-the-samples.md) | Hours of variant-testing replaced by one infeasibility certificate |
 | [data-engineering](rules/data-engineering/) | [Adjudicate with an external source](rules/data-engineering/adjudicate-with-an-external-source.md) | A repo's own comment and defect log cited as two sources for one claim |
+| [analytics](rules/analytics/) | [Summaries must carry the whole set](rules/analytics/summaries-must-carry-the-whole-set.md) | A two-group defect whose larger group was dropped from every summary after the first |
 
 ## Lessons
 

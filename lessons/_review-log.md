@@ -10,6 +10,31 @@ public one — see [sanitise-before-sharing](../rules/agent-workflow/sanitise-be
 
 ---
 
+## 2026-08-18 · off-cycle, triggered by a reader finding an omitted set member
+
+Harvested **1 rule**: `rules/analytics/summaries-must-carry-the-whole-set.md`.
+
+A data-vintage defect affected two groups (48 units with a five-period gap, 88 units with a
+one-period gap). Both were reported at discovery and both are in the project's findings log and
+task board. **Every summary written afterwards kept the 48 and dropped the 88** — the same-day
+impact line, a cost table, the numbered project rule extracted from it, the rule published to
+THIS repo, and the defect write-up, which used the 48-unit group as a worked control without
+saying a second group existed. The reader found the missing group themselves a day later and
+reasonably read it as withheld.
+
+The selection is the finding: summaries keep the most **dramatic** member and drop the
+**largest**. Here the dropped group was 1.8x bigger, and lost every retelling because a
+one-period gap is undramatic.
+
+Also **corrected the instance in this repo**: `agree-the-output-contract-first.md` carried
+"136 units mis-dated, one of them by five periods" in both its cost table and its earned-from
+line — the exact indefinite-singular phrasing the new rule prohibits. Both now carry the
+cardinality and the split. Fixing the class without fixing the published instance would have
+left this repo contradicting its own newest rule.
+
+Rules 29 → 30; links resolve (0 broken); sanitise scan clean — no names, paths, emails or
+project-specific terms in the new rule.
+
 ## 2026-08-15 · sanitising pass
 
 Audited everything published in the seed pass for information that should not be in a public
