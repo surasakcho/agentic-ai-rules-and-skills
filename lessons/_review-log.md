@@ -10,6 +10,43 @@ public one — see [sanitise-before-sharing](../rules/agent-workflow/sanitise-be
 
 ---
 
+## 2026-08-19 (fifth) - off-cycle, user instruction after a four-message wrong diagnosis
+
+Harvested **1 rule**: `rules/data-engineering/never-patch-a-key-to-force-a-join.md`.
+
+**Join on the code as it is. Never invent, rewrite or hand-author a translation table to make a
+join succeed.** Three-step escalation: join as-is and count misses both ways; if a lot is missing,
+question the KEYS not the rows (same authority? same standard? same granularity? same vintage?);
+if a lot is still missing, stop and ask - propose, implement nothing.
+
+The incident is unusually clean. A hand-written, undocumented 21-row table mapped `our_code ->
+their_code` and existed only to make one join land. Tested against the issuing authority's own
+roster: **their column 21 of 21 valid, our column 1 of 21** - and that one only because an earlier
+defect had already corrected it. There was no second numbering system; there were 20 wrong codes
+in our frame, and the table was a list of what each should have been. The consumer applied it
+backwards, rewriting the authority's correct value into our invalid one so the merge would land.
+
+Costs, all measured: it patched one join out of many, so one unit got its population right and its
+economic output **from the wrong province 200 km away, a 17.3% error**; five rows collided with
+codes already in the frame as separate zero-overlap polygons (one district had 11 frame rows
+against the authority's 10); and my own "fix" - making the rewrite conditional after seeing 12
+values go blank - did not repair a mis-seat but changed which half of a split unit got the whole
+population, leaving **28 shipped columns in which two blocks from one source disagree**.
+
+The rule carries the correct counter-pattern from the same repo: rewrite YOUR OWN codes, never the
+authority's, and propagate the correction through every derived file. A code correction is a frame
+rebuild applied everywhere, not a dictionary inside one join.
+
+And the generalisation past codes: **if your join needs a similarity threshold or a manual override
+list to succeed, the key is wrong.** Four sibling scripts in the same project forced joins with
+difflib and produced the identical defect class - one rural unit receiving a provincial
+administration's entire budget.
+
+Worth recording honestly: I defended the patch across four user messages before checking either
+column against the issuing authority. The check took one command.
+
+Rules 35 -> 36; links resolve; sanitise scan clean. (Two rules from another session landed on main between the previous pass and this one -- rebased onto them, files disjoint.)
+
 ## 2026-08-19 (fourth) · off-cycle, from a retrospective on how four defects hid
 
 Harvested **1 rule**: `rules/analytics/name-the-blind-spot.md`.
