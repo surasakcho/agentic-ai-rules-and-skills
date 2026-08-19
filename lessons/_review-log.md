@@ -10,6 +10,35 @@ public one — see [sanitise-before-sharing](../rules/agent-workflow/sanitise-be
 
 ---
 
+## 2026-08-19 (third) · off-cycle, from a defect introduced while fixing a defect
+
+Harvested **1 rule**: `rules/analytics/a-delta-is-three-numbers.md`.
+
+A source migration reported `coverage 65,541 -> 66,492 (+951)`. The first build of that migration
+also silently blanked 12 rows that previously had values. After the bug was fixed, coverage read
+**+951 again** — the losses exactly offset by gains elsewhere. The headline was true both times
+and distinguished nothing; only a row-level diff against a baseline captured *before* the rebuild
+separated 963-filled-12-lost from 951-filled-0-lost.
+
+The rule: report **gained, lost and changed separately, never the net** — a net can be exactly
+correct while its composition is wrong. With the observation that makes it bite: a net *gain*
+reads as good news and therefore suppresses the very check that would find the defect, where a
+net loss would have been investigated at once.
+
+It carries a second, mechanisable guard from the same incident: the bug was an **inverted lookup
+table**. Both its columns were unique, so it looked like a clean bijection — but 6 of its target
+values were themselves valid keys, making the inverse ambiguous. **Uniqueness on both columns does
+not make a mapping invertible**; the test is `set(targets) & set(valid_keys)`, one line, not run.
+
+Deliberately NOT published: a third observation from the same session — that all three of my
+errors that day were caught by a check returning something *implausible* (14,786 mismatches,
+0 of 77 matching, 12 unexpected losses) rather than by any check passing, and that the most
+dangerous of them was the one that arrived with a compelling explanation attached. True, and I
+could not reduce it to a guard that runs, so it stays as prose in the project repo rather than
+becoming a weak shared rule.
+
+Rules 31 → 32; links resolve; sanitise scan clean.
+
 ## 2026-08-19 (later) · correction to the same day's pass
 
 `inspect-what-you-downloaded.md` was published with an incident that said three stub files had
