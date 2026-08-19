@@ -10,6 +10,37 @@ public one — see [sanitise-before-sharing](../rules/agent-workflow/sanitise-be
 
 ---
 
+## 2026-08-19 (seventh) - off-cycle, user instruction on being shown the evidence
+
+Harvested **1 rule**: `rules/data-engineering/never-reseat-a-value-silently.md`.
+
+**Any operation that changes which row a value lands on must be surfaced before it ships - source
+row, destination row and value NAMED - and approved, not announced.**
+
+This fills a real gap between two rules published hours earlier. `never-patch-a-key-to-force-a-join`
+says do not build the remap; `unexpected-means-stop-and-propose` fires when something looks wrong.
+**Neither catches a remap that was already there and is working as designed.** A reseat throws no
+exception, leaves no null, reconciles perfectly (it is a loss and a gain of the same value), and
+surprises nobody. It is invisible to every check that looks for failure, because it is not a
+failure - it is a *decision about attribution* executing silently inside code written to make a
+join work. Attribution is the data owner's call, not the merge's.
+
+The incident, discovered by an audit run in the same session: the remap ran in two sibling scripts;
+one was later given a guard, the other was not. The two blocks then disagreed in shipped output -
+**12 unit-years carrying a fabricated `no_coverage = True` while the sibling block held real
+published population for the same units, 557,132 people.** The values were byte-identical across
+the two rows, which is both the proof they are one record and the reason no reconciliation caught
+it. The one check written to compare the two blocks filtered to rows where BOTH were populated -
+these have exactly one populated per side, so they were structurally invisible to the only guard
+aimed at them.
+
+Guards that can actually run: enumerate every reseat per run (a count is not enough - the count is
+what let it survive); emit the reseat list as a diffable artifact so a NEW reseat fails the build;
+assert both sides never both hold the value; never let a remap flip a coverage or quality flag,
+because the flag on the vacated row is then a claim nobody made.
+
+Rules 38 -> 39; links resolve; sanitise scan clean.
+
 ## 2026-08-19 (sixth) - off-cycle, two rules given directly by the user
 
 Harvested **2 rules**, both `agent-workflow`, both from the same session as the previous entry and
