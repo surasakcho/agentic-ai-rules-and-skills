@@ -10,6 +10,43 @@ public one — see [sanitise-before-sharing](../rules/agent-workflow/sanitise-be
 
 ---
 
+## 2026-08-19 (ninth) - off-cycle, user instruction; the universal form of the day's theme
+
+Harvested **1 rule**: `rules/agent-workflow/strict-first-then-the-residual.md`.
+
+**Build the strict, exact, straightforward solution first - even when you can already see it will
+not cover everything, and even when the difficulty is the reason you want to avoid it. Then treat
+what it does not cover as a separate second phase: enumerate the residual and propose a disposition
+for each item.** Never assume one, never skip phase 1 because you expect it to be hard, never merge
+phase 2 into phase 1 by building the accommodation in advance.
+
+Deliberately filed under `agent-workflow`, not `data-engineering`. Today produced four join rules
+and every one of them was a domain-specific instance of this; the user asked explicitly that this
+one apply to every kind of project. The table in it carries eight domains - parsing, migration,
+types, dependencies, tests, performance, error handling, joins - and the test of whether you did it
+right is the same in all of them: **the phase-2 column must be a list you can hand to someone.**
+
+The argument that makes it more than style advice, and the part I would keep if only one paragraph
+survived: **an accommodation built in advance is indistinguishable from a requirement.** Six months
+on nobody can tell whether the tolerance was necessary or merely precautionary, so nobody removes
+it and nobody trusts the strict path either. And the residual becomes unmeasurable - if the
+fallback absorbs the hard cases you never learn how many there were, and *how many* is the single
+most useful number the task can produce. It exists only in the gap between phase 1 and phase 2.
+
+Three bypasses are named so they can be called out: **pre-emptive tolerance** (writing the fallback
+before the strict version has ever run), **the absorbing fallback** (strict -> loose -> looser where
+the output records the value but not which branch produced it), and **the silent phase-merge**
+(doing phase 2 in your head so the residual never becomes a list).
+
+Incident: a similarity fallback written so a name lookup would "work". It did - every row got a
+value, nothing raised, totals reconciled - and the strict pass was never run, so the residual was
+never measured. Years later the strict pass found ~154 rows per year landing on the wrong entity,
+totals silently inflated where a correct row also arrived, and a sibling consumer placing 20% of
+its reference locations through the same fallback with no guard. **The strict pass would have been
+harder on day one and correct ever since.**
+
+Rules 40 -> 41; links resolve; sanitise scan clean.
+
 ## 2026-08-19 (eighth) - off-cycle, user direction
 
 Harvested **1 rule**: `rules/data-engineering/exact-match-on-a-complete-key.md`.
