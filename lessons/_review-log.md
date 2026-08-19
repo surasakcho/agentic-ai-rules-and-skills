@@ -10,6 +10,33 @@ public one — see [sanitise-before-sharing](../rules/agent-workflow/sanitise-be
 
 ---
 
+## 2026-08-19 · off-cycle, triggered by a silent ingest failure
+
+Harvested **1 new rule** and **strengthened 1 existing** — deliberately not two new rules.
+
+**New:** `rules/data-engineering/inspect-what-you-downloaded.md`. An ingest pulled 693 files
+from a government portal; three came back as ~1.3 KB stubs against a median of 83,933 bytes,
+served with a normal successful HTTP response. Single header line, no detail rows, name field
+mojibaked. Nothing failed — saved, cached, marked fetched, parsed to zero rows, skipped. Two
+entire regions lost a year of a demographic block (102 units). A third stub had caused no
+damage purely by luck. **The screen that found all three is one sort by file size**, never run
+in twelve months of ingests. The rule's core claim: the check is not "did the download succeed"
+but "is this the data", and the strongest version counts *records extracted*, not bytes.
+
+**Strengthened:** `completeness-checking.md`. The requester asked for a second rule on
+output-vs-input completeness, but that rule already covered detection and already said not to
+accept a mismatch as a limitation. Adding a second would have drifted. What it genuinely
+lacked, and now has: the **three-outcome decision procedure** after a mismatch (resolved /
+explained-and-enumerated / open-with-a-route, and the decision logged), and **Incident D** —
+a 3.8% aggregate gap that looked genuine (missing units were tiny islands, median area 1,023
+vs 27,087) until partitioned by group × period, at which point 102 of 753 turned out to be two
+entire urban regions at 100% in one period. **The aggregate percentage concealed it
+completely.** Cross-linked both directions.
+
+Rules 30 → 31; links resolve; sanitise scan clean, plus one judgement the scan cannot make —
+a mojibake sample was in the source project's own script and was replaced with a
+language-neutral one, since it hinted at the domain.
+
 ## 2026-08-18 · off-cycle, triggered by a reader finding an omitted set member
 
 Harvested **1 rule**: `rules/analytics/summaries-must-carry-the-whole-set.md`.
