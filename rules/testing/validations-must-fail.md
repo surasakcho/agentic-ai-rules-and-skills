@@ -1,6 +1,7 @@
 # A validation you have never seen fail is untested
 
 **Task type:** testing — guards, gates, assertions, acceptance checks.
+**Related:** [`name-the-blind-spot`](../analytics/name-the-blind-spot.md) — the mirror case. This rule is about a check that never fires; that one is about a check that *does* fire, returns a plausible number, and is believed.
 
 ---
 

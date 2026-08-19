@@ -10,6 +10,40 @@ public one — see [sanitise-before-sharing](../rules/agent-workflow/sanitise-be
 
 ---
 
+## 2026-08-19 (fourth) · off-cycle, from a retrospective on how four defects hid
+
+Harvested **1 rule**: `rules/analytics/name-the-blind-spot.md`.
+
+Asked how a defect had stayed hidden and what found it, a sweep turned up **four** instances of
+one shape in a single project — three from that day, one already written up five days earlier and
+never generalised:
+
+| the check reported | the truth |
+|---|---|
+| "0 corrupt values in any text column" | 164 rows corrupt; the guard tested one codec's byte signature and the other codec's corruption lands inside the target script's own Unicode block |
+| "0 of 77 groups match; source B is 1.7-19.1% low" | 77/77 match, max difference 0; it summed 204 detail columns against a total that also covered 12 columns outside them |
+| "14,786 name mismatches" | approximately none; the join key had been decoded with the wrong codec |
+| "coverage +951" | +951 filled AND 12 silently lost |
+
+The rule: **every check has a null space — the set of data changes that leave its output
+unchanged — and you state it before you read the result.** A check's output is a statement about
+the *subject*; it has no vocabulary for its own failure, so a broken instrument emits a confident
+claim about the data rather than an error. In three of the four the wrong answer arrived with a
+corroborating story, and in one the accusation was even partly true.
+
+The observation that makes it bite, and the reason it is a separate rule rather than a line in
+`validations-must-fail`: **implausibility is the detector we reach for by default and it is
+anti-correlated with harm.** Sorting the four by damage inverts the detection table — the two
+caught by "that number looks wrong" were harmless checks that cost hours, while the two that
+reached or nearly reached shipped data were found by an outside party and by a structural
+partition. A defect big enough to look wrong is a defect too small to ship.
+
+Cross-linked with `validations-must-fail` in both directions — that rule covers a guard that never
+fires, this one a guard that fires, returns a number, and is trusted. Honest about coverage: no
+single guard catches all four, and the write-up says which catches which.
+
+Rules 32 -> 33; links resolve; sanitise scan clean.
+
 ## 2026-08-19 (third) · off-cycle, from a defect introduced while fixing a defect
 
 Harvested **1 rule**: `rules/analytics/a-delta-is-three-numbers.md`.
