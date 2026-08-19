@@ -10,6 +10,23 @@ public one — see [sanitise-before-sharing](../rules/agent-workflow/sanitise-be
 
 ---
 
+## 2026-08-19 (later) · correction to the same day's pass
+
+`inspect-what-you-downloaded.md` was published with an incident that said three stub files had
+been skipped **silently**. Verified against the source project's code the same day: they were
+not. A row-count guard rejected them, the build raised unless the region-period was on an
+evidence-bearing allowlist, and the whole case was documented by name in the function's
+docstring. The claim had been inferred from the *data* — clustered nulls, files on disk —
+without reading the code that handled them.
+
+**The guidance was unaffected and stands**; the incident was rewritten to describe a guard that
+worked, which is the more useful story: it now carries the row-count-not-byte-size point, the
+earlier version of that check that threw away 15 good regions by sniffing for `404` inside
+numeric data, and the third stub that surfaced only after the hard failure was added.
+
+Rule count unchanged at 31. Logged rather than quietly amended, because a rule whose incident
+turns out to be wrong is exactly the thing this repo must not accumulate.
+
 ## 2026-08-19 · off-cycle, triggered by a silent ingest failure
 
 Harvested **1 new rule** and **strengthened 1 existing** — deliberately not two new rules.
