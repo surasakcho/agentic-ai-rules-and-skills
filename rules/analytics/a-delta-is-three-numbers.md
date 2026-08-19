@@ -79,6 +79,21 @@ It was not safely invertible, because **6 of its target values were themselves l
 in the frame being joined to. Reversing the map made those ambiguous, and the ambiguity was
 resolved silently in the wrong direction.
 
+**The table was not a rename map, which is what made the inversion look harmless.** The frame
+carried two kinds of polygon — the administrative units themselves, and municipality polygons
+overlaid on them — each with its own key, and the crosswalk recorded which unit each municipality
+belonged to. Both keys in every pair were real frame rows, and **the upstream source published
+only one of them**. So reversing the map moved each record off the unit the source names directly
+and onto the municipality it never names: the municipality filled, the genuine unit emptied, and
+the two cancelled to a net of zero.
+
+**Carry both counts, because they answer different questions.** Six targets intersect the key
+space — that is what the guard returns, and the number to assert on. Only **five** could actually
+mis-seat: the sixth mapped to *itself*, a leftover identity row, so reversing it is a no-op. The
+cheap test deliberately over-counts, and that is correct; what is not correct is quietly reporting
+the smaller number as if it were the guard's. Here the write-up drifted to "five" and stayed wrong
+for a day.
+
 **Uniqueness on both columns does not make a mapping invertible.** The test is whether the
 codomain intersects the domain:
 
