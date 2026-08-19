@@ -73,6 +73,7 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [data-engineering](rules/data-engineering/) | [A successful download is not data](rules/data-engineering/inspect-what-you-downloaded.md) | Three 1.3 KB stubs served with HTTP 200, cached as good, costing two regions a whole year |
 | [analytics](rules/analytics/) | [A delta is three numbers](rules/analytics/a-delta-is-three-numbers.md) | `+951` reported identically with and without a bug that blanked twelve rows |
 | [analytics](rules/analytics/) | [Name the check's blind spot](rules/analytics/name-the-blind-spot.md) | A codec guard testing the wrong byte range certified 164 corrupt rows as clean |
+| [agent-workflow](rules/agent-workflow/) | [Nothing leaves git without permission](rules/agent-workflow/nothing-leaves-git-without-permission.md) | A file gitignored as "build output" was the user's only copy of a GUI fix; an unasked verification rebuild destroyed it |
 
 ## Lessons
 
