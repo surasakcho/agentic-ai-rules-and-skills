@@ -10,6 +10,38 @@ public one — see [sanitise-before-sharing](../rules/agent-workflow/sanitise-be
 
 ---
 
+## 2026-08-19 (sixth) - off-cycle, two rules given directly by the user
+
+Harvested **2 rules**, both `agent-workflow`, both from the same session as the previous entry and
+both stated by the user rather than inferred by me.
+
+**`unexpected-means-stop-and-propose.md`** - do the straightforward thing; when the outcome is not
+what you expected, stop, report, propose, implement nothing. The tell it names is the sentence
+**"I noticed X, so I did Y"** - which reads as diligence and is a decision taken on the user's
+behalf, recorded as an observation. The incident: a diff showed 12 values coming back blank, I
+formed a theory on the spot, implemented a conditional, verified the 12 returned, and shipped it
+inside a defect fix that read as thorough. Every part of the theory was wrong, and the check that
+would have collapsed it was one command, run four messages later only after the user rejected the
+explanation.
+
+Most of the work in this one is the **boundary against `close-your-own-gaps`**, which says the
+opposite in its own domain. The test that separates them: *does the resolution change what the
+user receives?* A gap in your own rigour has exactly one right answer, so act. A choice between
+defensible readings of the data has more than one, so propose. Without that section the two rules
+read as contradictory and the weaker one gets ignored.
+
+**`watch-the-context-budget.md`** - track context continuously, prompt to compact at 40%, state
+the number, never compact unilaterally. It replaces the common "suggest compacting after 20-50
+prompts" heuristic, which is unusable because turns and context barely correlate: one command in a
+large repo can cost more than thirty conversational turns, so a turn-count trigger fires latest in
+exactly the tool-heavy sessions that need it earliest. Includes the reason 40% and not 90% (a
+compaction near the ceiling happens under pressure and mid-task rather than at a boundary), and
+the failure mode it prevents: **degradation is silent and feels exactly like ordinary
+confidence** - a model reasoning from a summary experiences recollection, not a gap, so it answers
+fluently without re-reading. Same incident, viewed from the other side.
+
+Rules 36 -> 38; links resolve; sanitise scan clean.
+
 ## 2026-08-19 (fifth) - off-cycle, user instruction after a four-message wrong diagnosis
 
 Harvested **1 rule**: `rules/data-engineering/never-patch-a-key-to-force-a-join.md`.
