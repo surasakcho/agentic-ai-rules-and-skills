@@ -10,6 +10,41 @@ public one — see [sanitise-before-sharing](../rules/agent-workflow/sanitise-be
 
 ---
 
+## 2026-08-19 (eighth) - off-cycle, user direction
+
+Harvested **1 rule**: `rules/data-engineering/exact-match-on-a-complete-key.md`.
+
+**Join only on exact equality of a complete key** - no similarity threshold, no fuzzy ratio, no
+startswith, no substring, no cascading fallback - **and every unmatched row is a deliverable**,
+collected and returned with a proposed decision, never dropped and never approximated.
+
+The rule exists for its second half, which is the part I would not have found by reasoning. The
+obvious failure is a loosened comparison: a similarity ratio cannot distinguish a typo from a
+different place whose name contains this one, both score high, and no cutoff separates them because
+the ratio is not measuring the thing you care about.
+
+**The non-obvious failure is an incomplete key, and it survives every fuzzy-matching fix.** Audited
+over eight years, ~154 rows per year seated on the wrong administrative unit - **only 11 from fuzzy
+matching, 142 from EXACT matches.** The candidate pool was keyed on (region, unit_name) while the
+source's own district column sat parsed and unused, and **133 of 7,108 pairs in the registry span
+2-5 districts**; the resolver returned `candidates[0]`. Exactness does not save an under-specified
+key, and it is more dangerous than fuzziness because it looks rigorous - the log says `exact`, the
+reviewer relaxes, and every guard aimed at the fuzzy path is irrelevant to it. Prove key uniqueness
+in the reference with one groupby before trusting any exact match.
+
+The rule also fixes a taxonomy for the unmatched list, whose point is the label
+`AMBIGUOUS_NEEDS_USER`: everything else can be settled with evidence, that one may not be, and
+answering it silently was the fuzzy matcher's entire purpose.
+
+Two guards worth naming: a computed match-method label that is **printed and discarded** is a match
+quality nobody can audit; and a guard added in the *caller* protects that caller only - one project
+had a length guard in one consumer and not in the two siblings calling the same helper.
+
+Cost: 357 published rows and 1.38% of the money on the wrong unit, with 128 units also receiving
+their correct row so the two were **summed** and the total silently inflated.
+
+Rules 39 -> 40; links resolve; sanitise scan clean.
+
 ## 2026-08-19 (seventh) - off-cycle, user instruction on being shown the evidence
 
 Harvested **1 rule**: `rules/data-engineering/never-reseat-a-value-silently.md`.
