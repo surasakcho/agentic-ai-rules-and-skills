@@ -67,6 +67,7 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [agent-workflow](rules/agent-workflow/) | ["I can't" is a task](rules/agent-workflow/cannot-is-a-task.md) | A dataset declared unobtainable while an unused tool sat in the session |
 | [agent-workflow](rules/agent-workflow/) | [Read the manual first](rules/agent-workflow/read-the-manual-first.md) | A new download route invented while the written procedure sat unread |
 | [agent-workflow](rules/agent-workflow/) | [Shut up and work](rules/agent-workflow/shut-up-and-work.md) | Padding that let a correctly-scoped claim read as an unscoped one |
+| [agent-workflow](rules/agent-workflow/) | [Default to silence](rules/agent-workflow/default-to-silence.md) | Six long process reports in a day on one four-word decision, burying the three questions only the user could answer |
 | [agent-workflow](rules/agent-workflow/) | [Characterise the object once](rules/agent-workflow/characterise-once-not-per-question.md) | Five findings surfaced by follow-up questions, none by the investigation |
 | [agent-workflow](rules/agent-workflow/) | [Known blast radius demands a scoped fix everywhere](rules/agent-workflow/known-blast-radius-demands-scoped-fix-everywhere.md) | Two-plus hours recomputing 99.93% of a dataset already known to be unchanged |
 | [agent-workflow](rules/agent-workflow/) | ["Almost done" needs a denominator](rules/agent-workflow/eta-needs-a-denominator.md) | "Not worth interrupting" said about a job that was 20% done, not checked until asked |
