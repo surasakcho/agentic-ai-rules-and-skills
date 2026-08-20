@@ -84,6 +84,7 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [agent-workflow](rules/agent-workflow/) | [Record your thinking before complex work](rules/agent-workflow/record-thinking-before-complex-work.md) | Proactive practice, no incident yet — added on user instruction |
 | [agent-workflow](rules/agent-workflow/) | [Phrase a narrow rule as a prohibition](rules/agent-workflow/phrase-narrow-rules-as-prohibitions.md) | Proactive practice, no incident yet — added on user instruction |
 | [agent-workflow](rules/agent-workflow/) | [Propose the XML schema before strict output](rules/agent-workflow/propose-xml-schema-before-strict-output.md) | Proactive practice, no incident yet — added on user instruction |
+| [agent-workflow](rules/agent-workflow/) | [Grill for reasoning before complex tasks](rules/agent-workflow/grill-for-reasoning-before-complex-tasks.md) | Proactive practice, no incident yet — added on user instruction |
 | [coding](rules/coding/) | [Ask before overwriting uncommitted work](rules/coding/ask-before-overwriting-uncommitted-work.md) | A build re-run "to verify" overwrote an untracked file; `git status` on it would have printed `??` |
 
 ## Lessons
