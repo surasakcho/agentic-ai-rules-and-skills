@@ -54,6 +54,7 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [data-engineering](rules/data-engineering/) | [Agree the output contract first](rules/data-engineering/agree-the-output-contract-first.md) | Four unstated assumptions about an output table's shape; three became remediation commits after the work was called done |
 | [coding](rules/coding/) | [Surgical, verified change](rules/coding/surgical-verified-change.md) | Fixes that introduced more defects than they closed |
 | [coding](rules/coding/) | [Scratch code lives outside the repo](rules/coding/scratch-code-lives-outside-the-repo.md) | 150+ undeleted probe scripts, none of them the reusable tool the task actually needed |
+| [coding](rules/coding/) | [Sanity-check test cases, hand-traced](rules/coding/sanity-check-test-cases.md) | Proactive practice, no incident yet — added on user instruction |
 | [agent-workflow](rules/agent-workflow/) | [Delegation and supervision](rules/agent-workflow/delegation-and-supervision.md) | Agent findings taken at face value and later disproved |
 | [agent-workflow](rules/agent-workflow/) | [Unexpected means stop and propose](rules/agent-workflow/unexpected-means-stop-and-propose.md) | "I noticed X, so I did Y" -- a wrong fix shipped because a one-command check was never run |
 | [agent-workflow](rules/agent-workflow/) | [Strict first, then the residual](rules/agent-workflow/strict-first-then-the-residual.md) | A fallback built before the strict pass ever ran, so nobody learned how big the problem was |
