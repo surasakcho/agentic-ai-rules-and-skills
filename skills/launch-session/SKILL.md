@@ -67,9 +67,17 @@ If the shell predates the `docker` group, wrap the `docker exec` in `sg docker -
 
 Three details, each of which has cost a real session:
 
-- **`--continue`** — a restart must resume the same conversation, not a blank one. It
-  exits 0 with no prior conversation, so there is no first-run special case. Without it
-  a crash silently loses the work.
+- **`--continue`, but only when there is something to continue** — a restart must
+  resume the same conversation, not a blank one. **It does NOT degrade gracefully:**
+  with no prior conversation, interactive `claude --continue` prints
+  `No conversation found to continue` and exits, which a restart loop then retries
+  forever. Decide at launch time by checking for
+  `$HOME/.claude/projects/<workdir with / replaced by ->/*.jsonl` — inside the
+  container for a container session, on the host for a host one:
+  ```bash
+  CONT=; ls "$HOME/.claude/projects/<slug>"/*.jsonl >/dev/null 2>&1 && CONT=--continue
+  claude $CONT --model <model> --remote-control '<rc>'
+  ```
 - **`--remote-control '<rc>'`** — without it Claude Code still registers, under an
   auto-generated name like `witty-hare`. The session then runs fine and is unfindable
   from a phone, with no error anywhere.
