@@ -4,7 +4,7 @@
 **Related:** [`report-both-sides-of-a-comparison`](report-both-sides-of-a-comparison.md) — a
 comparison has two results; this is the same discipline applied across *retellings* rather than
 across *sides*. [`review-every-output`](review-every-output.md) — the compressed artifacts are
-the ones to review. [`shut-up-and-work`](../agent-workflow/shut-up-and-work.md) — terseness is
+the ones to review. [`shut-up-and-work`](../how-we-work/shut-up-and-work.md) — terseness is
 right; dropping a set member is not the way to get it.
 
 ---

@@ -24,7 +24,7 @@ def git(cwd, *args):
 def build_shared(root: Path):
     """A miniature of the shared repo, as a real git repo so --shared can be pinned."""
     for cat in ("analytics", "testing", "coding", "research", "data-engineering",
-                "operations", "agent-workflow"):
+                "how-we-work"):
         d = root / "rules" / cat
         d.mkdir(parents=True)
         (d / f"{cat}-rule.md").write_text(f"# {cat}\n\n## The incident\n\nCost: real.\n",
@@ -78,16 +78,14 @@ def main():
             "does NOT select research (no evidence)": "research" not in sel,
             "does NOT select data-engineering (no evidence)": "data-engineering" not in sel,
             "records a pin": bool(data["sha"]),
-            # The target repo has no scheduler, no .claude/ and no CLAUDE.md yet -- so these
-            # two are adopted on the mandatory rule alone. If MANDATORY is ever emptied or a
-            # detector is bolted onto these categories, both of these go red.
-            "MANDATORY: operations adopted with zero evidence": "operations" in sel,
-            "MANDATORY: agent-workflow adopted before any CLAUDE.md exists":
-                "agent-workflow" in sel,
+            # The target repo has no scheduler, no .claude/ and no CLAUDE.md -- how-we-work is
+            # adopted on the mandatory rule alone. Empty MANDATORY, or bolt a detector onto
+            # this category, and these go red.
+            "MANDATORY: how-we-work adopted with zero evidence": "how-we-work" in sel,
             # .get(), not [] -- if MANDATORY is emptied this must report a red check, not raise
             # a KeyError that aborts the run before the other checks are even reached.
             "MANDATORY marker is the reason recorded, not a detector hit":
-                data["selected"].get("operations") == ["mandatory for every project"],
+                data["selected"].get("how-we-work") == ["mandatory for every project"],
         }
 
         # --check must FAIL before anything is written.
@@ -99,11 +97,10 @@ def main():
         checks["--write creates the block"] = "shared-lessons:begin" in cm
         checks["links point at the shared repo"] = "rules/analytics/analytics-rule.md" in cm
         checks["does not link an unselected category"] = "rules/research/" not in cm
-        checks["mandatory categories are linked"] = ("rules/operations/" in cm
-                                                     and "rules/agent-workflow/" in cm)
-        checks["mandatory categories are listed FIRST"] = (
-            "**operations**" in cm and "**analytics**" in cm
-            and cm.index("**operations**") < cm.index("**analytics**"))
+        checks["the mandatory category is linked"] = "rules/how-we-work/" in cm
+        checks["the mandatory category is listed FIRST"] = (
+            "**how-we-work**" in cm and "**analytics**" in cm
+            and cm.index("**how-we-work**") < cm.index("**analytics**"))
 
         code, _ = run(target, shared, "--check")
         checks["--check passes once pinned"] = code == 0

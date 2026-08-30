@@ -30,31 +30,29 @@ END = "<!-- shared-lessons:end -->"
 # Each category is selected only on evidence. A rule nobody needs is noise, and noise is how
 # a CLAUDE.md stops being read.
 #
-# EXCEPT the mandatory ones. A category in MANDATORY is adopted by every project regardless of
-# what the detectors find, and is listed first.
+# EXCEPT how-we-work. A category in MANDATORY is adopted by every project regardless of what
+# the detectors find, and is listed first.
 #
 # The evidence rule is right for DOMAIN categories -- analytics, data-engineering, research,
-# testing, coding all describe what a repo produces, and a repo that produces none of them
-# genuinely does not need those rules. The mandatory two are not domains. They are the two
-# constants underneath every project: HOW THE WORK IS DONE and HOW IT RUNS.
+# testing, coding all describe what a repo PRODUCES, and a repo that produces none of them
+# genuinely does not need those rules. `how-we-work` is not a domain. It is the constant
+# underneath every project: how the work is conducted, and how what it leaves behind behaves
+# once nobody is watching. Two independent reasons it can never be evidence-selected:
 #
-#   operations     -- the failure class here is a job that keeps reporting success after it
-#                     stopped working. It does not announce itself in a dependency list or a
-#                     directory name. The first cron entry, retry loop or background task
-#                     arrives long after the repo was characterised, and by then retrieval has
-#                     already run and concluded the category was irrelevant. Evidence-based
-#                     selection structurally cannot catch it.
-#   agent-workflow -- detecting this by globbing for CLAUDE.md is circular: this script WRITES
-#                     to CLAUDE.md, and only runs because an agent is working the repo. The
-#                     proxy also fails precisely where it matters most -- a fresh repo with no
-#                     CLAUDE.md yet is denied the rules, including the one on how to structure
-#                     a new CLAUDE.md.
-MANDATORY = ("operations", "agent-workflow")
+#   - The operational half leaves nothing to detect. A job that keeps reporting success after
+#     it stopped working does not announce itself in a dependency list or a directory name, and
+#     the first cron entry, retry loop or background task arrives long AFTER the repo was
+#     characterised -- by which time retrieval has already run and concluded it was irrelevant.
+#   - The conduct half is circular to detect. Globbing for CLAUDE.md to decide whether agents
+#     work here is checking for evidence of something the act of running this script already
+#     proves -- and it failed precisely where it mattered most, denying a fresh repo with no
+#     CLAUDE.md yet the rule on how to structure a new CLAUDE.md.
+MANDATORY = ("how-we-work",)
 
 DETECTORS = {
-    "operations": {
-        "why": "every project eventually runs something unattended, and a job that keeps "
-               "reporting success after it stopped working leaves no trace in the repo to detect",
+    "how-we-work": {
+        "why": "every project has conduct and operation — how the work is done, and how what "
+               "it leaves behind behaves once nobody is watching",
         "deps": (),
         "paths": (),
         "globs": (),
@@ -88,13 +86,6 @@ DETECTORS = {
         "deps": (),
         "paths": ("src", "lib", "app", "scripts", "pkg"),
         "globs": ("**/*.py", "**/*.ts", "**/*.js", "**/*.go", "**/*.rs", "**/*.java"),
-    },
-    "agent-workflow": {
-        "why": "this file is maintained by AI agents — which running this retrieval at all "
-               "already proves, so detecting it by globbing for CLAUDE.md would be circular",
-        "deps": (),
-        "paths": (".claude", ".agents"),
-        "globs": ("CLAUDE.md", "AGENTS.md", "GEMINI.md"),
     },
 }
 SKIP = {".git", "node_modules", ".venv", "venv", "__pycache__", "dist", "build", ".next",

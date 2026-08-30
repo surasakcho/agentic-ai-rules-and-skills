@@ -2,7 +2,7 @@
 
 **Task type:** coding — any write that destroys the existing contents of a file that is
 already there.
-**Related:** [`nothing-leaves-git-without-permission`](../agent-workflow/nothing-leaves-git-without-permission.md)
+**Related:** [`nothing-leaves-git-without-permission`](../how-we-work/nothing-leaves-git-without-permission.md)
 is why the file was unprotected in the first place; this is the last checkpoint before the
 damage. [`surgical-verified-change`](surgical-verified-change.md) keeps a change small once
 you are allowed to make it.

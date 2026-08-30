@@ -1,2 +1,3 @@
 # Machine-specific values (lib/skillconfig.py). Must never be committed.
 .env
+__pycache__/

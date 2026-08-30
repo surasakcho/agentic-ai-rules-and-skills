@@ -4,7 +4,7 @@
 *which row* a value lands on.
 **Related:** [`never-patch-a-key-to-force-a-join`](never-patch-a-key-to-force-a-join.md) — says
 don't build the remap. This says: when one exists anyway, it must be visible.
-[`unexpected-means-stop-and-propose`](../agent-workflow/unexpected-means-stop-and-propose.md) —
+[`unexpected-means-stop-and-propose`](../how-we-work/unexpected-means-stop-and-propose.md) —
 fires on surprise; **this one fires when nothing is surprising at all**, which is the gap it
 fills.
 [`a-delta-is-three-numbers`](../analytics/a-delta-is-three-numbers.md) — a reseat is a loss and a

@@ -66,7 +66,7 @@ Whenever the honest answer is *"green"*, the signal is decoration. This is the s
 behind a guard that never fires, a health ping emitted before the fallible step, a drill that
 exercises a retired code path, and a status field set from intent rather than outcome:
 **the success signal is not attached to the thing it reports.** See
-[`silence-must-be-the-alarm`](../operations/silence-must-be-the-alarm.md) for the unattended
+[`silence-must-be-the-alarm`](../how-we-work/silence-must-be-the-alarm.md) for the unattended
 case, where the answer is "green" for as long as nobody happens to look.
 
 ## When an invariant fails at scale, suspect the invariant

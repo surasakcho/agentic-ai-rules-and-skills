@@ -3,7 +3,7 @@
 **Task type:** coding — writing or changing logic, before calling it done.
 **Related:** [`surgical-verified-change`](surgical-verified-change.md) — turning "add
 validation" into "write tests, then make them pass" is the same discipline this rule specifies
-further. [`self-validation-loop-after-generating`](../agent-workflow/self-validation-loop-after-generating.md)
+further. [`self-validation-loop-after-generating`](../how-we-work/self-validation-loop-after-generating.md)
 — that loop checks the *output*; this rule checks the *logic* the output came from.
 
 ---
@@ -42,4 +42,4 @@ the automated check agree with each other but both disagree with reality.
 
 *Earned from:* proactive practice, no incident yet — added on user instruction rather than
 extracted from a failure, consistent with
-[`record-thinking-before-complex-work`](../agent-workflow/record-thinking-before-complex-work.md).
+[`record-thinking-before-complex-work`](../how-we-work/record-thinking-before-complex-work.md).

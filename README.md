@@ -12,21 +12,28 @@ just opinion, and there is enough of that already.
 ## Layout
 
 ```
-skills/           every skill — ~/.claude/skills points HERE, so discovery stays flat
-  lib/              helpers skills call (skillconfig.py); inside skills/ deliberately,
-                    because `..` from a junction escapes the link, not the repo
-rules/            portable rules, by task type
+rules/            portable rules
+  how-we-work/      MANDATORY — every project, every session. How the work is conducted,
+                    and how what it leaves behind behaves once nobody is watching.
   analytics/        producing figures, tables and reported numbers
   research/         reproducibility, logging, provenance
   coding/           writing and changing code
   testing/          validations, gates and checkers
   data-engineering/ ingestion, encoding, completeness
-  operations/       keeping something correct while it runs unattended
-  agent-workflow/   delegating to and supervising AI agents
-skills/           executable Claude Code skills (rules that can run)
+skills/           executable Claude Code skills (rules that can run) —
+                  ~/.claude/skills points HERE, so discovery stays flat
+  lib/              helpers skills call (skillconfig.py); inside skills/ deliberately,
+                    because `..` from a junction escapes the link, not the repo
 lessons/          incident write-ups the rules were extracted from
 CADENCE.md        how this repo stays alive
 ```
+
+**`how-we-work/` is first because it is the only category nobody may opt out of.** The other five
+are *domains* — a repo that produces no figures genuinely does not need the analytics rules, and
+selecting it anyway is the noise that stops a `CLAUDE.md` being read. `how-we-work/` is not a
+domain. It covers conduct and operation, which every project has, so evidence-based selection can
+only ever fail it: the first cron entry, the first background task, the first delegation all
+arrive long after the repo was characterised.
 
 ## The ranking that governs everything here
 
@@ -43,6 +50,34 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 
 | Category | Rule | Earned from |
 |---|---|---|
+| [how-we-work](rules/how-we-work/) | [Derive from state, not invocation count](rules/how-we-work/derive-from-state-not-invocation-count.md) | An accrual job crediting a flat 8h per run because it was scheduled every 8h — short on every missed run |
+| [how-we-work](rules/how-we-work/) | [Silence must be the alarm](rules/how-we-work/silence-must-be-the-alarm.md) | A nightly backup that failed three nights running, logged its own remedy each time, and was found by accident |
+| [how-we-work](rules/how-we-work/) | [One writer per shared artifact](rules/how-we-work/one-writer-per-shared-artifact.md) | Four uncoordinated-writer defects in one system; one rewrote a config backup backwards, 226 lines → 174 |
+| [how-we-work](rules/how-we-work/) | [Delegation and supervision](rules/how-we-work/delegation-and-supervision.md) | Agent findings taken at face value and later disproved |
+| [how-we-work](rules/how-we-work/) | [Unexpected means stop and propose](rules/how-we-work/unexpected-means-stop-and-propose.md) | "I noticed X, so I did Y" -- a wrong fix shipped because a one-command check was never run |
+| [how-we-work](rules/how-we-work/) | [Strict first, then the residual](rules/how-we-work/strict-first-then-the-residual.md) | A fallback built before the strict pass ever ran, so nobody learned how big the problem was |
+| [how-we-work](rules/how-we-work/) | [Watch the context budget](rules/how-we-work/watch-the-context-budget.md) | Post-compaction, four messages spent defending a table that had never been re-read |
+| [how-we-work](rules/how-we-work/) | [Publish lessons weekly](rules/how-we-work/publish-lessons-weekly.md) | Eleven reusable lessons that would have stayed in one repo |
+| [how-we-work](rules/how-we-work/) | [Retrieve lessons weekly](rules/how-we-work/retrieve-lessons-weekly.md) | Nine rules published outward, the retrieval never once run inward |
+| [how-we-work](rules/how-we-work/) | [Sanitise before sharing](rules/how-we-work/sanitise-before-sharing.md) | This repo's own seed pass published a collaborator's name and unpublished results |
+| [how-we-work](rules/how-we-work/) | [Prompt for machine-specific values](rules/how-we-work/prompt-and-store-config.md) | Four skills hardcoding a username and another private repo's name |
+| [how-we-work](rules/how-we-work/) | ["I can't" is a task](rules/how-we-work/cannot-is-a-task.md) | A dataset declared unobtainable while an unused tool sat in the session |
+| [how-we-work](rules/how-we-work/) | [Read the manual first](rules/how-we-work/read-the-manual-first.md) | A new download route invented while the written procedure sat unread |
+| [how-we-work](rules/how-we-work/) | [Shut up and work](rules/how-we-work/shut-up-and-work.md) | Padding that let a correctly-scoped claim read as an unscoped one |
+| [how-we-work](rules/how-we-work/) | [Default to silence](rules/how-we-work/default-to-silence.md) | Six long process reports in a day on one four-word decision, burying the three questions only the user could answer |
+| [how-we-work](rules/how-we-work/) | [Characterise the object once](rules/how-we-work/characterise-once-not-per-question.md) | Five findings surfaced by follow-up questions, none by the investigation |
+| [how-we-work](rules/how-we-work/) | [Known blast radius demands a scoped fix everywhere](rules/how-we-work/known-blast-radius-demands-scoped-fix-everywhere.md) | Two-plus hours recomputing 99.93% of a dataset already known to be unchanged |
+| [how-we-work](rules/how-we-work/) | [A correction is not a control unless something can fail it](rules/how-we-work/a-correction-is-not-a-control.md) | Twelve retractions, zero changes of direction — and the anti-drift instruments had all drifted |
+| [how-we-work](rules/how-we-work/) | [Escalate the blocker before polishing everything around it](rules/how-we-work/escalate-the-blocker-before-polishing-the-rest.md) | Nine review rounds refining the half that was never the constraint, at 4× the cost of doing the thing |
+| [how-we-work](rules/how-we-work/) | [A finding is scoped to what you checked](rules/how-we-work/a-finding-is-scoped-to-what-you-checked.md) | A verified omission in one model, written up as "absent from every model" and applied to a second that already carried it — a published double-count |
+| [how-we-work](rules/how-we-work/) | ["Almost done" needs a denominator](rules/how-we-work/eta-needs-a-denominator.md) | "Not worth interrupting" said about a job that was 20% done, not checked until asked |
+| [how-we-work](rules/how-we-work/) | [Nothing leaves git without permission](rules/how-we-work/nothing-leaves-git-without-permission.md) | A file gitignored as "build output" was the user's only copy of a GUI fix; an unasked verification rebuild destroyed it |
+| [how-we-work](rules/how-we-work/) | [Record your thinking before complex work](rules/how-we-work/record-thinking-before-complex-work.md) | Proactive practice, no incident yet — added on user instruction |
+| [how-we-work](rules/how-we-work/) | [Phrase a narrow rule as a prohibition](rules/how-we-work/phrase-narrow-rules-as-prohibitions.md) | Proactive practice, no incident yet — added on user instruction |
+| [how-we-work](rules/how-we-work/) | [Propose the XML schema before strict output](rules/how-we-work/propose-xml-schema-before-strict-output.md) | Proactive practice, no incident yet — added on user instruction |
+| [how-we-work](rules/how-we-work/) | [Grill for reasoning before complex tasks](rules/how-we-work/grill-for-reasoning-before-complex-tasks.md) | Proactive practice, no incident yet — added on user instruction |
+| [how-we-work](rules/how-we-work/) | [Structure a new project's CLAUDE.md as System / Rules / Brief](rules/how-we-work/structure-new-project-claude-md.md) | Proactive practice, no incident yet — added on user instruction |
+| [how-we-work](rules/how-we-work/) | [Run a self-validation loop after generating](rules/how-we-work/self-validation-loop-after-generating.md) | Proactive practice, no incident yet — added on user instruction |
 | [analytics](rules/analytics/) | [Review every output](rules/analytics/review-every-output.md) | Six defects found in the first fourteen figures ever examined |
 | [research](rules/research/) | [Reproducibility](rules/research/reproducibility.md) | Outputs that could not be regenerated after the source moved |
 | [research](rules/research/) | [Research and Q&A logs](rules/research/research-and-qa-logs.md) | The same dead-end source evaluated twice |
@@ -58,29 +93,8 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [coding](rules/coding/) | [Scratch code lives outside the repo](rules/coding/scratch-code-lives-outside-the-repo.md) | 150+ undeleted probe scripts, none of them the reusable tool the task actually needed |
 | [coding](rules/coding/) | [Sanity-check test cases, hand-traced](rules/coding/sanity-check-test-cases.md) | Proactive practice, no incident yet — added on user instruction |
 | [coding](rules/coding/) | [BAU artifacts are built permanent](rules/coding/bau-artifacts-are-built-permanent.md) | A live host's cron rewrite *and its rollback* both staged in a `tmpfs` scratchpad |
-| [operations](rules/operations/) | [Derive from state, not invocation count](rules/operations/derive-from-state-not-invocation-count.md) | An accrual job crediting a flat 8h per run because it was scheduled every 8h — short on every missed run |
-| [operations](rules/operations/) | [Silence must be the alarm](rules/operations/silence-must-be-the-alarm.md) | A nightly backup that failed three nights running, logged its own remedy each time, and was found by accident |
-| [operations](rules/operations/) | [One writer per shared artifact](rules/operations/one-writer-per-shared-artifact.md) | Four uncoordinated-writer defects in one system; one rewrote a config backup backwards, 226 lines → 174 |
-| [agent-workflow](rules/agent-workflow/) | [Delegation and supervision](rules/agent-workflow/delegation-and-supervision.md) | Agent findings taken at face value and later disproved |
-| [agent-workflow](rules/agent-workflow/) | [Unexpected means stop and propose](rules/agent-workflow/unexpected-means-stop-and-propose.md) | "I noticed X, so I did Y" -- a wrong fix shipped because a one-command check was never run |
-| [agent-workflow](rules/agent-workflow/) | [Strict first, then the residual](rules/agent-workflow/strict-first-then-the-residual.md) | A fallback built before the strict pass ever ran, so nobody learned how big the problem was |
-| [agent-workflow](rules/agent-workflow/) | [Watch the context budget](rules/agent-workflow/watch-the-context-budget.md) | Post-compaction, four messages spent defending a table that had never been re-read |
-| [agent-workflow](rules/agent-workflow/) | [Publish lessons weekly](rules/agent-workflow/publish-lessons-weekly.md) | Eleven reusable lessons that would have stayed in one repo |
-| [agent-workflow](rules/agent-workflow/) | [Retrieve lessons weekly](rules/agent-workflow/retrieve-lessons-weekly.md) | Nine rules published outward, the retrieval never once run inward |
-| [agent-workflow](rules/agent-workflow/) | [Sanitise before sharing](rules/agent-workflow/sanitise-before-sharing.md) | This repo's own seed pass published a collaborator's name and unpublished results |
-| [agent-workflow](rules/agent-workflow/) | [Prompt for machine-specific values](rules/agent-workflow/prompt-and-store-config.md) | Four skills hardcoding a username and another private repo's name |
 | [analytics](rules/analytics/) | [Report both sides of a comparison](rules/analytics/report-both-sides-of-a-comparison.md) | A "95.51% match" whose largest residual bucket was our own defect |
 | [data-engineering](rules/data-engineering/) | [Status fields must be earned](rules/data-engineering/status-fields-must-be-earned.md) | 206 items recorded as fetched; 3 never were, and the manifest's own hashes proved it |
-| [agent-workflow](rules/agent-workflow/) | ["I can't" is a task](rules/agent-workflow/cannot-is-a-task.md) | A dataset declared unobtainable while an unused tool sat in the session |
-| [agent-workflow](rules/agent-workflow/) | [Read the manual first](rules/agent-workflow/read-the-manual-first.md) | A new download route invented while the written procedure sat unread |
-| [agent-workflow](rules/agent-workflow/) | [Shut up and work](rules/agent-workflow/shut-up-and-work.md) | Padding that let a correctly-scoped claim read as an unscoped one |
-| [agent-workflow](rules/agent-workflow/) | [Default to silence](rules/agent-workflow/default-to-silence.md) | Six long process reports in a day on one four-word decision, burying the three questions only the user could answer |
-| [agent-workflow](rules/agent-workflow/) | [Characterise the object once](rules/agent-workflow/characterise-once-not-per-question.md) | Five findings surfaced by follow-up questions, none by the investigation |
-| [agent-workflow](rules/agent-workflow/) | [Known blast radius demands a scoped fix everywhere](rules/agent-workflow/known-blast-radius-demands-scoped-fix-everywhere.md) | Two-plus hours recomputing 99.93% of a dataset already known to be unchanged |
-| [agent-workflow](rules/agent-workflow/) | [A correction is not a control unless something can fail it](rules/agent-workflow/a-correction-is-not-a-control.md) | Twelve retractions, zero changes of direction — and the anti-drift instruments had all drifted |
-| [agent-workflow](rules/agent-workflow/) | [Escalate the blocker before polishing everything around it](rules/agent-workflow/escalate-the-blocker-before-polishing-the-rest.md) | Nine review rounds refining the half that was never the constraint, at 4× the cost of doing the thing |
-| [agent-workflow](rules/agent-workflow/) | [A finding is scoped to what you checked](rules/agent-workflow/a-finding-is-scoped-to-what-you-checked.md) | A verified omission in one model, written up as "absent from every model" and applied to a second that already carried it — a published double-count |
-| [agent-workflow](rules/agent-workflow/) | ["Almost done" needs a denominator](rules/agent-workflow/eta-needs-a-denominator.md) | "Not worth interrupting" said about a job that was 20% done, not checked until asked |
 | [analytics](rules/analytics/) | [Solve the space, don't sample it](rules/analytics/solve-the-space-not-the-samples.md) | Hours of variant-testing replaced by one infeasibility certificate |
 | [data-engineering](rules/data-engineering/) | [Adjudicate with an external source](rules/data-engineering/adjudicate-with-an-external-source.md) | A repo's own comment and defect log cited as two sources for one claim |
 | [data-engineering](rules/data-engineering/) | [Never patch a key to force a join](rules/data-engineering/never-patch-a-key-to-force-a-join.md) | A hand-written crosswalk whose own code column was 1-of-21 valid against the issuing authority |
@@ -90,13 +104,6 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [data-engineering](rules/data-engineering/) | [A successful download is not data](rules/data-engineering/inspect-what-you-downloaded.md) | Three 1.3 KB stubs served with HTTP 200, cached as good, costing two regions a whole year |
 | [analytics](rules/analytics/) | [A delta is three numbers](rules/analytics/a-delta-is-three-numbers.md) | `+951` reported identically with and without a bug that blanked twelve rows |
 | [analytics](rules/analytics/) | [Name the check's blind spot](rules/analytics/name-the-blind-spot.md) | A codec guard testing the wrong byte range certified 164 corrupt rows as clean |
-| [agent-workflow](rules/agent-workflow/) | [Nothing leaves git without permission](rules/agent-workflow/nothing-leaves-git-without-permission.md) | A file gitignored as "build output" was the user's only copy of a GUI fix; an unasked verification rebuild destroyed it |
-| [agent-workflow](rules/agent-workflow/) | [Record your thinking before complex work](rules/agent-workflow/record-thinking-before-complex-work.md) | Proactive practice, no incident yet — added on user instruction |
-| [agent-workflow](rules/agent-workflow/) | [Phrase a narrow rule as a prohibition](rules/agent-workflow/phrase-narrow-rules-as-prohibitions.md) | Proactive practice, no incident yet — added on user instruction |
-| [agent-workflow](rules/agent-workflow/) | [Propose the XML schema before strict output](rules/agent-workflow/propose-xml-schema-before-strict-output.md) | Proactive practice, no incident yet — added on user instruction |
-| [agent-workflow](rules/agent-workflow/) | [Grill for reasoning before complex tasks](rules/agent-workflow/grill-for-reasoning-before-complex-tasks.md) | Proactive practice, no incident yet — added on user instruction |
-| [agent-workflow](rules/agent-workflow/) | [Structure a new project's CLAUDE.md as System / Rules / Brief](rules/agent-workflow/structure-new-project-claude-md.md) | Proactive practice, no incident yet — added on user instruction |
-| [agent-workflow](rules/agent-workflow/) | [Run a self-validation loop after generating](rules/agent-workflow/self-validation-loop-after-generating.md) | Proactive practice, no incident yet — added on user instruction |
 | [coding](rules/coding/) | [Ask before overwriting uncommitted work](rules/coding/ask-before-overwriting-uncommitted-work.md) | A build re-run "to verify" overwrote an untracked file; `git status` on it would have printed `??` |
 
 ## Lessons

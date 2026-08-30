@@ -52,7 +52,7 @@ check. `prose < checklist < test < gate`. If it can run, it goes to `skills/`.
 
 **5. Sanitise — blocking, and it happens last.** Portability and disclosure are different
 questions that feel like one. Before anything is pushed, scan for **people, places, paths and
-findings**: see [sanitise-before-sharing](rules/agent-workflow/sanitise-before-sharing.md).
+findings**: see [sanitise-before-sharing](rules/how-we-work/sanitise-before-sharing.md).
 The first three are gated by `harvest.py --check --deny …`; the fourth needs a reader.
 
 **6. Publish.** Commit and push. A weekly pass that ends on an unpushed branch has not

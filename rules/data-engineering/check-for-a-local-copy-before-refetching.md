@@ -2,9 +2,9 @@
 
 **Task type:** data engineering — any pipeline step that downloads, re-downloads, or
 regenerates an input it needs.
-**Related:** [`read-the-manual-first`](../agent-workflow/read-the-manual-first.md) — the local
+**Related:** [`read-the-manual-first`](../how-we-work/read-the-manual-first.md) — the local
 copy is usually documented; this is the specific case of not looking.
-[`eta-needs-a-denominator`](../agent-workflow/eta-needs-a-denominator.md) — a fetch you never
+[`eta-needs-a-denominator`](../how-we-work/eta-needs-a-denominator.md) — a fetch you never
 questioned is also a fetch whose size you never measured.
 
 ---

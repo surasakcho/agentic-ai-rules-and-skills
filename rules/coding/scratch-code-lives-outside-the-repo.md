@@ -4,7 +4,7 @@
 rather than to ship.
 **Related:** [`surgical-verified-change`](surgical-verified-change.md) is about changes to real
 code; this is about code that was never meant to become real code.
-[`characterise-once-not-per-question`](../agent-workflow/characterise-once-not-per-question.md)
+[`characterise-once-not-per-question`](../how-we-work/characterise-once-not-per-question.md)
 — the fix for a scoped investigation is a real, saved script; this rule is what happens to
 everything that isn't that script.
 
@@ -89,7 +89,7 @@ Before writing a script whose only purpose is to answer a question you're holdin
   reproducible — and let the temp original expire wherever it was written.
 - **If a session is about to end with scratch code sitting inside the repo tree**, that's the
   signal the rule was skipped this time, not evidence the code might be needed — per
-  [`close-your-own-gaps`](../agent-workflow/close-your-own-gaps.md), noticing this is the same
+  [`close-your-own-gaps`](../how-we-work/close-your-own-gaps.md), noticing this is the same
   turn as moving it out or deleting it.
 
 ---

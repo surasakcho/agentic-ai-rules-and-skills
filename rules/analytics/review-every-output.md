@@ -3,7 +3,7 @@
 **Task type:** analytics — producing figures, tables, or numbers quoted in prose.
 **Mechanised by:** [`skills/verify-outputs`](../../skills/verify-outputs/) (partly).
 **When you realise you skipped this:** do it now, do not ask — see
-[`close-your-own-gaps`](../agent-workflow/close-your-own-gaps.md). The failure mode this rule
+[`close-your-own-gaps`](../how-we-work/close-your-own-gaps.md). The failure mode this rule
 describes reappears one level up, as *"I only reviewed some of them"* offered to the reader as
 a caveat instead of finished.
 
