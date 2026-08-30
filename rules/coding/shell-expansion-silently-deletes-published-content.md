@@ -79,3 +79,29 @@ artifact.
 | **Grep the artifact for what must survive** — a number, a threshold, a scope | a checked count is a check; a glance is not |
 
 **Never trust a visual read of your own outgoing text.** You will read what you meant.
+
+## Verification has a lifetime — arrange it before you publish, not after
+
+Two checks are available, and they are not interchangeable:
+
+| check | strength | availability |
+|---|---|---|
+| **Canary** — a `$(...)` in the body; look for it literal in the refetched artifact | proves no expansion occurred | always |
+| **Byte-diff** — refetch the published body, `diff` it against the composed source | proves the artifact IS the source | **only while the source still exists** |
+
+The byte-diff is exact and is the one to prefer. But it depends on an artifact that scratch
+cleanup deletes, and the moment it is gone the only fallback is reading the published text and
+calling it fine — **which is precisely the worthless check this rule exists to replace.** A
+deletion leaves no trace, so a mangled body and a correct one look identical, and "I looked and
+it seemed right" is the same non-check either way.
+
+> One session's byte-diff succeeded only because its scratch files happened not to have been
+> cleaned up yet. Had they gone, it would have fallen back to a visual read and published a
+> false negative — after having correctly identified that the visual read was worthless.
+
+So the practice is not "diff afterwards". It is **keep the composed body until the artifact is
+verified, then clean up** — a decision made before publishing, not a step remembered after.
+Expect one trailing-newline difference; some hosts append one.
+
+*The canary is cheap and always there; the byte-diff is exact and perishable. Use the canary
+when you did not arrange for the other one.*
