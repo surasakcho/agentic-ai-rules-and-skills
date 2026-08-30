@@ -84,8 +84,13 @@ DETECTORS = {
     "coding": {
         "why": "contains source code that gets changed",
         "deps": (),
-        "paths": ("src", "lib", "app", "scripts", "pkg"),
-        "globs": ("**/*.py", "**/*.ts", "**/*.js", "**/*.go", "**/*.rs", "**/*.java"),
+        # bin/ and *.sh matter: an ops repo whose entire content is shell scripts is
+        # a repo that contains code, and omitting them made such repos adopt no coding
+        # rules at all -- including one whose own headline defect was a hardcoded
+        # constant, which is exactly what those rules cover.
+        "paths": ("src", "lib", "app", "scripts", "pkg", "bin"),
+        "globs": ("**/*.py", "**/*.ts", "**/*.js", "**/*.go", "**/*.rs", "**/*.java",
+                  "**/*.sh", "**/*.bash"),
     },
 }
 SKIP = {".git", "node_modules", ".venv", "venv", "__pycache__", "dist", "build", ".next",
