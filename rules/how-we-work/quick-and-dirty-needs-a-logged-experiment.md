@@ -35,6 +35,42 @@ Three obligations come with that licence, and none of them is optional:
 
 **"It works" is the trigger to start building properly, not permission to stop.**
 
+## Disposition — every artifact ends in exactly one of three states
+
+At the end of the work, **nothing is left floating.** Go through the scratch
+directory and put each artifact into one of these, explicitly:
+
+| State | What it means | What is left behind |
+|---|---|---|
+| **Promoted** | it worked and is worth keeping | permanent code in its real home, separately proved, committed |
+| **Logged** | it produced a finding but the artifact itself is not worth keeping | the finding recorded; artifact discarded |
+| **Superseded** | a permanent version now covers it | nothing; deleted |
+
+A dead end is **Logged**, not Superseded — "tried X, it does not work because Y"
+is the finding most likely to be re-derived by someone later.
+
+### Promotion is writing the permanent version — never `git add` on the probe
+
+**Do not commit the scratch directory.** It is a strong temptation at exactly this
+point: the work feels valuable, deleting it feels lossy, and committing it looks
+like preservation. It is not.
+
+- A probe is shaped by the question that was live when it was written. Committed
+  as-is, it enters the repo with no docstring, no entry point, no test, and no
+  statement of what it is for — and the next reader cannot tell it from code the
+  project depends on.
+- A scratch tree usually contains things that must never be committed at all:
+  full copies of other repositories, binary intermediates, pickles, fixtures
+  captured from a live machine.
+- The permanent version is almost never the probe with a better path. In the
+  incident below, the reusable tool was written a second time from scratch and
+  the 150 probes contributed nothing to it.
+
+**If someone asks you to "commit the scratch", the faithful reading is "make sure
+none of this work is lost" — which is served by promoting, logging and deleting,
+not by staging a temp directory.** Say what you promoted, what you logged, and
+what you deleted, so the decision is visible and reversible.
+
 ## The incident
 
 An investigation into why a pipeline's output disagreed with a reference file produced **over 150
