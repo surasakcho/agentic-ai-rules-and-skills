@@ -76,15 +76,85 @@ def run(*args, cwd=None):
                           errors="replace")
 
 
+def default_branch(shared: Path) -> str:
+    """The remote's default branch. Never assume 'main' -- ask the remote."""
+    head = run("git", "-C", str(shared), "symbolic-ref", "--short", "-q",
+               "refs/remotes/origin/HEAD").stdout.strip()
+    return head.split("/", 1)[1] if "/" in head else "main"
+
+
+def published_sha(shared: Path) -> str:
+    """The SHA to pin: the remote's, or local HEAD when there is no remote at all.
+
+    Preferring `origin/<default>` is the whole point -- a consumer must never be
+    pinned to a commit only one machine has. But a clone with NO origin (a test
+    fixture, or a deliberately local `--shared` checkout) has no published SHA, and
+    there local HEAD is the only truth available. Falling back is correct there and
+    nowhere else.
+    """
+    remote = run("git", "-C", str(shared), "rev-parse", "--short",
+                 f"origin/{default_branch(shared)}")
+    if remote.returncode == 0 and remote.stdout.strip():
+        return remote.stdout.strip()
+    return run("git", "-C", str(shared), "rev-parse", "--short", "HEAD").stdout.strip() or "HEAD"
+
+
+def sync_shared(shared: Path) -> str:
+    """Fetch, MERGE, push back -- then report the REMOTE's SHA, never the local one.
+
+    Three properties, each closing a distinct way this went wrong in practice:
+
+    1. MERGE, not `pull --ff-only`. A clone carrying local commits -- which is what
+       happens the moment someone drafts a rule in it -- could not fast-forward, so
+       the old code printed a WARNING and carried on against a silently stale
+       mirror. Merging keeps both sides.
+    2. PUSH BACK when the merge leaves us ahead. Otherwise a lesson written locally
+       is stranded in a cache directory nobody backs up, which is the opposite of
+       sharing it.
+    3. PIN FROM THE REMOTE, after the push. The old code read the SHA from local
+       HEAD, so a clone sitting on a branch pinned consumers to a commit that
+       existed only on that machine, with rule links that 404 for everyone else --
+       while both --check and --write reported success. Reading `origin/<default>`
+       makes that structurally impossible: if the push fails, the pin falls back to
+       the last genuinely published commit rather than an unreachable one.
+    """
+    branch = default_branch(shared)
+    if run("git", "-C", str(shared), "fetch", "--quiet", "origin").returncode != 0:
+        print("  WARNING: fetch failed; working from the cached copy")
+        return published_sha(shared)
+
+    cur = run("git", "-C", str(shared), "symbolic-ref", "--short", "-q", "HEAD").stdout.strip()
+    if cur != branch:
+        if run("git", "-C", str(shared), "status", "--porcelain").stdout.strip():
+            raise SystemExit(
+                f"ERROR: shared clone at {shared} is on '{cur or 'detached HEAD'}' with "
+                f"uncommitted changes.\n       Commit or stash them, then re-run.")
+        run("git", "-C", str(shared), "checkout", "--quiet", branch)
+
+    m = run("git", "-C", str(shared), "merge", "--no-edit", "--quiet", f"origin/{branch}")
+    if m.returncode != 0:
+        raise SystemExit(
+            f"ERROR: merging origin/{branch} into the shared clone conflicted.\n"
+            f"       Resolve it in {shared}, then re-run.\n"
+            f"       {m.stderr.strip().splitlines()[-1] if m.stderr.strip() else ''}")
+
+    ahead = run("git", "-C", str(shared), "rev-list", "--count",
+                f"origin/{branch}..HEAD").stdout.strip()
+    if ahead and ahead != "0":
+        print(f"  shared clone is {ahead} commit(s) ahead of origin -- pushing back")
+        if run("git", "-C", str(shared), "push", "--quiet", "origin", branch).returncode != 0:
+            print(f"  WARNING: push failed, so those {ahead} commit(s) stay local.\n"
+                  f"           Pinning to the last PUBLISHED commit instead -- a consumer must\n"
+                  f"           never be pinned to a commit only this machine has.")
+        else:
+            run("git", "-C", str(shared), "fetch", "--quiet", "origin")
+
+    return published_sha(shared)
+
+
 def ensure_shared(shared: Path, url: str, offline: bool) -> Path:
-    """Clone or refresh the shared repo. A stale cache silently serving old rules is the
-    failure this function exists to prevent, so a refresh failure is reported, not swallowed."""
+    """Clone the shared repo if it is absent. Syncing is sync_shared()'s job."""
     if shared.exists() and (shared / ".git").exists():
-        if not offline:
-            r = run("git", "-C", str(shared), "pull", "--ff-only", "--quiet")
-            if r.returncode != 0:
-                print(f"  WARNING: could not refresh the shared repo, using the cached copy\n"
-                      f"           {r.stderr.strip().splitlines()[-1] if r.stderr.strip() else ''}")
         return shared
     if offline:
         raise SystemExit(f"ERROR: no shared repo at {shared} and --offline was given")
@@ -94,6 +164,18 @@ def ensure_shared(shared: Path, url: str, offline: bool) -> Path:
     if r.returncode != 0:
         raise SystemExit(f"ERROR: clone failed: {r.stderr.strip()}")
     return shared
+
+
+def verify_links(shared: Path, sha: str, rules) -> None:
+    """Every linked rule must exist at the SHA being written. Cheap, and it is the
+    last line of defence: it catches a bad pin even if the sync above is bypassed."""
+    missing = [f"rules/{cat}/{name}" for cat in rules for name in rules[cat]
+               if run("git", "-C", str(shared), "cat-file", "-e",
+                      f"{sha}:rules/{cat}/{name}").returncode != 0]
+    if missing:
+        raise SystemExit(
+            f"ERROR: {len(missing)} rule file(s) do not exist at {sha} -- refusing to write "
+            f"links that 404:\n" + "\n".join(f"         {m}" for m in missing))
 
 
 def dep_text(repo: Path) -> str:
@@ -190,13 +272,16 @@ def main():
     shared = Path(args.shared).resolve() if args.shared else \
         Path.home() / ".claude" / "cache" / "agentic-ai-rules-and-skills"
     shared = ensure_shared(shared, args.url, args.offline or bool(args.shared))
-    sha = run("git", "-C", str(shared), "rev-parse", "--short", "HEAD").stdout.strip() or "HEAD"
+    # The pin is the REMOTE's SHA, never local HEAD -- see sync_shared().
+    sha = published_sha(shared) if (args.offline or bool(args.shared)) \
+        else sync_shared(shared)
 
     selected = detect(repo)
     if not selected:
         print("No category matched. Nothing is adopted -- that is a valid outcome, not a bug.")
         return 0
     rules = rules_for(shared, selected)
+    verify_links(shared, sha, rules)
 
     if args.json:
         print(json.dumps({"sha": sha, "selected": selected, "rules": rules}, indent=2))
