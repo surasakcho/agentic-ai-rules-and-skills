@@ -50,6 +50,7 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 
 | Category | Rule | Earned from |
 |---|---|---|
+| [how-we-work](rules/how-we-work/) | [Quick and dirty needs a logged experiment](rules/how-we-work/quick-and-dirty-needs-a-logged-experiment.md) | 150+ unlogged probes and a reusable tool written twice; plus a verified experiment promoted only as a chat message |
 | [how-we-work](rules/how-we-work/) | [Derive from state, not invocation count](rules/how-we-work/derive-from-state-not-invocation-count.md) | An accrual job crediting a flat 8h per run because it was scheduled every 8h — short on every missed run |
 | [how-we-work](rules/how-we-work/) | [Silence must be the alarm](rules/how-we-work/silence-must-be-the-alarm.md) | A nightly backup that failed three nights running, logged its own remedy each time, and was found by accident |
 | [how-we-work](rules/how-we-work/) | [One writer per shared artifact](rules/how-we-work/one-writer-per-shared-artifact.md) | Four uncoordinated-writer defects in one system; one rewrote a config backup backwards, 226 lines → 174 |
