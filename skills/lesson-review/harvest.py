@@ -301,6 +301,55 @@ def health(shared: Path, deny=()):
             log_problem("_review-log.md has no dated entries")
 
 
+def _git(shared, *a):
+    return subprocess.run(["git", "-C", str(shared), *a], capture_output=True,
+                          encoding="utf-8", errors="replace")
+
+
+def sync_shared(shared: Path) -> None:
+    """Fetch, MERGE, and push back BEFORE and AFTER the pass.
+
+    This script health-checks and writes to the shared repo, and previously did
+    neither of these things -- it just operated on whatever happened to be on disk.
+    Two consequences, both real:
+
+      * it could pass a repo that was already broken upstream, or fail one that had
+        been fixed there, because the local copy was stale; and
+      * anything written during a pass stayed in a cache directory nobody backs up.
+        A lesson that is not pushed is not shared, which is the whole point of the
+        skill.
+
+    Merge rather than fast-forward, because a clone that carries local drafts cannot
+    fast-forward and the old behaviour there was to carry on regardless.
+    """
+    if not (shared / ".git").exists():
+        print(f"  note: {shared} is not a git repo -- skipping sync")
+        return
+    head = _git(shared, "symbolic-ref", "--short", "-q", "refs/remotes/origin/HEAD").stdout.strip()
+    branch = head.split("/", 1)[1] if "/" in head else "main"
+
+    if _git(shared, "fetch", "--quiet", "origin").returncode != 0:
+        print("  WARNING: fetch failed -- checking a possibly stale copy")
+        return
+
+    cur = _git(shared, "symbolic-ref", "--short", "-q", "HEAD").stdout.strip()
+    if cur != branch:
+        if _git(shared, "status", "--porcelain").stdout.strip():
+            raise SystemExit(f"ERROR: {shared} is on '{cur or 'detached HEAD'}' with "
+                             f"uncommitted changes. Commit or stash, then re-run.")
+        _git(shared, "checkout", "--quiet", branch)
+
+    if _git(shared, "merge", "--no-edit", "--quiet", f"origin/{branch}").returncode != 0:
+        raise SystemExit(f"ERROR: merging origin/{branch} conflicted in {shared}. "
+                         f"Resolve it there, then re-run.")
+
+    ahead = _git(shared, "rev-list", "--count", f"origin/{branch}..HEAD").stdout.strip()
+    if ahead and ahead != "0":
+        print(f"  shared repo is {ahead} commit(s) ahead -- pushing back")
+        if _git(shared, "push", "--quiet", "origin", branch).returncode != 0:
+            log_problem(f"{ahead} local commit(s) could not be pushed -- they are NOT shared")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -311,11 +360,21 @@ def main():
     ap.add_argument("--deny", default="",
                     help="comma-separated terms that must not appear in the shared repo "
                          "(private repo names, collaborator names, internal hostnames)")
+    ap.add_argument("--no-sync", action="store_true",
+                    help="skip the fetch/merge/push around the pass (offline, or when "
+                         "deliberately inspecting a fixed checkout)")
     args = ap.parse_args()
+
+    shared = Path(args.shared)
+    if not args.no_sync:
+        sync_shared(shared)          # pull+merge BEFORE: never check a stale copy
 
     if args.projects and not args.check:
         harvest(Path(args.projects), args.since)
-    health(Path(args.shared), [t.strip() for t in args.deny.split(",") if t.strip()])
+    health(shared, [t.strip() for t in args.deny.split(",") if t.strip()])
+
+    if not args.no_sync:
+        sync_shared(shared)          # push back AFTER: an unpushed lesson is not shared
 
     print("\n" + "=" * 76)
     if problems:
