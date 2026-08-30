@@ -2,7 +2,7 @@
 
 **Task type:** how-we-work — every piece of code written, at the moment you decide how carefully
 to write it.
-**Related:** [`scratch-code-lives-outside-the-repo`](scratch-code-lives-outside-the-repo.md) says
+**Related:** [`scratch-code-lives-outside-the-repo`](../coding/scratch-code-lives-outside-the-repo.md) says
 *where* a probe goes; this says *what entitles you to write one*.
 [`bau-artifacts-are-built-permanent`](../coding/bau-artifacts-are-built-permanent.md) is the
 other end of the same pipeline. [`reproducibility`](../research/reproducibility.md) and
