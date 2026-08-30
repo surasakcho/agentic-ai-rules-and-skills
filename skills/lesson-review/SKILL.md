@@ -58,6 +58,19 @@ next to its redacted version. See
 **6. Publish.** Commit, push, and append one line to `lessons/_review-log.md` with the date
 and what was harvested.
 
+**Where you cannot push directly — a fork, or a bot identity without write access — publish by
+PR, and name the owner as reviewer IN the create command.** A PR with no reviewer and no
+assignee misses every default filter GitHub builds a person's list from (authored by you,
+assigned to you, review requested from you), so it is open, mergeable and invisible:
+
+```sh
+gh pr create --title "..." --body-file pr.md --reviewer <owner> --assignee <owner>
+```
+
+Adding it afterwards is a separate step, and a separate step is one that gets skipped when the
+turn ends. Report the PR by what it is routed to, not that it exists. See
+[`a-pr-nobody-is-asked-to-review-is-invisible`](../../rules/how-we-work/a-pr-nobody-is-asked-to-review-is-invisible.md).
+
 ## Recording an empty pass
 
 **A pass that harvests nothing is a valid outcome** and must still be logged. Three empty
