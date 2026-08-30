@@ -57,6 +57,12 @@ a PR instead has, without a reviewer, converted a visible commit into an invisib
   step is a step that gets skipped when the turn ends early.
 - **Add `--assignee` too.** Reviewer and assignee populate different filters, and GitHub will
   not let an author request review from themselves — the assignee is what survives that case.
+- **Verify the EFFECT, not the exit status.** This is the general form, and the
+  self-review-request below is one instance of it. A CLI that accepts a flag, applies none of
+  it, and exits 0 is not rare — it is the normal outcome whenever the flag is valid but the
+  *operation* is refused server-side. Three instances were collected across two machines in a
+  single week. Exit 0 means "the command ran", never "the thing you asked for is true". Read
+  the state back.
 - **`--reviewer` fails SILENTLY when you are the author.** GitHub refuses a self-review-request,
   and `gh` neither errors nor warns — it exits 0 having set nothing. So which flag works depends
   on which identity you are authenticated as: as the bot, `--reviewer` lands; as the owner,
