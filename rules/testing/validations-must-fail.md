@@ -51,6 +51,24 @@ Find the subpopulation where the treatment does approximately nothing and confir
 measurement shows approximately nothing. If it does not, the **baseline** is wrong, and no
 conclusion about the treatment is worth reading yet.
 
+### 4. Ask what would still be green if it were already broken
+
+The general form of this rule, and the cheapest question in it. Take any check, dashboard,
+health signal, status field or passing test, assume the thing it watches is **already broken**,
+and ask what it would be showing right now.
+
+> **Incident.** Two assertions in a new test suite read `check("watermark written", "key" in
+> state)` against a fixture that already set that key. Both passed against an implementation
+> that never wrote the watermark at all — proved by patching it out and re-running. They had
+> been written minutes earlier, by an author who knew the rule on this page.
+
+Whenever the honest answer is *"green"*, the signal is decoration. This is the shared shape
+behind a guard that never fires, a health ping emitted before the fallible step, a drill that
+exercises a retired code path, and a status field set from intent rather than outcome:
+**the success signal is not attached to the thing it reports.** See
+[`silence-must-be-the-alarm`](../operations/silence-must-be-the-alarm.md) for the unattended
+case, where the answer is "green" for as long as nobody happens to look.
+
 ## When an invariant fails at scale, suspect the invariant
 
 > **Incident.** A validation asserted that no unit may be closer to a deep-sea port than to

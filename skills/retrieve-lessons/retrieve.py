@@ -29,7 +29,36 @@ END = "<!-- shared-lessons:end -->"
 
 # Each category is selected only on evidence. A rule nobody needs is noise, and noise is how
 # a CLAUDE.md stops being read.
+#
+# EXCEPT the mandatory ones. A category in MANDATORY is adopted by every project regardless of
+# what the detectors find, and is listed first.
+#
+# The evidence rule is right for DOMAIN categories -- analytics, data-engineering, research,
+# testing, coding all describe what a repo produces, and a repo that produces none of them
+# genuinely does not need those rules. The mandatory two are not domains. They are the two
+# constants underneath every project: HOW THE WORK IS DONE and HOW IT RUNS.
+#
+#   operations     -- the failure class here is a job that keeps reporting success after it
+#                     stopped working. It does not announce itself in a dependency list or a
+#                     directory name. The first cron entry, retry loop or background task
+#                     arrives long after the repo was characterised, and by then retrieval has
+#                     already run and concluded the category was irrelevant. Evidence-based
+#                     selection structurally cannot catch it.
+#   agent-workflow -- detecting this by globbing for CLAUDE.md is circular: this script WRITES
+#                     to CLAUDE.md, and only runs because an agent is working the repo. The
+#                     proxy also fails precisely where it matters most -- a fresh repo with no
+#                     CLAUDE.md yet is denied the rules, including the one on how to structure
+#                     a new CLAUDE.md.
+MANDATORY = ("operations", "agent-workflow")
+
 DETECTORS = {
+    "operations": {
+        "why": "every project eventually runs something unattended, and a job that keeps "
+               "reporting success after it stopped working leaves no trace in the repo to detect",
+        "deps": (),
+        "paths": (),
+        "globs": (),
+    },
     "analytics": {
         "why": "produces figures, tables or reported numbers",
         "deps": ("matplotlib", "seaborn", "plotly", "ggplot2", "altair", "bokeh", "d3"),
@@ -61,7 +90,8 @@ DETECTORS = {
         "globs": ("**/*.py", "**/*.ts", "**/*.js", "**/*.go", "**/*.rs", "**/*.java"),
     },
     "agent-workflow": {
-        "why": "is worked on by AI agents",
+        "why": "this file is maintained by AI agents — which running this retrieval at all "
+               "already proves, so detecting it by globbing for CLAUDE.md would be circular",
         "deps": (),
         "paths": (".claude", ".agents"),
         "globs": ("CLAUDE.md", "AGENTS.md", "GEMINI.md"),
@@ -191,7 +221,8 @@ def dep_text(repo: Path) -> str:
 
 
 def detect(repo: Path):
-    """Return {category: [evidence, ...]} -- only categories with actual evidence."""
+    """Return {category: [evidence, ...]}: every MANDATORY category, plus any other category
+    with actual evidence."""
     deps = dep_text(repo)
     dirs = {p.name.lower() for p in repo.rglob("*")
             if p.is_dir() and not any(s in p.parts for s in SKIP)}
@@ -211,6 +242,10 @@ def detect(repo: Path):
                 evidence.append(f"{hit.relative_to(repo).as_posix()}")
         if evidence:
             found[cat] = evidence[:3]
+    # Mandatory categories are adopted whether or not anything was detected. Any evidence that
+    # WAS found is kept after the marker -- informative, but never load-bearing.
+    for cat in MANDATORY:
+        found[cat] = ["mandatory for every project"] + found.get(cat, [])[:2]
     return found
 
 
@@ -236,9 +271,16 @@ def build_block(shared: Path, sha: str, selected, rules):
              f"at `{sha}`. **Linked, not copied** — a copied rule drifts out of agreement with "
              f"its source and nobody notices. Refresh with `/retrieve-lessons`.",
              ""]
-    for cat in sorted(rules):
-        lines.append(f"**{cat}** — selected because this repo {DETECTORS[cat]['why']} "
-                     f"({', '.join(selected[cat])}).")
+    # Mandatory categories lead, in declared order; detected ones follow alphabetically.
+    order = ([c for c in MANDATORY if c in rules]
+             + sorted(c for c in rules if c not in MANDATORY))
+    for cat in order:
+        if cat in MANDATORY:
+            lines.append(f"**{cat}** — **mandatory, adopted by every project**: "
+                         f"{DETECTORS[cat]['why']}.")
+        else:
+            lines.append(f"**{cat}** — selected because this repo {DETECTORS[cat]['why']} "
+                         f"({', '.join(selected[cat])}).")
         lines.append("")
         for name in rules[cat]:
             title = name[:-3].replace("-", " ")
@@ -277,9 +319,11 @@ def main():
         else sync_shared(shared)
 
     selected = detect(repo)
-    if not selected:
-        print("No category matched. Nothing is adopted -- that is a valid outcome, not a bug.")
-        return 0
+    # No "nothing matched" path any more: MANDATORY is non-empty, so `selected` never is. The
+    # old early return here could not fire once operations/agent-workflow became mandatory, and
+    # a branch that cannot fire is exactly what rules/testing/validations-must-fail.md is about.
+    # Assert the invariant instead of pretending to handle its negation.
+    assert selected, "MANDATORY is empty -- every project must adopt at least the mandatory rules"
     rules = rules_for(shared, selected)
     verify_links(shared, sha, rules)
 
@@ -288,7 +332,8 @@ def main():
         return 0
 
     print(f"\nshared repo at {sha}\n")
-    for cat in sorted(selected):
+    for cat in ([c for c in MANDATORY if c in selected]
+                + sorted(c for c in selected if c not in MANDATORY)):
         print(f"  {cat:18} {', '.join(selected[cat])}")
         for name in rules[cat]:
             print(f"      - {name}")

@@ -21,6 +21,7 @@ rules/            portable rules, by task type
   coding/           writing and changing code
   testing/          validations, gates and checkers
   data-engineering/ ingestion, encoding, completeness
+  operations/       keeping something correct while it runs unattended
   agent-workflow/   delegating to and supervising AI agents
 skills/           executable Claude Code skills (rules that can run)
 lessons/          incident write-ups the rules were extracted from
@@ -57,6 +58,9 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [coding](rules/coding/) | [Scratch code lives outside the repo](rules/coding/scratch-code-lives-outside-the-repo.md) | 150+ undeleted probe scripts, none of them the reusable tool the task actually needed |
 | [coding](rules/coding/) | [Sanity-check test cases, hand-traced](rules/coding/sanity-check-test-cases.md) | Proactive practice, no incident yet — added on user instruction |
 | [coding](rules/coding/) | [BAU artifacts are built permanent](rules/coding/bau-artifacts-are-built-permanent.md) | A live host's cron rewrite *and its rollback* both staged in a `tmpfs` scratchpad |
+| [operations](rules/operations/) | [Derive from state, not invocation count](rules/operations/derive-from-state-not-invocation-count.md) | An accrual job crediting a flat 8h per run because it was scheduled every 8h — short on every missed run |
+| [operations](rules/operations/) | [Silence must be the alarm](rules/operations/silence-must-be-the-alarm.md) | A nightly backup that failed three nights running, logged its own remedy each time, and was found by accident |
+| [operations](rules/operations/) | [One writer per shared artifact](rules/operations/one-writer-per-shared-artifact.md) | Four uncoordinated-writer defects in one system; one rewrote a config backup backwards, 226 lines → 174 |
 | [agent-workflow](rules/agent-workflow/) | [Delegation and supervision](rules/agent-workflow/delegation-and-supervision.md) | Agent findings taken at face value and later disproved |
 | [agent-workflow](rules/agent-workflow/) | [Unexpected means stop and propose](rules/agent-workflow/unexpected-means-stop-and-propose.md) | "I noticed X, so I did Y" -- a wrong fix shipped because a one-command check was never run |
 | [agent-workflow](rules/agent-workflow/) | [Strict first, then the residual](rules/agent-workflow/strict-first-then-the-residual.md) | A fallback built before the strict pass ever ran, so nobody learned how big the problem was |
