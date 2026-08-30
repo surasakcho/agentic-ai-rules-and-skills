@@ -57,6 +57,16 @@ a PR instead has, without a reviewer, converted a visible commit into an invisib
   step is a step that gets skipped when the turn ends early.
 - **Add `--assignee` too.** Reviewer and assignee populate different filters, and GitHub will
   not let an author request review from themselves — the assignee is what survives that case.
+- **`--reviewer` fails SILENTLY when you are the author.** GitHub refuses a self-review-request,
+  and `gh` neither errors nor warns — it exits 0 having set nothing. So which flag works depends
+  on which identity you are authenticated as: as the bot, `--reviewer` lands; as the owner,
+  only `--assignee` does. Pass both and **verify after creating**, because the exit status is
+  not evidence:
+  ```sh
+  gh pr view <n> --json reviewRequests,assignees
+  ```
+  This rule's own demonstration PR hit exactly this: `--reviewer` was accepted, silently
+  discarded, and only the assignee routed it.
 - **Report the PR by what it is routed to, not that it exists.** "Open, review requested from
   X" is a status; "opened PR #8" is not.
 - **Sweep periodically for the ones already lost:**
