@@ -85,6 +85,7 @@ def ensure_shared(shared: Path, url: str, offline: bool) -> Path:
             if r.returncode != 0:
                 print(f"  WARNING: could not refresh the shared repo, using the cached copy\n"
                       f"           {r.stderr.strip().splitlines()[-1] if r.stderr.strip() else ''}")
+        _assert_on_default_branch(shared)
         return shared
     if offline:
         raise SystemExit(f"ERROR: no shared repo at {shared} and --offline was given")
@@ -94,6 +95,55 @@ def ensure_shared(shared: Path, url: str, offline: bool) -> Path:
     if r.returncode != 0:
         raise SystemExit(f"ERROR: clone failed: {r.stderr.strip()}")
     return shared
+
+
+def _assert_on_default_branch(shared: Path) -> None:
+    """A cache clone sitting on a feature branch makes this skill lie.
+
+    `sha` below is read from the clone's HEAD, and `git pull --ff-only` pulls
+    whatever branch is checked out. So a clone left on a local branch -- which is
+    exactly what happens when someone authors a contribution in it -- produces:
+
+      * `--check` reporting "shared repo is at <your branch tip>", and
+      * `--write` pinning a consumer's CLAUDE.md to a commit that exists ONLY on
+        that person's fork, with rule links that 404 at the pinned SHA, while
+        silently omitting rules genuinely new on the default branch.
+
+    Both commands report success. Nothing in the output suggests a problem. Fail
+    loudly instead: a wrong pin is worse than a refusal, because it looks right.
+    """
+    r = run("git", "-C", str(shared), "symbolic-ref", "--short", "-q", "HEAD")
+    branch = r.stdout.strip()
+    if not branch:
+        raise SystemExit(
+            f"ERROR: the shared-rules clone at {shared} is in detached HEAD.\n"
+            f"       The pin would be read from that commit. Run:\n"
+            f"         git -C {shared} checkout main")
+    head = run("git", "-C", str(shared), "symbolic-ref", "--short", "-q",
+               "refs/remotes/origin/HEAD").stdout.strip()
+    default = head.split("/", 1)[1] if "/" in head else "main"
+    if branch != default:
+        raise SystemExit(
+            f"ERROR: the shared-rules clone at {shared} is on branch '{branch}', "
+            f"not '{default}'.\n"
+            f"       This clone is a read-only mirror -- the pin is read from its "
+            f"HEAD, so a branch here\n"
+            f"       silently pins consumers to a commit that may not exist "
+            f"upstream.\n"
+            f"       Fix:  git -C {shared} checkout {default}\n"
+            f"       Author contributions in a SEPARATE clone, not this one.")
+
+
+def verify_links(shared: Path, sha: str, rules) -> None:
+    """Every linked rule must exist at the SHA being written. Cheap, and it is the
+    check that catches a bad pin even if the branch guard above is bypassed."""
+    missing = [f"rules/{cat}/{name}" for cat in rules for name in rules[cat]
+               if run("git", "-C", str(shared), "cat-file", "-e",
+                      f"{sha}:rules/{cat}/{name}").returncode != 0]
+    if missing:
+        raise SystemExit(
+            f"ERROR: {len(missing)} rule file(s) do not exist at {sha} -- refusing to "
+            f"write links that 404:\n" + "\n".join(f"         {m}" for m in missing))
 
 
 def dep_text(repo: Path) -> str:
@@ -197,6 +247,7 @@ def main():
         print("No category matched. Nothing is adopted -- that is a valid outcome, not a bug.")
         return 0
     rules = rules_for(shared, selected)
+    verify_links(shared, sha, rules)
 
     if args.json:
         print(json.dumps({"sha": sha, "selected": selected, "rules": rules}, indent=2))
