@@ -87,6 +87,8 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [research](rules/research/) | [Research and Q&A logs](rules/research/research-and-qa-logs.md) | The same dead-end source evaluated twice |
 | [research](rules/research/) | [External sources only are primary](rules/research/external-sources-only-are-primary.md) | Most internally-"VERIFIED" ledger entries had no external link a human could check |
 | [testing](rules/testing/) | [Validations must be able to fail](rules/testing/validations-must-fail.md) | A guard that never fired, silently, for its whole life |
+| [testing](rules/testing/) | [A check that shares a source with its subject is not a check](rules/testing/a-check-that-shares-a-source-is-not-a-check.md) | A continuity guard that passed against the very 54-day hole it was written to catch |
+| [how-we-work](rules/how-we-work/) | [Monitor the number, not just the job](rules/how-we-work/monitor-the-number-not-just-the-job.md) | 59 days green, no errors, no missed runs — booking one eighth of the income |
 | [data-engineering](rules/data-engineering/) | [Text encoding](rules/data-engineering/text-encoding.md) | 164 mojibake labels from a locale-codec fallback |
 | [data-engineering](rules/data-engineering/) | [Completeness checking](rules/data-engineering/completeness-checking.md) | A whole province silently locked in as "done" by a caching bug |
 | [data-engineering](rules/data-engineering/) | [Check for a local copy before re-fetching](rules/data-engineering/check-for-a-local-copy-before-refetching.md) | ~38 GB re-downloaded while all of it sat committed in the same repo |
