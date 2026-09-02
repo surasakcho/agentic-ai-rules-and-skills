@@ -22,7 +22,7 @@ recorded in the repo, and it is never guessed.**
 See the format below.
 
 **b. The host has a managed launcher and knows this repo.** If
-`~/projects/zkyhax-host-config/bin/claude-session.sh` exists, run
+`~/projects/zkyhax-svr-config/bin/claude-session.sh` exists, run
 `claude-session.sh list` and look for a row whose workdir matches this repo. If there
 is one, launch with `claude-session.sh start <name>` and stop — that path brings the
 memory guard and the container's own mounts, which this skill must not reimplement.
@@ -41,7 +41,7 @@ needs no prompt.
 ## 2. Find the repo directory — do not hardcode
 
 Check `~/repos/<repo>` then `~/projects/<repo>`; use whichever exists. Machines differ
-(`~/repos` on the Pi, `~/projects` on zkyhax-server) and a hardcoded path fails on a
+(`~/repos` on the Pi, `~/projects` on zkyhax-svr) and a hardcoded path fails on a
 missing directory rather than falling back.
 
 ## 3. Launch
