@@ -64,6 +64,7 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [how-we-work](rules/how-we-work/) | [Publish lessons weekly](rules/how-we-work/publish-lessons-weekly.md) | Eleven reusable lessons that would have stayed in one repo |
 | [how-we-work](rules/how-we-work/) | [Retrieve lessons weekly](rules/how-we-work/retrieve-lessons-weekly.md) | Nine rules published outward, the retrieval never once run inward |
 | [how-we-work](rules/how-we-work/) | [Sanitise before sharing](rules/how-we-work/sanitise-before-sharing.md) | This repo's own seed pass published a collaborator's name and unpublished results |
+| [how-we-work](rules/how-we-work/) | [Discard secret output, never filter it](rules/how-we-work/discard-secret-output-never-filter-it.md) | `compose config \| grep` wrote an API key into a transcript; the filter shaped what was seen, not what was captured |
 | [how-we-work](rules/how-we-work/) | [Prompt for machine-specific values](rules/how-we-work/prompt-and-store-config.md) | Four skills hardcoding a username and another private repo's name |
 | [how-we-work](rules/how-we-work/) | ["I can't" is a task](rules/how-we-work/cannot-is-a-task.md) | A dataset declared unobtainable while an unused tool sat in the session |
 | [how-we-work](rules/how-we-work/) | [Read the manual first](rules/how-we-work/read-the-manual-first.md) | A new download route invented while the written procedure sat unread |
