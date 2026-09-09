@@ -72,6 +72,8 @@ says a green result "checked less than it looks" whenever any row was skipped.
 
 ## Related
 
+[`a-correction-lands-where-you-noticed-it`](../../rules/how-we-work/a-correction-lands-where-you-noticed-it.md)
+— the rule this skill mechanises. Read it first; the tool is step 2 of its five.
 [`a-correction-is-not-a-control`](../../rules/how-we-work/a-correction-is-not-a-control.md) — a
 retraction the object absorbs and survives is an output, not a control. This is what gives one an
 off-switch.
