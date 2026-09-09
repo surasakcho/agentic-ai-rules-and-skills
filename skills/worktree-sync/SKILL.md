@@ -53,6 +53,47 @@ moment by construction: a commit just succeeded, so the tree is normally clean.
 > **Never rebase a session that may have uncommitted work under it.** A refused push is a loud, safe
 > failure; a surprise rewrite is a silent, unsafe one.
 
+## Telling the other session what landed
+
+**A sync is not finished when the push succeeds.** The other session is sitting on a checkout that
+changed underneath it a moment ago and has no idea: git moved the files, nothing told the reader. It
+keeps reasoning from what it read *before* the rebase — which is the same lost-update shape this
+skill exists to prevent, one level up. **The files stopped colliding; the models of the repo still
+do.**
+
+So after a successful land, and only then, the script prints a `SYNC-NOTIFY` block: what landed,
+which files, and which other worktrees are checked out.
+
+```
+SYNC-NOTIFY: 1 other worktree(s) checked out on this repo.
+  landed:  8259e68..HEAD -> origin/main
+    78610c0 side: add c.txt
+    37efc93 side: add b.txt
+  files:
+    b.txt
+    c.txt
+  peers:
+    /home/app/ebiz-factory
+```
+
+**Printing it is not telling anyone.** A shell script cannot call `SendMessage`, and a notice that
+lands in one session's scrollback has been delivered to nobody — that is precisely why conflicts are
+recorded on `main` instead of announced. **So the block is the agent's cue, not the mechanism: when
+you see it, relay it to the session that owns each listed worktree before you carry on.** Name the
+files, because that is what tells the reader whether anything they are holding just moved.
+
+The split is deliberate. *What changed* is deterministic and free, so the script computes it. *Who
+to tell, and whether it matters to them* is a judgement, and a notifier that guesses at judgement is
+one people learn to mute.
+
+**The range is what `main` gained, not what the branch gained**, and those differ: a branch already
+sitting on top of `origin/main` rebases to a no-op, so the branch's own range is empty while `main`
+still gains every commit on it. The first version of this reported the branch range and printed an
+empty commit list next to a successful land — a notice that fired correctly and said nothing.
+
+**It stays quiet when there is nothing to say:** no other worktree, a no-op sync, or a conflict.
+Conflicts already have the louder path — an open task written onto `main` that every session reads.
+
 ## What it does when a rebase conflicts
 
 1. **Aborts and restores the exact starting commit.** No half-finished rebase, no lost commit.

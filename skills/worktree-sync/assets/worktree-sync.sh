@@ -14,6 +14,47 @@ MAIN_BRANCH="${MAIN_BRANCH:-main}"
 cd "$(git rev-parse --show-toplevel)" || exit 1
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 
+# --- Tell the other sessions what just landed -------------------------------
+#
+# A sync is not finished when the push succeeds. Another session is sitting on a
+# checkout that changed underneath it a moment ago and does not know: git moved
+# the files, nothing told the reader. That session keeps reasoning from what it
+# read BEFORE the rebase -- the same lost-update shape this skill exists to
+# prevent, one level up. The files stopped colliding; the MODELS of the repo
+# still do.
+#
+# A shell script cannot call SendMessage, so it does not pretend to. It prints
+# the facts an agent needs to relay -- what landed, which files, who else is
+# checked out -- and SKILL.md makes sending it the agent's step. Printing is
+# deterministic and free; deciding who to tell is a judgement, and mixing the
+# two is how a notifier becomes something people mute.
+#
+# Emitted ONLY after a successful land. A conflict already has a louder path:
+# conflict-record.sh writes an open task on main that every session reads.
+notify_peers() {
+  range="$1"
+  here="$(git rev-parse --show-toplevel)"
+  peers=$(git worktree list --porcelain 2>/dev/null \
+          | awk '/^worktree /{print $2}' \
+          | grep -Fxv "$here")
+  [ -z "$peers" ] && return 0
+  [ -z "$range" ] && return 0
+
+  echo
+  echo "SYNC-NOTIFY: $(printf '%s\n' "$peers" | wc -l) other worktree(s) checked out on this repo."
+  echo "  Relay this to the session that owns each -- it is behind now and does not know."
+  echo
+  echo "  landed:  $range -> origin/$MAIN_BRANCH"
+  git log --oneline "$range" 2>/dev/null | sed 's/^/    /'
+  echo "  files:"
+  git diff --name-only "$range" 2>/dev/null | sed 's/^/    /'
+  echo "  peers:"
+  printf '%s\n' "$peers" | sed 's/^/    /'
+  echo
+  echo "  Each peer catches up with: tools/worktree-sync.sh"
+}
+
+
 # Guard: worktrees SHARE .git/hooks, so a post-commit hook installed for the side worktree also
 # fires in the main one. Refuse to act on the main branch -- there is nothing to sync there.
 if [ "$BRANCH" = "$MAIN_BRANCH" ]; then
@@ -49,8 +90,10 @@ if [ "$BRANCH" = "$MAIN_BRANCH" ]; then
 
   if [ "${ahead:-0}" -eq 0 ]; then
     # Nothing local to replay: a fast-forward, which cannot conflict and cannot lose a commit.
+    ff_before=$(git rev-parse HEAD)
     if git merge -q --ff-only "origin/$MAIN_BRANCH"; then
       echo "SYNC: fast-forwarded $MAIN_BRANCH $behind commit(s) to $(git rev-parse --short HEAD)."
+      notify_peers "$ff_before..HEAD"
     else
       echo "SYNC: fast-forward refused unexpectedly -- pull by hand."
     fi
@@ -61,8 +104,9 @@ if [ "$BRANCH" = "$MAIN_BRANCH" ]; then
   before=$(git rev-parse HEAD)
   if git rebase -q "origin/$MAIN_BRANCH"; then
     echo "SYNC: rebased $ahead local commit(s) onto origin/$MAIN_BRANCH ($(git rev-parse --short HEAD))."
+    main_before=$(git rev-parse "origin/$MAIN_BRANCH")
     git push -q origin "HEAD:$MAIN_BRANCH" \
-      && echo "SYNC: pushed to origin/$MAIN_BRANCH." \
+      && { echo "SYNC: pushed to origin/$MAIN_BRANCH."; notify_peers "$main_before..HEAD"; } \
       || echo "SYNC: rebased, but the push was refused -- origin moved again. Re-run."
   else
     git rebase --abort 2>/dev/null
@@ -100,6 +144,10 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
 fi
 
 before=$(git rev-parse HEAD)
+# What the PEERS care about is what origin/main gains, which is not the same as what
+# this branch gained: a branch already on top of origin/main rebases to a no-op, so
+# `before..HEAD` is empty while main still gains every commit on the branch.
+main_before=$(git rev-parse "origin/$MAIN_BRANCH")
 if ! git rebase -q "origin/$MAIN_BRANCH"; then
   conflicted=$(git diff --name-only --diff-filter=U 2>/dev/null | tr '\n' ' ')
   git rebase --abort 2>/dev/null
@@ -124,6 +172,7 @@ git push -q --force-with-lease -u origin "$BRANCH" || { echo "SYNC: branch push 
 if git push -q origin "HEAD:$MAIN_BRANCH"; then
   echo "SYNC: $BRANCH rebased and landed on origin/$MAIN_BRANCH ($(git rev-parse --short HEAD))."
   [ -x tools/conflict-record.sh ] && tools/conflict-record.sh clear "$BRANCH"
+  notify_peers "$main_before..HEAD"
 else
   echo "SYNC: branch pushed, but origin/$MAIN_BRANCH moved again -- re-run to land it."
   exit 6
