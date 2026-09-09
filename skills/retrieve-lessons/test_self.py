@@ -48,6 +48,20 @@ def build_target(root: Path):
     return root
 
 
+def build_vendored_target(root: Path):
+    """A prose repo whose ONLY code is a downloaded dependency.
+
+    An Obsidian vault ships every installed plugin as a built main.js. Nothing here was
+    written by the repo's authors, so "coding" is evidence they cannot act on.
+    """
+    (root / ".obsidian" / "plugins" / "obsidian-reminder-plugin").mkdir(parents=True)
+    (root / ".obsidian" / "plugins" / "obsidian-reminder-plugin" / "main.js").write_text(
+        "'use strict';var e=require('obsidian');\n", encoding="utf-8")
+    (root / "notes").mkdir(parents=True)
+    (root / "notes" / "a-note.md").write_text("# a note\n", encoding="utf-8")
+    return root
+
+
 def run(target, shared, *extra):
     r = subprocess.run([sys.executable, "-X", "utf8", str(SCRIPT), "--repo", str(target),
                         "--shared", str(shared), *extra],
@@ -87,6 +101,14 @@ def main():
             "MANDATORY marker is the reason recorded, not a detector hit":
                 data["selected"].get("how-we-work") == ["mandatory for every project"],
         }
+
+        # A repo whose only code is vendored must not adopt the coding rules.
+        vendored = build_vendored_target(tmp / "vault")
+        _, vout = run(vendored, shared, "--json")
+        vsel = set(json.loads(vout)["selected"])
+        checks["does NOT select coding from a vendored .obsidian plugin"] = "coding" not in vsel
+        checks["still adopts the mandatory category in a prose-only repo"] = (
+            "how-we-work" in vsel)
 
         # --check must FAIL before anything is written.
         code, _ = run(target, shared, "--check")

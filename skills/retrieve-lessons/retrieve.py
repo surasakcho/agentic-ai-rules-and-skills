@@ -93,8 +93,13 @@ DETECTORS = {
                   "**/*.sh", "**/*.bash"),
     },
 }
+# Directories holding code the repo did not write. Vendored bundles look exactly like
+# first-party source to a glob, so every one of them has to be named here or the detector
+# reports evidence the repo's authors have never edited and cannot act on.
+# .obsidian: an Obsidian vault ships each installed plugin as a built main.js. A vault of
+# pure prose matched "coding" on a downloaded reminder plugin -- same class as node_modules.
 SKIP = {".git", "node_modules", ".venv", "venv", "__pycache__", "dist", "build", ".next",
-        "site-packages", ".mypy_cache", ".pytest_cache"}
+        ".obsidian", "site-packages", ".mypy_cache", ".pytest_cache"}
 
 
 def run(*args, cwd=None):
