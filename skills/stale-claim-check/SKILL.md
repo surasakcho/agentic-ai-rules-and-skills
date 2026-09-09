@@ -50,6 +50,15 @@ Nothing else is repo-specific — both paths are flags.
   there is noise by construction. The count of skipped files is printed, because a silent exclusion
   is indistinguishable from a clean tree. `--no-default-excludes` scans them anyway;
   `--exclude-dir NAME` adds more.
+- **The marker window cannot reach a section banner, and this is not the tool being wrong.** The
+  window is a few lines wide, so a `> **REVISED**` heading does not qualify a figure thirty lines
+  below it. Demonstrated rather than predicted: a section banner was tried twice on an append-only
+  design document and the figure stayed flagged both times; only an inline marker on the figure
+  itself cleared it. The file-level escape below was no help either — it would have skipped the only
+  *live* sections in the same file.
+  **So mark the figure where it stands, not where the section starts.** The window is deliberately
+  not widened to fix this: a wide window is how a real survivor sitting three lines from an unrelated
+  retraction goes unflagged, and the failure it would introduce is silent while this one is loud.
 - **File-level banner.** A document whose first 25 lines carry an `ABANDONED` / `RETRACTED` /
   `SUPERSEDED` / `MOOT` banner is a historical record and is skipped whole. Only the first 25 lines
   count — a banner buried mid-file does not exempt the document, because a reader quoting line 200

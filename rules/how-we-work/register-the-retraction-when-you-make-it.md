@@ -45,7 +45,8 @@ retractions recalls the dramatic ones.
 about the whole tree.** The registry was the sample, and nobody had computed its coverage.
 
 The survivor it did catch is worth stating, because it shows what the uncovered two-thirds could
-have been hiding. A design document asserted *"the endpoint is undeployed"* — and that sentence sat
+have been hiding. (The claim quoted next is **superseded** — reproduced here as the worked example,
+not asserted.) A design document asserted *"the endpoint is undeployed"* — and that sentence sat
 in the section that **instructs the release gate how to record the telemetry row.** It did not
 merely sit there being wrong; it told the gate to log an exception. It had been false for a week,
 and it is most of the reason that gate row looked impossible to satisfy. One stale sentence, wired
@@ -73,24 +74,35 @@ the old wording, the value that replaced it, and why.** If a project has no regi
 commit creates it — a one-row registry that grows with the log is worth more than a twenty-row one
 assembled from memory a week later.
 
+**And the row is a claim like any other, so it ages like any other.** Registering on time is
+necessary and not sufficient: when something is corrected a *second* time, the row is one of the
+places that correction has to land. Two independent repos hit this on the same evening — in one, a
+row was wrong before the day it was written correctly had ended; in the other, two of ten rows had
+gone stale within a day, and both were moved by rulings the same person made *after* registering
+them. **The live value is most perishable in exactly the rows an active decision-maker just wrote**,
+because those are the ones still being ruled on.
+
+A checker cannot save you here, and this is the trap: the pattern column guards the *old* values, so
+**nothing watches the live field**, and the registry is read as the reference rather than as input.
+**A stale guard is worse than a missing one, because it produces the same colour as a correct one.**
+In one of the two incidents, correcting a single rotted row immediately exposed a real survivor in a
+design document that had been invisible behind it the whole time.
+
+The repair is cheap and is the same operation as any other retraction: **the dead live value moves
+into the pattern column.** A figure superseded twice is then watched at both stages rather than
+replaced and forgotten. Which is this rule reaching one level further in — register the retraction
+when you make it, *including the retraction of your own replacement*.
+
 Two supporting habits, both cheap:
 
-**Say the word in the document.** A retraction stated without a marker — *superseded*, *revised*,
+**Mark the figure where it stands, not where the section starts.** A checker's marker window is a
+few lines wide, so a banner at the head of a revision section does not qualify a number thirty lines
+below it — demonstrated three times in one evening on an append-only document, where a file-level
+banner was not an option either because it would have skipped the only live sections. A retraction
+stated without a marker — *superseded*, *revised*,
 *rescinded*, *no longer* — cannot be distinguished from an assertion by a tool, and cannot be
 distinguished by a human skimming either. In the incident above, one flagged hit was a correctly
 written retraction that simply never said so; the reader's eye lands on the stale number.
-
-**And know what registering does not buy you.** Reported by a second project on the day this rule
-was written: a row added *the same day the correction was made* — exactly as this rule asks — was
-wrong before that day ended, because the claim was corrected twice and only the first correction
-reached the row. The registry then asserted a superseded claim in the field it presents as the live
-truth, and every run would have handed that sentence to whoever asked.
-
-So **registering on time is necessary and not sufficient.** A row is a claim like any other, it ages
-like any other, and nothing in the tooling can tell that its expectation went stale. When something
-is corrected a second time, the row is one of the places the correction has to land — which is
-[`a-correction-lands-where-you-noticed-it`](a-correction-lands-where-you-noticed-it.md) applied to
-the registry itself.
 
 **Report coverage, not colour.** "No unqualified survivors across N registered claims" is a
 statement someone can evaluate. "Clean" is not. If the registry has six rows and the week had
