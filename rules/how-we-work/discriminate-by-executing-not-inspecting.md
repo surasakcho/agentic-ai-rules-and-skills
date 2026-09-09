@@ -61,6 +61,38 @@ the six instances above were caught by another person or by an execution, never 
 them in prose, and pinned them to a commit. Two happened *inside sessions actively applying that
 rule to someone else's work.* Knowing the rule is not the control; running the thing is.
 
+
+## Mechanising it: measure lift, not rate
+
+The guard question has a mechanical form, and a second project built it independently the same day
+as a QA tool over telemetry, from a domain with no shell commands or diffs in it at all:
+
+> **lift = P(flag true | the fact it is named after) − P(flag true | that fact absent)**
+
+Their worst instance is the clearest statement of the whole rule. A flag named *"the predator is
+getting closer"* read a perfectly healthy **42.7% of ticks** — and was a readout of the player's own
+footsteps. It fired **less** during a hunt than outside one. Three days of conclusions rested on it
+and the game looked unwinnable at a 0% clear rate; repairing that one expression took it to 45% with
+no design change. **Rate said healthy. Lift said −7.9 — anti-correlated with the thing it names.**
+No amount of checking whether 42.7% was *accurate* could have found that.
+
+## Two things that make the mechanised version survivable
+
+**A dead readout is often correct content, so the gate cannot be "zero failures".** Three of their
+rows read dead because the mechanic had been deliberately retired. **A check that fires on correct
+states gets routed around, and then it catches nothing.** So the gate is that every failing row is
+*named with a reason*, not that the table is green. The same shape appears in
+[`stale-claim-check`](../../skills/stale-claim-check/SKILL.md), where a file carrying its own
+retraction banner is skipped whole rather than flagged forever.
+
+**And the executing check has an inspecting step hidden inside it.** Someone still writes down what
+the number is *about*, and a wrong "of" line produces a confident, useless row. One of their rows
+read −4.3 because the comparison pool for *"predator interested"* contained *"predator hunting"*,
+where the flag is true 62.9% of the time — it was measuring against the strongest state of the same
+fact. Corrected, it reads +1.3. **The tool's own author had warned of exactly this, and it came true
+within a day.** Executing does not abolish the failure; it moves it somewhere narrower, better
+lit, and cheap to re-run.
+
 ## Guard
 
 Before reporting a check as passed, answer in one line: **what would this have shown if the claim
