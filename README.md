@@ -68,6 +68,8 @@ agent that actually looks. Both halves are here. Neither pretends to be the othe
 | [how-we-work](rules/how-we-work/) | [Prompt for machine-specific values](rules/how-we-work/prompt-and-store-config.md) | Four skills hardcoding a username and another private repo's name |
 | [how-we-work](rules/how-we-work/) | ["I can't" is a task](rules/how-we-work/cannot-is-a-task.md) | A dataset declared unobtainable while an unused tool sat in the session |
 | [how-we-work](rules/how-we-work/) | [Read the manual first](rules/how-we-work/read-the-manual-first.md) | A new download route invented while the written procedure sat unread |
+| [how-we-work](rules/how-we-work/) | [A board holds the state; a sprint holds the commitment](rules/how-we-work/board-for-state-sprint-for-commitment.md) | Dozens of ideas explored and none shipped; seven review rounds on one document; a round-two blocker left unescalated |
+| [how-we-work](rules/how-we-work/) | [Write it down when you read it](rules/how-we-work/write-it-down-when-you-read-it.md) | Nine ideas acknowledged one by one and held in context; written down only when the operator asked whether they had been |
 | [how-we-work](rules/how-we-work/) | [Shut up and work](rules/how-we-work/shut-up-and-work.md) | Padding that let a correctly-scoped claim read as an unscoped one |
 | [how-we-work](rules/how-we-work/) | [Default to silence](rules/how-we-work/default-to-silence.md) | Six long process reports in a day on one four-word decision, burying the three questions only the user could answer |
 | [how-we-work](rules/how-we-work/) | [Characterise the object once](rules/how-we-work/characterise-once-not-per-question.md) | Five findings surfaced by follow-up questions, none by the investigation |
