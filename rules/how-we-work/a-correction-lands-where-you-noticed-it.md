@@ -8,6 +8,9 @@ adjacent failure: correcting loudly while the object survives unchanged.
 — the same discipline for code.
 [`discriminate-by-executing-not-inspecting`](discriminate-by-executing-not-inspecting.md)
 — why "I corrected it" is an inspection, and the grep is the execution.
+[`register-the-retraction-when-you-make-it`](register-the-retraction-when-you-make-it.md)
+— the unguarded flank: this rule reaches every place the claim lives, that one is about
+knowing it needs correcting at all.
 **Mechanised by:** the [`stale-claim-check`](../../skills/stale-claim-check/SKILL.md) skill.
 
 ---
