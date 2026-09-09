@@ -113,6 +113,26 @@ The fix is to pin rather than to re-derive: the row carries **the command that r
 that they do not hold at HEAD. *A citation that says where to stand beats one that assumes the
 reader is already standing there.*
 
+**Reproduced independently, in a different repo, within hours.** A second project's row one carried
+`1.62x clean` as its live value; the measurement at that moment was `1.55x`, re-baselined the same
+evening by an unrelated change. Registered on time, wrong before the day ended — and the checker
+returned *no unqualified survivors* over it, because **the pattern column guards the old value, so
+nothing watches the live one.** Two repos, two mechanisms, one field: the field the tool presents as
+the truth is the one field the tool never checks.
+
+**The repair, and it is cheap: retire the dead live value INTO the pattern column.** When a live
+value is superseded, it does not get overwritten — it moves left, becoming a guarded pattern, and
+the corrected figure takes its place. The row's own history is just another claim, so this is the
+same operation as registering any other retraction, and a value superseded twice ends up watched at
+both stages instead of replaced and forgotten.
+
+**It pays immediately.** Doing exactly that surfaced a real survivor the wrong row had been hiding —
+a design document asserting *"honest gradient is 1.62x clean and 1.34x as shipped"*, in a section a
+future reader would quote. **A wrong row does not merely fail to guard its own claim; it produces
+the same green as a correct one while guarding nothing.** That is the coverage problem and the
+staleness problem turning out to be one failure seen from two ends: an unregistered claim and a
+mis-registered one are indistinguishable in the output.
+
 **The general shape: correct behaviour, wrong object, silent.** The tool has no way to learn that
 its own expectation went stale, and it reports clean the entire time. So when a claim is corrected
 twice, **update the row as well as the documents** — and write the row to record the correction,
