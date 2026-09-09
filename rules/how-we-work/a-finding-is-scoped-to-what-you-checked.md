@@ -6,6 +6,8 @@ governs a set that is *"known precisely — not estimated, enumerated"*; **this 
 when you skip the enumeration and act on the estimate.**
 [`read-the-manual-first`](read-the-manual-first.md) is the obligation to find the record;
 this is the obligation to keep going back to it after you have summarised it.
+[`discriminate-by-executing-not-inspecting`](discriminate-by-executing-not-inspecting.md)
+— the actionable half: what to reach for instead of the artifact near the thing.
 
 ---
 

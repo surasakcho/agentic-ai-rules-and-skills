@@ -7,6 +7,8 @@ answer is "the same person who wrote the bug," the check inherits the bug and pa
 [`a-pr-nobody-is-asked-to-review-is-invisible`](../how-we-work/a-pr-nobody-is-asked-to-review-is-invisible.md)
 — "verify the effect, not the exit status" is the same distrust aimed one layer lower: at what a
 command *reports*, rather than at where a check gets its expectation.
+[`discriminate-by-executing-not-inspecting`](../how-we-work/discriminate-by-executing-not-inspecting.md)
+— the neighbouring failure: right source, wrong object.
 
 ---
 
