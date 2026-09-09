@@ -84,6 +84,28 @@ The tool reported 83 problems and the repo had none. **A watcher watching nothin
 not as breakage** — which is why the check fails the run rather than warning, and why the summary
 says a green result "checked less than it looks" whenever any row was skipped.
 
+## The registry's own `live` field is a claim, and nothing checks it
+
+**The row says what is true now. Nothing verifies that.** The tool compiles field 1 as a pattern and
+prints field 2 as the answer — so a `live` value that has itself been superseded is handed to
+every future run as the truth, by the instrument whose entire job is catching exactly that.
+
+**Observed 2026-09-09, and it is the sharpest instance this tool has produced.** A row guarding a
+deadlock claim carried, as its live value, *"the live build 97c9933 predates the flock and has no
+seedlock.py — it cannot deadlock."* That sentence had been falsified empirically the same evening —
+the build does deadlock, and the mechanism was known. So the **registry of superseded claims was
+itself asserting a superseded claim**, and would have kept answering the question correctly-shaped
+and wrongly for as long as anyone asked.
+
+**It was found by running the tool, not by reading the file** — the pattern still matched and no
+marker cleared it. The registry is part of the tree, so it is subject to its own check; that is
+worth knowing, because the instinct is to treat the registry as the reference rather than as input.
+
+**The general shape: correct behaviour, wrong object, silent.** The tool has no way to learn that
+its own expectation went stale, and it reports clean the entire time. So when a claim is corrected
+twice, **update the row as well as the documents** — and write the row to record the correction,
+not the half of it you were sure of at the time.
+
 ## Related
 
 [`a-correction-lands-where-you-noticed-it`](../../rules/how-we-work/a-correction-lands-where-you-noticed-it.md)

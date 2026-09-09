@@ -80,6 +80,18 @@ Two supporting habits, both cheap:
 distinguished by a human skimming either. In the incident above, one flagged hit was a correctly
 written retraction that simply never said so; the reader's eye lands on the stale number.
 
+**And know what registering does not buy you.** Reported by a second project on the day this rule
+was written: a row added *the same day the correction was made* — exactly as this rule asks — was
+wrong before that day ended, because the claim was corrected twice and only the first correction
+reached the row. The registry then asserted a superseded claim in the field it presents as the live
+truth, and every run would have handed that sentence to whoever asked.
+
+So **registering on time is necessary and not sufficient.** A row is a claim like any other, it ages
+like any other, and nothing in the tooling can tell that its expectation went stale. When something
+is corrected a second time, the row is one of the places the correction has to land — which is
+[`a-correction-lands-where-you-noticed-it`](a-correction-lands-where-you-noticed-it.md) applied to
+the registry itself.
+
 **Report coverage, not colour.** "No unqualified survivors across N registered claims" is a
 statement someone can evaluate. "Clean" is not. If the registry has six rows and the week had
 sixteen retractions, the honest summary says so.
