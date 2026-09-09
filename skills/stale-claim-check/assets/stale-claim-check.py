@@ -42,7 +42,16 @@ MARKERS = re.compile(
     # 2026-09-08: 8 of that run's 83 hits were the 175 THB fee quoted correctly,
     # i.e. next to the words that say it is unverified. A checker that flags the
     # careful phrasing teaches people to ignore it.
-    r"second-hand|unconfirmed|widely reported|no amount|not stated|amount is not",
+    r"second-hand|unconfirmed|widely reported|no amount|not stated|amount is not|"
+    # An APPEND-ONLY document carries its own retracted claims by construction -- that is
+    # what a revision log IS -- and the convention for marking them is a REVISED/AMENDED
+    # banner on the superseded section. Added 2026-09-09 after gamedev-srv ran this against
+    # a design document using `> **REVISED -- see 13.7.**` in twelve sections: the tool did
+    # not know the word, so every correctly-marked revision read as an unqualified survivor.
+    # Either the vocabulary learns the convention or every project changes its convention to
+    # suit the tool; the first is obviously right. Append-only documents are this tool's
+    # main habitat, not an edge case.
+    r"revised|amended|rescinded|see .?[0-9]+\.[0-9]",
     re.I,
 )
 CONTEXT = 3  # lines either side -- 2 was too tight; a 'refuted' sat just outside it
@@ -78,7 +87,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--registry", default="ops/superseded-claims.tsv")
     ap.add_argument("--root", default=".")
+    ap.add_argument("--no-default-excludes", action="store_true",
+                    help="also scan vendored/build directories (node_modules, vendor, ...)")
+    ap.add_argument("--exclude-dir", action="append", default=[],
+                    help="additional directory name to skip; repeatable")
     a = ap.parse_args()
+    DEFAULT_EXCLUDES = {"node_modules", "vendor", "third_party", ".venv", "venv",
+                        "site-packages", "dist", "build", ".next", "target"}
+    a.exclude_dirs = set(a.exclude_dir) | (set() if a.no_default_excludes else DEFAULT_EXCLUDES)
 
     rows, malformed = load(a.registry)
     if malformed:
@@ -88,7 +104,29 @@ def main():
         print("  Schema is: pattern <TAB> the live value <TAB> why it was superseded.")
         print("  A row in any other shape compiles its FIRST field as the regex, which is")
         print("  usually not the claim -- so the claim it was added for goes unwatched.\n")
-    files = [p for p in pathlib.Path(a.root).rglob("*.md") if ".git" not in p.parts]
+    # VENDORED TREES ARE EXCLUDED BY DEFAULT -- added 2026-09-09.
+    # A third-party changelog under node_modules cannot ASSERT anything about this project;
+    # it is someone else's record of someone else's decision. Every hit there is noise by
+    # construction, and noise is how a checker gets ignored -- the failure this file already
+    # argues about at length, arriving by a different door. gamedev-srv's first run outside
+    # the repo that grew this took SIX OF EIGHT hits from node_modules.
+    # Anchoring the registry pattern also fixed their case; that does not make this optional,
+    # because the exclusion holds regardless of pattern quality.
+    excluded = 0
+    def vendored(p):
+        return bool(set(p.parts) & a.exclude_dirs)
+    files = []
+    for p in pathlib.Path(a.root).rglob("*.md"):
+        if ".git" in p.parts:
+            continue
+        if vendored(p):
+            excluded += 1
+            continue
+        files.append(p)
+    if excluded:
+        # Say what was skipped. A silent exclusion is indistinguishable from a clean tree.
+        print(f"({excluded} file(s) in vendored/build directories excluded: "
+              f"{', '.join(sorted(a.exclude_dirs))}. Use --no-default-excludes to scan them.)\n")
 
     # FILE-LEVEL SUPERSEDED BANNER -- added 2026-08-31.
     # A document whose OPENING carries an abandonment/retraction banner is a historical record. Flagging

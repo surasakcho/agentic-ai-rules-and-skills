@@ -37,8 +37,19 @@ Nothing else is repo-specific — both paths are flags.
 ## How it decides
 
 - **Marker window.** An occurrence within 3 lines of `retract`, `supersed`, `~~`, `no longer`,
-  `formerly`, `unconfirmed` and friends is being *discussed*, not asserted, and is not flagged. Two
-  lines was too tight: a `refuted` sat just outside it.
+  `formerly`, `unconfirmed`, `revised`, `amended` and friends is being *discussed*, not asserted, and
+  is not flagged. Two lines was too tight: a `refuted` sat just outside it.
+- **`REVISED` / `AMENDED` are in the vocabulary because append-only documents are this tool's main
+  habitat, not an edge case.** A revision log carries its own retracted claims by construction, and
+  the convention for marking one is a banner on the superseded section — `> **REVISED — see §13.7.**`.
+  A tool that does not know the word turns every correctly-marked revision into an unqualified
+  survivor, which forces the project to change its convention to suit the checker. That is backwards.
+- **Vendored trees are skipped by default** — `node_modules`, `vendor`, `third_party`, `.venv`,
+  `site-packages`, `dist`, `build`, `.next`, `target`. **A third-party changelog cannot assert
+  anything about your project**; it is someone else's record of someone else's decision, so every hit
+  there is noise by construction. The count of skipped files is printed, because a silent exclusion
+  is indistinguishable from a clean tree. `--no-default-excludes` scans them anyway;
+  `--exclude-dir NAME` adds more.
 - **File-level banner.** A document whose first 25 lines carry an `ABANDONED` / `RETRACTED` /
   `SUPERSEDED` / `MOOT` banner is a historical record and is skipped whole. Only the first 25 lines
   count — a banner buried mid-file does not exempt the document, because a reader quoting line 200
@@ -49,7 +60,10 @@ Nothing else is repo-specific — both paths are flags.
 
 ## Read the output, do not trust the colour
 
-**False positives are expected and are not a bug.** First run: 5 flagged, 1 real. The other four were
+**False positives are expected and are not a bug.** First run: 5 flagged, 1 real. First run
+*outside* the repo that grew this (2026-09-09): 8 flagged, 1 real — **six of the eight came from
+`node_modules`** and the eighth was a properly-marked `REVISED` section. Both are now excluded by
+construction rather than by triage, which is where an exclusion belongs once you can name the class. The other four were
 legitimate — a scope document quoting the stale lines it exists to catalogue, and a table row
 deliberately reciting old figures to make a scale-free argument. The marker heuristic cannot read
 intent. **Triage every hit by opening it, and report the real/flagged ratio when you cite a run.** A
