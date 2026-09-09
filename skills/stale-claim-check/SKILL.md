@@ -101,6 +101,18 @@ and wrongly for as long as anyone asked.
 marker cleared it. The registry is part of the tree, so it is subject to its own check; that is
 worth knowing, because the instinct is to treat the registry as the reference rather than as input.
 
+**And the field has a shelf life, not just a truth value — a line number is the shortest.** The same
+row, rewritten to fix the error above, was about to go stale a second time within the hour: it cited
+`main.py` lines 664/675/691, true at `97c9933` and meaningless at HEAD, because the fixing commit
+moved everything (664 is now an unrelated guard, 675 the middle of a docstring). **That is a
+different failure from a wrong claim — it is a true claim decaying into a false citation**, and it
+needs no one to be mistaken about anything.
+
+The fix is to pin rather than to re-derive: the row carries **the command that reproduces it**
+(`git show 97c9933:./app/app/main.py`), the commit the numbers are true at, and an explicit note
+that they do not hold at HEAD. *A citation that says where to stand beats one that assumes the
+reader is already standing there.*
+
 **The general shape: correct behaviour, wrong object, silent.** The tool has no way to learn that
 its own expectation went stale, and it reports clean the entire time. So when a claim is corrected
 twice, **update the row as well as the documents** — and write the row to record the correction,
