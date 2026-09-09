@@ -82,7 +82,20 @@ values of which one had never once occurred in 600 runs, and that the "mistiming
 timing for exactly one of three player profiles — below that it is recall failure wearing timing's
 name. **That game's central design claim was measured with that column.**
 
-## Porting it
+## Adopt the manifest first; the runner is optional
+
+**The portable part is not the runner — it is the manifest**, and that is also the part another
+engine can adopt *before* anyone writes a runner for it. Four fields carry the whole idea: the
+readout, the hidden fact it is named after, the one-sentence `of`, and the scope.
+
+Someone on a different engine can write that manifest today, **read it by eye, and find a dead or
+inverted readout with no tool at all.** The founding defect would have been caught three days
+earlier that way. And if a second runner is ever built, the manifests are already there to test it
+against.
+
+So the order is: specify the declaration, leave the runner as a reference.
+
+## Porting the runner
 
 `assets/census.mjs` is a **reference implementation, not a drop-in.** It imports its host project's
 simulation harness (`createDriver`, `replay`, `TICK_DT`) and assumes a deterministic engine that can
