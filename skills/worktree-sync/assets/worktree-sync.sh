@@ -12,6 +12,44 @@ set -uo pipefail
 
 MAIN_BRANCH="${MAIN_BRANCH:-main}"
 cd "$(git rev-parse --show-toplevel)" || exit 1
+
+# --- RECURSION GUARD. First thing, before the fetch. -------------------------
+#
+# post-commit fires for EVERY commit git creates, and a rebase creates one per
+# replayed commit. So this script, run from post-commit, re-enters itself in the
+# middle of the rebase it started -- fetches again, and corrupts the operation
+# already in flight.
+#
+# The same four conditions were already checked further down, and being further
+# down is exactly the bug: they sat after the fetch and inside the main-branch
+# path, so the damage had begun before anything looked. A guard that runs after
+# the thing it guards is decoration.
+#
+# The symptoms are strange enough to be worth naming, because they send you
+# looking in the wrong place. A push rejected as "behind its remote counterpart"
+# one line after a SUCCESSFUL rebase onto that same remote. "Both sessions
+# changed the same lines" printed for files no two clones share. And an
+# open-conflicts entry whose worktree is literally "HEAD" with no conflicting
+# files captured -- because during a replay HEAD is detached, so
+# `rev-parse --abbrev-ref HEAD` answers "HEAD" rather than a branch name. An
+# empty conflicting-files field next to a named conflict is the tell.
+#
+# Reported by ebiz-srv, 2026-09-09, with a direct measurement rather than an
+# inference: "hook fired 2 time(s) for ONE git commit", against a control run
+# with hooks off that landed first try. It cost four failed push cycles and left
+# two artefact commits on that repo's main.
+gd_top="$(git rev-parse --git-dir 2>/dev/null)"
+if [ -n "$gd_top" ] && { [ -d "$gd_top/rebase-merge" ] || [ -d "$gd_top/rebase-apply" ] \
+     || [ -f "$gd_top/MERGE_HEAD" ] || [ -f "$gd_top/CHERRY_PICK_HEAD" ]; }; then
+  exit 0
+fi
+# Belt and braces: git sets GIT_REFLOG_ACTION during a replay, so the hook can
+# recognise its own recursion directly instead of inferring it from on-disk
+# state. Cheap, and it covers any operation whose state files we have not named.
+case "${GIT_REFLOG_ACTION:-}" in
+  rebase*|cherry-pick*|merge*|revert*) exit 0 ;;
+esac
+
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 
 # --- Tell the other sessions what just landed -------------------------------
