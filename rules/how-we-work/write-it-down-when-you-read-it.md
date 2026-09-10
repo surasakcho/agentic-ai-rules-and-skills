@@ -26,6 +26,18 @@ after the tenth.
 undecided. Judging it, scheduling it, or reconciling it against something it contradicts are later
 acts, and none of them is a precondition for writing it down.
 
+**Durable means IN THE REPO — tracked, committed, pushed.** This is the half the rule left
+implicit and it is the half that gets gamed. A scratch file, a note in the agent's own memory, or a
+task list that records what the input *became* all feel like compliance and none of them survives
+the things a transcript does not: another machine, another session, a disk. **An untracked file has
+no undo**, a private memory is invisible to everyone else, and a summary is not the words.
+
+**The words and the tasks are two different records, and keeping only the second is the common
+failure.** A tracker holds what an instruction turned into — already interpreted, already scoped.
+The verbatim log holds what was actually said, which is the only thing that can settle a
+disagreement about what was meant. Keeping the interpretation and discarding the source looks
+complete right up until the interpretation is questioned.
+
 **Contradictions get recorded as contradictions.** Two items that cannot both be true are two
 records plus a note, not one record and a silent choice. Resolving on the fly is how the losing half
 disappears without anyone deciding it should.
@@ -73,6 +85,12 @@ again.
 ## Guard
 
 - **Write before you reply.** The append and the acknowledgement are one action, in that order.
+- **Write it where a diff would show it.** If the record is not in version control, it is not
+  durable — it is a file one machine happens to have.
+- **Recover from the record, not from recall, when backfilling** — and size the population first.
+  A transcript's user turns are not all typed input: compaction summaries and injected skill bodies
+  arrive in the same shape. One backfill counted 408 and the real figure was 393, with a single
+  injected entry larger than every genuine message combined.
 - **Verbatim first, judgement later.** Quote what was said. Paraphrase is where meaning quietly
   shifts, and the shift is undetectable once the original is gone.
 - **"Noted" is not a capture** unless a file changed. If nothing was written, nothing was noted.
