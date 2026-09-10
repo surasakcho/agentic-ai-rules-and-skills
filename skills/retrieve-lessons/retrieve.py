@@ -292,6 +292,54 @@ def build_block(shared: Path, sha: str, selected, rules):
     return "\n".join(lines)
 
 
+def rules_changed(shared: Path, old_sha: str, new_sha: str):
+    """Which rule files differ between two SHAs. Empty list = the pin is behind but
+    NOTHING A CONSUMER LINKS TO has moved.
+
+    This distinction is the whole point and it was learned the expensive way. `--check`
+    used to compare repo HEAD, so a commit touching only `skills/` marked every consumer
+    stale -- and the remedy it recommended was provably a no-op, because skills reach
+    sessions by symlink and are live on pull regardless of any pin. One observed case:
+    78 links would have been rewritten to say nothing different.
+
+    A checker whose recommended fix changes nothing is how a checker gets muted, and a
+    muted checker misses the commit that DID move a rule.
+    """
+    r = run("git", "-C", str(shared), "diff", "--name-only",
+            f"{old_sha}..{new_sha}", "--", "rules/")
+    if r.returncode != 0:
+        # An unknown SHA is not "no change" -- it is "cannot tell", and those must not
+        # look the same. Returning None forces the caller to say so.
+        return None
+    return [l for l in r.stdout.splitlines() if l.strip()]
+
+
+def parse_block(text: str):
+    """The categories and rule files a CLAUDE.md block ALREADY links, read back out of it.
+
+    This is what makes re-pinning separable from re-detecting. `detect()` asks "what should
+    this repo adopt?", which is judgement and is wrong in both directions today. This asks
+    "what did someone already decide it adopts?", which is a fact recorded in the file.
+    Advancing a SHA over a set a human chose is mechanical; re-running detection under a
+    cron job is not, and conflating them is why nothing could be automated at all.
+    """
+    m = re.search(re.escape(BEGIN) + r"(.*?)" + re.escape(END), text, re.S)
+    if not m:
+        return None
+    body = m.group(1)
+    out = {}
+    for cat, name in re.findall(r"/rules/([a-z-]+)/([a-z0-9-]+\.md)\)", body):
+        out.setdefault(cat, set()).add(name)
+    if not out:
+        return None
+    # The evidence string a human reviewed when the category was adopted, kept verbatim.
+    # Re-deriving it here would be detection by the back door, and detection is the half
+    # that needs judgement.
+    ev = {c: [e.strip() for e in m2.split(",")]
+          for c, m2 in re.findall(r"\*\*([a-z-]+)\*\* — selected because this repo [^(]*\(([^)]*)\)", body)}
+    return {"rules": {c: sorted(v) for c, v in out.items()}, "evidence": ev}
+
+
 def read_pin(text: str):
     m = re.search(re.escape(BEGIN) + r".*?at `([0-9a-f]{6,40})`", text, re.S)
     return m.group(1) if m else None
@@ -307,6 +355,11 @@ def main():
     ap.add_argument("--check", action="store_true", help="exit 1 if the pin is stale/missing")
     ap.add_argument("--offline", action="store_true", help="never touch the network")
     ap.add_argument("--json", action="store_true", help="machine-readable detection output")
+    ap.add_argument("--repin", action="store_true",
+                    help="advance the SHA over the categories ALREADY in the block; never "
+                         "re-runs detection. No-op unless a rule actually moved (--force overrides)")
+    ap.add_argument("--force", action="store_true",
+                    help="with --repin: rewrite the block even when no rule changed")
     args = ap.parse_args()
 
     repo = Path(args.repo).resolve()
@@ -318,6 +371,64 @@ def main():
     # The pin is the REMOTE's SHA, never local HEAD -- see sync_shared().
     sha = published_sha(shared) if (args.offline or bool(args.shared)) \
         else sync_shared(shared)
+
+    # --repin runs BEFORE detect() is ever called, and that placement is the guarantee.
+    # "Never re-runs detection" is a structural property here, not a promise in a docstring:
+    # there is no detection result in scope to use by accident.
+    if args.repin:
+        cm = repo / "CLAUDE.md"
+        existing = cm.read_text(encoding="utf-8", errors="replace") if cm.exists() else ""
+        parsed = parse_block(existing)
+        if parsed is None:
+            raise SystemExit(
+                f"ERROR: no shared-lessons block in {cm} -- nothing to re-pin.\n"
+                f"       First-time adoption chooses CATEGORIES, which is judgement. "
+                f"Run --write and read what it proposes.")
+        pin = read_pin(existing)
+        old_rules, evidence = parsed["rules"], parsed["evidence"]
+
+        if pin == sha and not args.force:
+            print(f"already pinned at {sha} -- nothing to do")
+            return 0
+        changed = rules_changed(shared, pin, sha) if pin else None
+        if pin and changed is None and not args.force:
+            raise SystemExit(f"ERROR: cannot read the diff {pin}..{sha} -- refusing to re-pin "
+                             f"on an unverifiable comparison. Use --force only if you know why.")
+        if pin and not changed and not args.force:
+            print(f"held at {pin} (shared repo {sha}): no rule moved, so re-pinning would "
+                  f"rewrite {sum(len(v) for v in old_rules.values())} links to say nothing "
+                  f"different")
+            return 0
+
+        new_rules = rules_for(shared, sorted(old_rules))
+        # A rule that VANISHED is the one case a human must see. verify_links cannot catch
+        # it -- that checks the links about to be written, and a deleted rule simply stops
+        # being in the list. A rule is deleted when later experience contradicted it, so a
+        # disappearance can mean this repo is currently doing something now known to be wrong.
+        vanished = {c: [n for n in names if n not in new_rules.get(c, [])]
+                    for c, names in old_rules.items()}
+        vanished = {c: v for c, v in vanished.items() if v}
+        if vanished:
+            raise SystemExit(
+                "ERROR: rule(s) this repo links no longer exist at {}:\n{}\n"
+                "       A rule contradicted by later experience is DELETED, not hedged -- so\n"
+                "       this can mean something this repo does is now known to be wrong.\n"
+                "       Read the deletion, then re-run with --write.".format(
+                    sha, "\n".join(f"         rules/{c}/{n}" for c, v in vanished.items() for n in v)))
+
+        added = {c: [n for n in new_rules[c] if n not in old_rules[c]] for c in old_rules}
+        added = {c: v for c, v in added.items() if v}
+        verify_links(shared, sha, new_rules)
+        block = build_block(shared, sha, evidence, new_rules)
+        new = re.sub(re.escape(BEGIN) + r".*?" + re.escape(END), block, existing, flags=re.S)
+        cm.write_text(new, encoding="utf-8")
+        n_links = sum(len(v) for v in new_rules.values())
+        print(f"re-pinned {cm} {pin} -> {sha} "
+              f"({len(new_rules)} categories, {n_links} links, categories unchanged)")
+        for c, v in added.items():
+            for n in v:
+                print(f"  new rule in an adopted category: rules/{c}/{n}")
+        return 0
 
     selected = detect(repo)
     # No "nothing matched" path any more: MANDATORY is non-empty, so `selected` never is. The
@@ -347,12 +458,28 @@ def main():
         if BEGIN not in existing:
             print(f"\nPROBLEM: no shared-lessons block in {cm.name}. Run --write.")
             return 1
-        if pin != sha:
-            print(f"\nPROBLEM: pinned at {pin}, shared repo is at {sha}. "
-                  f"Re-read what changed, then --write.")
+        if pin == sha:
+            print(f"\nPin is current ({sha}).")
+            return 0
+        changed = rules_changed(shared, pin, sha)
+        if changed is None:
+            # Cannot tell is not the same as no change, and they must not print the same.
+            print(f"\nPROBLEM: pinned at {pin}, shared repo is at {sha}, and the diff "
+                  f"between them could not be read (unknown SHA? shallow clone?). "
+                  f"Unverifiable is not verified -- resolve it rather than assuming.")
             return 1
-        print(f"\nPin is current ({sha}).")
-        return 0
+        if not changed:
+            print(f"\nPin is behind ({pin} -> {sha}) but NO RULE MOVED -- holding is correct.\n"
+                  f"  Re-pinning would rewrite every link in the block to say nothing "
+                  f"different. Skills are not pinned: they reach sessions by symlink and "
+                  f"are already live.")
+            return 0
+        print(f"\nPROBLEM: pinned at {pin}, shared repo is at {sha}, "
+              f"and {len(changed)} rule file(s) moved:")
+        for f in changed:
+            print(f"         {f}")
+        print("\n  Read what changed, then --repin (same categories) or --write (re-detect).")
+        return 1
 
     block = build_block(shared, sha, selected, rules)
     if not args.write:

@@ -7,6 +7,7 @@ ones with no evidence. A detector that selects everything is the same as no dete
     python -X utf8 test_self.py
 """
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -158,6 +159,90 @@ def main():
 
         for label, ok in checks.items():
             print(f"  [{'ok' if ok else 'MISS'}] {label}")
+            if not ok:
+                failures.append(label)
+
+        # ---- re-pin: the SHA advances, the categories do not ----------------------
+        # Each case below is checked in BOTH directions where it can be: the hold case
+        # asserts the file was not rewritten, not merely that the exit code was 0.
+        rp_shared = tmp / "rp_shared"
+        rp_shared.mkdir()
+        build_shared(rp_shared)
+        rp_target = tmp / "rp_target"
+        rp_target.mkdir()
+        build_target(rp_target)
+        run(rp_target, rp_shared, "--offline", "--write")
+        cm = rp_target / "CLAUDE.md"
+        pinned_once = cm.read_text(encoding="utf-8")
+
+        # A commit that touches only skills/ must NOT make a consumer stale. This is the
+        # false alarm that cost 78 links of churn for no behavioural difference.
+        (rp_shared / "skills").mkdir(exist_ok=True)
+        (rp_shared / "skills" / "s.md").write_text("# skill\n", encoding="utf-8")
+        git(rp_shared, "add", "-A"); git(rp_shared, "commit", "-q", "-m", "skills only")
+        code, out = run(rp_target, rp_shared, "--offline", "--check")
+        for label, ok in [
+            ("--check holds through a skills-only commit", code == 0 and "NO RULE MOVED" in out),
+        ]:
+            print(f"  [{'ok' if ok else 'FAIL'}] {label}")
+            if not ok:
+                failures.append(label)
+
+        code, out = run(rp_target, rp_shared, "--offline", "--repin")
+        unchanged = cm.read_text(encoding="utf-8") == pinned_once
+        for label, ok in [
+            ("--repin holds, and does not rewrite the file", code == 0 and unchanged),
+        ]:
+            print(f"  [{'ok' if ok else 'FAIL'}] {label}")
+            if not ok:
+                failures.append(label)
+
+        # A commit that DOES touch rules/ must fire, and --repin must then write.
+        (rp_shared / "rules" / "how-we-work" / "new-rule.md").write_text(
+            "# new\n", encoding="utf-8")
+        git(rp_shared, "add", "-A"); git(rp_shared, "commit", "-q", "-m", "a rule moved")
+        code_check, out_check = run(rp_target, rp_shared, "--offline", "--check")
+        code_pin, out_pin = run(rp_target, rp_shared, "--offline", "--repin")
+        after = cm.read_text(encoding="utf-8")
+        cats_before = set(re.findall(r"/rules/([a-z-]+)/", pinned_once))
+        cats_after = set(re.findall(r"/rules/([a-z-]+)/", after))
+        for label, ok in [
+            ("--check fires when a rule moves, and names it",
+             code_check == 1 and "new-rule.md" in out_check),
+            ("--repin writes when a rule moved", code_pin == 0 and after != pinned_once),
+            ("--repin does NOT change the category set", cats_before == cats_after),
+            ("--repin picks up a new rule in an adopted category",
+             "new-rule.md" in after),
+        ]:
+            print(f"  [{'ok' if ok else 'FAIL'}] {label}")
+            if not ok:
+                failures.append(label)
+
+        # A linked rule that VANISHED must stop the run. verify_links cannot catch this --
+        # it checks the links about to be written, and a deleted rule just stops being one.
+        git(rp_shared, "rm", "-q", str(rp_shared / "rules" / "how-we-work" / "how-we-work-rule.md"))
+        git(rp_shared, "commit", "-q", "-m", "delete an adopted rule")
+        before_del = cm.read_text(encoding="utf-8")
+        code, out = run(rp_target, rp_shared, "--offline", "--repin")
+        for label, ok in [
+            ("--repin refuses when an adopted rule was deleted",
+             code != 0 and "no longer exist" in out
+             and cm.read_text(encoding="utf-8") == before_del),
+        ]:
+            print(f"  [{'ok' if ok else 'FAIL'}] {label}")
+            if not ok:
+                failures.append(label)
+
+        # First-time adoption is judgement and must not be invented by --repin.
+        fresh = tmp / "fresh"
+        fresh.mkdir()
+        build_target(fresh)
+        code, out = run(fresh, rp_shared, "--offline", "--repin")
+        for label, ok in [
+            ("--repin refuses a repo with no block, and points at --write",
+             code != 0 and "--write" in out),
+        ]:
+            print(f"  [{'ok' if ok else 'FAIL'}] {label}")
             if not ok:
                 failures.append(label)
 

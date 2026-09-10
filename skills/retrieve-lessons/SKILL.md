@@ -13,9 +13,53 @@ project learned; this pulls it into the next repo so the lesson is paid for once
 
 ```bash
 python -X utf8 retrieve.py --repo <target-repo>            # detect + show what it would adopt
-python -X utf8 retrieve.py --repo <target-repo> --write    # write the block into CLAUDE.md
-python -X utf8 retrieve.py --repo <target-repo> --check     # exit 1 if the pin is stale
+python -X utf8 retrieve.py --repo <target-repo> --write    # re-detect categories, write the block
+python -X utf8 retrieve.py --repo <target-repo> --repin    # advance the SHA, keep the categories
+python -X utf8 retrieve.py --repo <target-repo> --check    # exit 1 only if a RULE moved
 ```
+
+## `--write` and `--repin` are different operations, and separating them is what makes this safe
+
+`--write` does two things at once, with very different risk:
+
+| | risk | needs |
+|---|---|---|
+| **re-select** — which categories apply | judgement; detection is wrong in both directions | a human |
+| **re-pin** — advance the SHA over links already chosen | mechanical, fully verifiable | nothing |
+
+Coupling them is why none of this could be automated. A job that silently re-runs detection
+across twenty repos is a bad idea; a job that advances a SHA over a set a human already chose,
+and **stops** if any of those links stopped resolving, is not.
+
+`--repin` reads the categories back out of the existing block and never calls `detect()` — it runs
+before detection is reached at all, so *"never re-detects"* is structural rather than a promise.
+The original *"selected because…"* evidence is preserved verbatim; re-deriving it would be
+detection by the back door. It **refuses** on a repo with no block, because first-time adoption is
+category selection and that is judgement.
+
+**A rule that VANISHED stops the run.** `verify_links` cannot catch that — it checks the links
+about to be written, and a deleted rule simply stops being one. A rule contradicted by later
+experience is *deleted, not hedged*, so a disappearance can mean this repo is currently doing
+something now known to be wrong. That is the one case that must reach a person.
+
+## `--check` fires on `rules/`, not on repo HEAD
+
+**A commit touching only `skills/` does not make any consumer stale, and `--check` no longer says
+it does.** Skills reach sessions by symlink and are live on pull; only rules are pinned. The old
+HEAD comparison marked every repo stale on a skills-only commit, and the fix it recommended was a
+**provable no-op** — one observed case would have rewritten 78 links to say nothing different.
+
+**A checker whose recommended fix changes nothing is how a checker gets muted**, and a muted
+checker misses the commit that did move a rule. So `--check` now reports three states, and
+`--repin` holds by itself unless `--force` is passed:
+
+- **current** — pin equals the published SHA.
+- **behind, but no rule moved** — exit 0, and it says holding is correct.
+- **behind, and N rules moved** — exit 1, **naming each file**, so you read the diff rather than
+  re-pinning blind.
+
+A fourth exists and is deliberately not folded into "no change": if the diff between the two SHAs
+cannot be read at all, that is **unverifiable, not verified**, and it fails.
 
 Paths are arguments, never literals — a machine path in a shared skill publishes a username
 and a directory layout.
