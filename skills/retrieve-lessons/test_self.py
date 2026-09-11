@@ -30,6 +30,11 @@ def build_shared(root: Path):
         d.mkdir(parents=True)
         (d / f"{cat}-rule.md").write_text(f"# {cat}\n\n## The incident\n\nCost: real.\n",
                                           encoding="utf-8")
+        # A SECOND rule per category, so declining one rule leaves the category populated.
+        # With one rule each, "decline a rule" and "decline the category" are the same act
+        # and the distinction the selection record exists for cannot be tested at all.
+        (d / f"{cat}-rule-two.md").write_text(f"# {cat} two\n\n## The incident\n\nReal.\n",
+                                              encoding="utf-8")
     git(root, "init", "-q", "-b", "main")
     git(root, "config", "user.email", "t@t.t")
     git(root, "config", "user.name", "t")
@@ -241,6 +246,59 @@ def main():
         for label, ok in [
             ("--repin refuses a repo with no block, and points at --write",
              code != 0 and "--write" in out),
+        ]:
+            print(f"  [{'ok' if ok else 'FAIL'}] {label}")
+            if not ok:
+                failures.append(label)
+
+        # ---- selection record: review, decline, manual adopt ----------------------------
+        # PRD docs/prd/retrieve-lessons-review-and-declines.md -- all five "done" checks.
+        sel = tmp / "sel"
+        sel.mkdir()
+        build_target(sel)
+
+        code, out = run(sel, rp_shared, "--offline", "--review")
+        cm_absent = not (sel / "CLAUDE.md").exists()
+        code_d1, _ = run(sel, rp_shared, "--offline",
+                         "--decline", "testing", "--reason", "no suite anyone runs")
+        code_d2, _ = run(sel, rp_shared, "--offline",
+                         "--decline", "coding/coding-rule.md", "--reason", "does not fit")
+        code_w, _ = run(sel, rp_shared, "--offline", "--write")
+        block = (sel / "CLAUDE.md").read_text(encoding="utf-8")
+        rec = (sel / ".claude" / "lessons-selection.tsv").read_text(encoding="utf-8")
+
+        code_r2, out_r2 = run(sel, rp_shared, "--offline", "--review")
+        code_ra, out_ra = run(sel, rp_shared, "--offline", "--review", "--all")
+
+        # a category with NO detector evidence, adopted by hand, must survive --write
+        run(sel, rp_shared, "--offline", "--adopt", "research", "--reason", "we publish findings")
+        run(sel, rp_shared, "--offline", "--write")
+        block2 = (sel / "CLAUDE.md").read_text(encoding="utf-8")
+        run(sel, rp_shared, "--offline", "--write")
+        block3 = (sel / "CLAUDE.md").read_text(encoding="utf-8")
+
+        code_chk, _ = run(sel, rp_shared, "--offline", "--check")
+
+        for label, ok in [
+            ("--review writes nothing", code == 0 and cm_absent),
+            ("--decline records a category and a single rule",
+             code_d1 == 0 and code_d2 == 0
+             and "testing" in rec and "coding/coding-rule.md" in rec
+             and "no suite anyone runs" in rec),
+            ("a declined CATEGORY is absent from the written block",
+             code_w == 0 and "rules/testing/" not in block),
+            ("a declined RULE is absent, but its category survives",
+             "rules/coding/coding-rule.md)" not in block
+             and "rules/coding/coding-rule-two.md" in block),
+            ("declines persist: --review no longer offers them as new",
+             code_r2 == 0 and "declined" in out_r2.lower()),
+            ("--review --all re-presents declines WITH their reasons",
+             code_ra == 0 and "no suite anyone runs" in out_ra),
+            ("a hand-adopted category with no evidence reaches the block",
+             "rules/research/research-rule.md" in block2),
+            ("...and SURVIVES a second --write (the analytics drift bug)",
+             "rules/research/research-rule.md" in block3),
+            ("--check stays non-interactive and passes after all of it", code_chk == 0),
         ]:
             print(f"  [{'ok' if ok else 'FAIL'}] {label}")
             if not ok:

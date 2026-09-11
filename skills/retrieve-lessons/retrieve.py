@@ -250,6 +250,101 @@ def detect(repo: Path):
     return found
 
 
+
+# ---------------------------------------------------------------------------------------
+# The selection record. Declines and hand-adoptions are properties of the CONSUMING repo,
+# not of the shared rules, so they live with the repo and are version-controlled.
+#
+# Two failures this exists for, both observed:
+#   - A category the detectors miss must be adoptable BY HAND and must survive --write.
+#     `analytics` was hand-added OUTSIDE the generated block precisely because --write would
+#     wipe it, and then drifted two pins behind while the managed block moved twice.
+#   - A rule considered and rejected left no trace, so the same judgement was re-made from
+#     nothing at every retrieval. Declined and never-seen looked identical.
+#
+# Resurfacing is MANUAL and that is a ruling, not an oversight: "I will ask to review all
+# rules again." No timer, no repo-state trigger. Do not add one because it seems helpful.
+SELECTION = Path(".claude") / "lessons-selection.tsv"
+SEL_HEADER = "# verb\tscope\tdate\tsha\treason\n"
+
+
+def sel_path(repo: Path) -> Path:
+    return repo / SELECTION
+
+
+def read_selection(repo: Path):
+    """-> (declined:set[str], adopted:dict[str,str], rows:list[tuple]).
+
+    A scope is a category ("testing") or one rule inside it ("coding/foo.md").
+    A malformed row is NAMED and fatal, never silently skipped -- a selection file that
+    quietly drops a row would re-adopt something a human had declined.
+    """
+    p = sel_path(repo)
+    declined, adopted, rows = set(), {}, []
+    if not p.exists():
+        return declined, adopted, rows
+    for i, line in enumerate(p.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        parts = line.split("\t")
+        if len(parts) != 5:
+            raise SystemExit(f"ERROR: {p}:{i} has {len(parts)} fields, expected 5 "
+                             f"(verb/scope/date/sha/reason). Refusing to guess which "
+                             f"rules were declined.")
+        verb, scope, date, at, reason = (x.strip() for x in parts)
+        if verb == "DECLINE":
+            declined.add(scope)
+        elif verb == "ADOPT":
+            adopted[scope] = reason
+        else:
+            raise SystemExit(f"ERROR: {p}:{i} unknown verb {verb!r} (expected DECLINE/ADOPT)")
+        rows.append((verb, scope, date, at, reason))
+    return declined, adopted, rows
+
+
+def write_selection(repo: Path, verb: str, scope: str, sha: str, reason: str):
+    p = sel_path(repo)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    if not p.exists():
+        p.write_text(SEL_HEADER, encoding="utf-8")
+    if "\t" in reason or "\n" in reason:
+        raise SystemExit("ERROR: a reason may not contain a tab or a newline")
+    if not reason:
+        raise SystemExit(f"ERROR: --{verb.lower()} needs --reason. A decision with no reason "
+                         f"is one nobody can review later, which is the whole failure this "
+                         f"record exists to fix.")
+    date = subprocess.run(["date", "-u", "+%Y-%m-%d"], capture_output=True,
+                          encoding="utf-8").stdout.strip()
+    with p.open("a", encoding="utf-8") as f:
+        f.write(f"{verb}\t{scope}\t{date}\t{sha}\t{reason}\n")
+
+
+def apply_selection(selected, rules, declined, adopted, shared):
+    """Remove declined scopes; add hand-adopted categories. Returns (selected, rules)."""
+    for cat in list(selected):
+        if cat in declined:
+            if cat in MANDATORY:
+                raise SystemExit(f"ERROR: {cat} is mandatory for every project and cannot be "
+                                 f"declined. Remove the row from {SELECTION.as_posix()}.")
+            selected.pop(cat, None)
+            rules.pop(cat, None)
+    for cat, reason in adopted.items():
+        if cat in selected:
+            continue
+        d = shared / "rules" / cat
+        if not d.exists():
+            raise SystemExit(f"ERROR: {SELECTION.as_posix()} adopts rules/{cat}, which does "
+                             f"not exist in the shared repo.")
+        selected[cat] = [f"adopted by hand -- {reason}"]
+        rules[cat] = sorted(p.name for p in d.glob("*.md"))
+    for cat in list(rules):
+        rules[cat] = [n for n in rules[cat] if f"{cat}/{n}" not in declined]
+        if not rules[cat]:
+            selected.pop(cat, None)
+            rules.pop(cat, None)
+    return selected, rules
+
+
 def rules_for(shared: Path, cats):
     """Every rule file under each selected category. Missing category = hard error: it means
     the shared repo moved and this skill is pointing at nothing."""
@@ -358,6 +453,18 @@ def main():
     ap.add_argument("--repin", action="store_true",
                     help="advance the SHA over the categories ALREADY in the block; never "
                          "re-runs detection. No-op unless a rule actually moved (--force overrides)")
+    ap.add_argument("--review", action="store_true",
+                    help="show what WOULD be adopted, with evidence and any prior decisions, "
+                         "and write nothing. The review step before --write")
+    ap.add_argument("--all", action="store_true",
+                    help="with --review: re-present previously declined scopes too, with the "
+                         "reasons given. Resurfacing declines is MANUAL and this is the way")
+    ap.add_argument("--decline", metavar="SCOPE",
+                    help="record a decline: a category ('testing') or one rule "
+                         "('coding/foo.md'). Needs --reason")
+    ap.add_argument("--adopt", metavar="CATEGORY",
+                    help="adopt a category the detectors did not find. Needs --reason")
+    ap.add_argument("--reason", default="", help="why, in your own words -- recorded verbatim")
     ap.add_argument("--force", action="store_true",
                     help="with --repin: rewrite the block even when no rule changed")
     args = ap.parse_args()
@@ -371,6 +478,22 @@ def main():
     # The pin is the REMOTE's SHA, never local HEAD -- see sync_shared().
     sha = published_sha(shared) if (args.offline or bool(args.shared)) \
         else sync_shared(shared)
+
+    if args.decline or args.adopt:
+        if args.decline and args.adopt:
+            raise SystemExit("ERROR: --decline and --adopt in one run; do them separately so "
+                             "each lands as its own reviewable row")
+        verb, scope = ("DECLINE", args.decline) if args.decline else ("ADOPT", args.adopt)
+        if verb == "ADOPT" and "/" in scope:
+            raise SystemExit("ERROR: --adopt takes a CATEGORY, not a rule. A category is "
+                             "adopted whole; decline the rules inside it that do not fit.")
+        if verb == "DECLINE" and scope in MANDATORY:
+            raise SystemExit(f"ERROR: {scope} is mandatory for every project.")
+        write_selection(repo, verb, scope, sha, args.reason.strip())
+        print(f"recorded: {verb} {scope} -- {args.reason.strip()}")
+        print(f"  in {sel_path(repo)}")
+        print(f"  run --write to apply it to the block")
+        return 0
 
     # --repin runs BEFORE detect() is ever called, and that placement is the guarantee.
     # "Never re-runs detection" is a structural property here, not a promise in a docstring:
@@ -437,7 +560,38 @@ def main():
     # Assert the invariant instead of pretending to handle its negation.
     assert selected, "MANDATORY is empty -- every project must adopt at least the mandatory rules"
     rules = rules_for(shared, selected)
+    declined, adopted, sel_rows = read_selection(repo)
+    selected, rules = apply_selection(selected, rules, declined, adopted, shared)
     verify_links(shared, sha, rules)
+
+    if args.review:
+        print(f"\nshared repo at {sha}\n")
+        print("WOULD ADOPT:")
+        for cat in ([c for c in MANDATORY if c in selected]
+                    + sorted(c for c in selected if c not in MANDATORY)):
+            print(f"  {cat:18} {', '.join(selected[cat])}")
+            for name in rules[cat]:
+                print(f"      - {name}")
+        skipped = [c for c in DETECTORS
+                   if c not in selected and c not in declined
+                   and (shared / "rules" / c).exists()]
+        if skipped:
+            print("\nNOT ADOPTED -- no evidence found. Adopt by hand with "
+                  "--adopt CAT --reason ...:")
+            for c in skipped:
+                print(f"  {c:18} {DETECTORS[c]['why'][:70]}")
+        if declined:
+            print("\nPREVIOUSLY DECLINED -- not offered again unless you ask:")
+            for verb, scope, date, at, reason in sel_rows:
+                if verb != "DECLINE":
+                    continue
+                if args.all:
+                    print(f"  {scope:34} {date}  {reason}")
+                else:
+                    print(f"  {scope:34} {date}  (--review --all shows why)")
+        print("\nNothing was written. --write applies this; "
+              "--decline SCOPE --reason ... changes it.")
+        return 0
 
     if args.json:
         print(json.dumps({"sha": sha, "selected": selected, "rules": rules}, indent=2))
