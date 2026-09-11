@@ -1,5 +1,8 @@
 # Mocking a screen
 
+**The rule is [`mock-the-screen-before-you-build-it`](../../rules/coding/mock-the-screen-before-you-build-it.md).
+This file is the procedure, not a replacement for it.**
+
 **No UI is built before the owner has looked at a picture of it.** For screens that means an HTML
 mockup screenshotted in a real browser — not Canva. *Canva is for brand assets; see
 [`mock-brand.md`](mock-brand.md).*
