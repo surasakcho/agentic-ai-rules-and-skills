@@ -105,3 +105,18 @@ dismantling a confident explanation of something that had never been checked.
 *Earned from:* user instruction, immediately after the above — *"always do things straightforward.
 When things turned out unexpected, prompt and propose a solution. Never assume or implicitly
 decide any solution on your own."*
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'the construction the rule names - I noticed X, so I did Y - in an outgoing message, and a fix committed in the same turn as a discovered anomaly with no ask'
+trigger: 'Stop'
+check: 'msg matches /noticed .{0,80}(so|therefore) I/ -> refuse'
+escape: 'a one-line justification naming which side of the rule own boundary this is - closing a gap in your own rigour is correct and looks identical'
+narrows: 'gates the sentence the rule says gives it away; the boundary between acting and proposing is judgement'
+```

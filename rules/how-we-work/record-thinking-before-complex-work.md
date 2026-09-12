@@ -51,3 +51,19 @@ mistakes are made of.
 *Earned from:* proactive practice, no incident yet — added on user instruction rather than
 extracted from a failure. Flagged as a deviation from this repo's normal bar (a rule enters only
 after a real incident); revisit this line if/when a concrete incident supersedes it.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'a branch diff over N changed lines with no thinking file touched in the same branch'
+trigger: 'pre-commit'
+check: 'changed_lines > N and nothing under thinking/ was touched -> block'
+escape: 'path exclusions for mechanical bulk edits - renames, generated files, link repointing - or a recorded reason'
+fires_late: true
+note: 'the threshold is arguable; the check is not'
+```

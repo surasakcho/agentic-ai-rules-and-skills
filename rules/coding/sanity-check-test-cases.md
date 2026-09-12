@@ -43,3 +43,18 @@ the automated check agree with each other but both disagree with reality.
 *Earned from:* proactive practice, no incident yet — added on user instruction rather than
 extracted from a failure, consistent with
 [`record-thinking-before-complex-work`](../how-we-work/record-thinking-before-complex-work.md).
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'surviving mutants on the changed logic - the mechanical form of tests that encode the same blind spot as the code they were written beside'
+trigger: 'CI'
+check: 'mutation_score(changed) < threshold -> fail'
+escape: 'a baseline ratchet, and equivalent mutants declared'
+narrows: 'a surviving mutant is a test that cannot fail, which is the rule real subject; hand-tracing a sample by eye has no artifact and stays prose'
+```

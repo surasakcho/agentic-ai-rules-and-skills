@@ -86,3 +86,18 @@ machine's layout into every project that adopts this.
 had one answered by a bare "yes" that resolved only the most recent, and left the rest
 undetected — including one that had already gone unanswered across two prior sessions and
 survived only because a handoff file happened to capture it.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'a question put to the human in the outgoing message with no tracker entry written in the same turn'
+trigger: 'Stop'
+check: 'msg has a question to the user and no tracker write this turn -> refuse'
+escape: 'write the entry - ten seconds, per the rule; a rhetorical question is marked as one'
+note: 'the entry records what is blocked and what the default is if no answer comes'
+```

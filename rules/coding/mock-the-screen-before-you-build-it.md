@@ -64,3 +64,19 @@ stop condition does not protect the build; it replaces it.
 *Earned from:* an operator directive on 2026-09-11 that all visual and UX work be mocked before
 development. The tool split came out of grilling the instruction rather than executing it as
 stated — the named tool was right for brand assets and wrong for application screens.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'a commit touching UI files with no mockup artifact committed earlier in the branch, and whether three states were rendered rather than one'
+trigger: 'pre-commit'
+check: 'ui files changed and no mockup in the branch history -> block'
+escape: 'a small UI fix under the threshold, or a declared exemption'
+fires_late: true
+note: 'the rule moment is before the build; a commit-time catch is the late version and says so'
+```

@@ -132,3 +132,19 @@ a matter of remembering.
 that had to be written twice because none of them recorded what it had found — and, in the same
 week, a verified experiment whose promoted result was delivered as a chat message and never
 written down.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a probe path being staged, any tracked file under a declared scratch directory, and a probe with no log row naming its question'
+trigger: 'PreToolUse(Bash) on git add, plus pre-commit'
+check: 'staged path under scratch_dir -> deny; tracked file under scratch/ -> block'
+escape: 'a module legitimately named scratch is declared once'
+narrows: 'gates the disposition half; that the licence expires the moment the concept works is a trigger with no artifact'
+fires_late: true
+```

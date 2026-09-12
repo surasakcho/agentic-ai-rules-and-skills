@@ -66,3 +66,19 @@ pressure at all to do the second.
 4. **Report the real-to-flagged ratio** when you cite a run. A checker that fires on
    careful phrasing gets muted, and a muted checker is worse than none.
 5. **Treat a green run as "the registry is clean"**, never as "the repo is clean".
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'files that still ASSERT a retracted claim - the registered pattern present with no supersession marker inside the marker window'
+trigger: 'pre-commit'
+check: 'for row in registry - hits = grep(row.pattern) minus marked_superseded; any hits -> block'
+escape: 'marker vocabulary (superseded, revised, rescinded, no longer) near the figure, or a file-level exempt marker for a file that is the worked example'
+implemented_by: 'skills/stale-claim-check/'
+note: 'green means the registry is clean, never that the repo is - report coverage, not colour'
+```

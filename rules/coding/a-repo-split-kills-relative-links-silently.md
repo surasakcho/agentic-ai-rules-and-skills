@@ -55,3 +55,18 @@ that this was deliberate.
 *Earned from:* extracting a venture into its own repository on 2026-09-11. The code was cleanly
 decoupled, and four documents still carried links that climbed above the new root; the first pass
 also left behind the sixteen agent definitions the repo's own review process requires.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'relative links that resolve outside the repo root, an ignore file absent on the first run, and the test suite never run standalone in the new repo'
+trigger: 'check exit code, in the same commit as the split'
+check: 'dest resolves outside root -> problem; drive the escaping-link count to zero before pushing'
+escape: 'rewrite escaping links to absolute URLs in the split commit'
+implemented_by: 'skills/lesson-review/harvest.py'
+```

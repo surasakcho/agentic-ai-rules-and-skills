@@ -58,3 +58,18 @@ around the gap it left.
 *Earned from:* a two-file consolidation on 2026-09-11 that found four single-homed tasks, one of
 which gated publication, plus three owner-asked questions that sat untriaged for a day while work
 was built around them.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'task-shaped lines (unchecked boxes, decision rows, TODO entries) removed or restructured in a document, with no matching entry in the declared tracker'
+trigger: 'pre-commit'
+check: 'deleted_task_lines minus tracker_entries -> block'
+escape: 'the task appears as done in the tracker, or the commit records it as explicitly dropped'
+note: 'requires the repo to declare where its tracker lives - the rule leaves the location per-project, and the declaration is what makes it checkable'
+```

@@ -103,3 +103,19 @@ crude proxy and call it enforcement.
 *Earned from:* a data-preparation handoff, 2026-08. The user's reply to the third caveat was
 **"Do it then"** — which is the only reply such a caveat can ever get, and the reason this rule
 exists.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a silent skip inside a verification loop (continue on a missing name), and a step that reads an artifact another step produces without asserting they agree on the population'
+trigger: 'pre-commit lint plus a Stop advisory on caveat phrasing'
+check: 'AST - continue-on-missing inside a verify loop -> block; summary matches /could verify|shall I look/ -> advise'
+escape: 'assert the expected count instead of skipping; a deliberately optional field is declared'
+narrows: 'the two named consequences gate; the disposition does not - the rule already says so in its own Mechanisable section'
+fires_late: true
+```

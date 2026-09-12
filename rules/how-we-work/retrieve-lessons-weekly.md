@@ -73,3 +73,19 @@ is publishing.
 *Earned from:* a repo that had published nine rules outward over two days and never once run the
 retrieval in the other direction — the consuming half existed as a skill, with no cadence
 attached to it and nowhere to record that it had been run.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'the pin against the shared repo HEAD, and the newest date in the retrieval log'
+trigger: 'check exit code'
+check: 'retrieve.py --check nonzero on drift; age(log) > 7 -> fail'
+escape: 'read the diff, then advance the pin'
+implemented_by: 'skills/retrieve-lessons/retrieve.py'
+note: 'advancing the pin to silence the check is the retrieval equivalent of deleting a failing test'
+```

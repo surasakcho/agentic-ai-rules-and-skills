@@ -90,3 +90,19 @@ how large the problem actually was.
 *Earned from:* user instruction — *"Do all things straightforward and exact solution first even if
 it will lead to difficulty. Then handle what remains later by propose me sound solution. Never
 assume or bypass these steps."*
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a computed branch or match-quality label that is never persisted to the output, and a fuzzy fallback with no recorded strict-pass residual count'
+trigger: 'pre-commit lint'
+check: 'a branch label is computed and not written -> block'
+escape: 'persist the label - the rule already states this as an imperative'
+narrows: 'gates the absorbing fallback, which has a code shape; running strict first and enumerating the residual stays prose'
+fires_late: true
+```

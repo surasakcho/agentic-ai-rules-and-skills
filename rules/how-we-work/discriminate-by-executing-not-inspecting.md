@@ -101,3 +101,19 @@ were false?** If you cannot answer, you have an observation, not a check.
 Then prefer, in order: run the thing and read its effect · run the two cases and compare · read the
 primary artifact in full · read a summary of it. **The last is not a check** — it is a reason to do
 one of the first three.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'for every named flag or metric, lift = P(flag given the fact it names) minus P(flag given that fact absent), and whether each non-positive row carries a stated reason'
+trigger: 'scheduled audit or CI over the readout'
+check: 'lift <= 0 and the row carries no reason -> fail'
+escape: 'a deliberately retired mechanic reads dead and is correct - name the reason; the gate is that every failing row is explained, never that the table is green'
+narrows: 'mechanises the telemetry case the rule mechanised itself; the general discipline stays prose'
+fires_late: true
+```

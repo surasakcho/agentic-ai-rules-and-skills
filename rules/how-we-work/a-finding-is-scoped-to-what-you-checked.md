@@ -81,3 +81,19 @@ name as a candidate and dropped the ruling against it.
 Before a finding crosses from one case to another, answer in one line: **which cases did I open, and
 is this one of them?** If the answer is "I opened one and this is a different one", the finding has
 not been established here yet — and saying so costs a sentence, where being wrong costs a retraction.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a universal quantifier (every, all, none, always) in a written finding with no count in the same sentence'
+trigger: 'pre-commit on finding documents plus Stop advisory'
+check: 'claim matches /\b(every|all|none)\b/ and no adjacent count -> flag'
+escape: 'put the count in the sentence - which is the rule prescription already'
+narrows: 'gates the phrasing the rule names as the tell; cannot tell whether case N+1 was actually opened'
+fires_late: true
+```

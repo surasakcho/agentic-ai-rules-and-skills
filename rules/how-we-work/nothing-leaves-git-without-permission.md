@@ -98,3 +98,18 @@ recovery strategy.
 The user's instruction afterwards, which is now this rule:
 
 > "before excluding any file from git commit, ask for my decision first. never decide on your own."
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'tool input matching an exclusion verb - a .gitignore write, git rm --cached, --assume-unchanged, --skip-worktree'
+trigger: 'PreToolUse(Bash|Write|Edit)'
+check: 'cmd or edit matches EXCLUSION_VERBS -> deny and put it to the operator'
+escape: 'the operator own confirmation - a new repo still gets the list proposed rather than applied'
+note: 'the asymmetry is the reason this is absolute - an untracked file has no undo inside the repo at all'
+```

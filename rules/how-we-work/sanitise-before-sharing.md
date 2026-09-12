@@ -89,3 +89,19 @@ result. Do that one by hand, deliberately, and say that you did.
 
 Related: [publish-lessons-weekly](publish-lessons-weekly.md) decides *what* gets shared; this
 rule decides what that thing may *contain*. Run this one second, and treat it as blocking.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'people, places and paths in anything crossing from a private context to a public one - and the push itself, not only the check'
+trigger: 'check exit code, plus PreToolUse(Bash) on a push to a public remote'
+check: 'harvest.py --check --deny; and push to a public remote whose diff matches the denylist -> deny'
+escape: 'placeholder segments are not hits'
+implemented_by: 'skills/lesson-review/harvest.py'
+narrows: 'people, places and paths gate; findings need a reader, and the rule already says only a reader can tell whether a number is a result'
+```

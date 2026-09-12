@@ -59,3 +59,19 @@ is always available and a decisive check might end the work.**
 Before dispatching another review round, answer in one line: **what in the last round was mine to send rather
 than mine to fix?** If the answer is "nothing", check the status surface actually says what is owed — because
 the most common reason nothing looks escalatable is that something already recorded it as closed.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'the status surface asserting nothing is owed while the tracker holds open items marked as needing the principal'
+trigger: 'pre-commit on the status file, plus a session-start advisory'
+check: 'status asserts nothing owed and open_owner_blocked > 0 -> block'
+escape: 'update the status line - which is the fix'
+fires_late: true
+note: 'the enabling condition the rule names is a stale status line, and that contradiction is exactly computable'
+```

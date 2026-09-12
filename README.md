@@ -46,6 +46,14 @@ About half of what is written down can be mechanised. The other half — judging
 invariant matches the domain, whether a caption matches its figure — needs a human or an
 agent that actually looks. Both halves are here. Neither pretends to be the other.
 
+**"About half" was an estimate, and a reduction pass has since measured it.** Of the 56 rules
+in `how-we-work/` and `coding/`, **50 reduce to something a machine can check** — 29 at full
+strength, 21 only in a narrowed form that covers the incident but not the rule's whole intent,
+and **6 that genuinely do not reduce.** Each rule now carries its own `## Enforcement` clause
+naming the observable and the moment it fires; the six without one are the finding, not an
+omission. See **[docs/gateability.md](docs/gateability.md)** for the verdicts, the priority
+ordering, and why a gate on the remaining six would be worse than the prose.
+
 ## Rules by task type
 
 | Category | Rule | Earned from |

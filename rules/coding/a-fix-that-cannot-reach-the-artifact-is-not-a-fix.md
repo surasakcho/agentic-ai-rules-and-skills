@@ -75,3 +75,19 @@ defect.
 *Earned from:* seven instances in a single day in one application, five in the app, one in the
 mechanism written to prevent them, and one in the test that was green for weeks about a database
 that could not exist. Every one passed its own check.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a test environment disabling a constraint production enables (foreign keys off, relaxed pragmas), and a migration or backfill with no test seeded from the defective population'
+trigger: 'pre-commit or CI'
+check: 'a test disables a constraint that production enables -> block; a migration with no polluted-state fixture -> block'
+escape: 'a fixture that legitimately needs the constraint off declares it per file'
+narrows: 'catches the check-and-artifact-are-different-objects shape; cannot verify the fix reached the running row'
+fires_late: true
+```

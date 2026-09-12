@@ -128,3 +128,18 @@ scratchpad and offering both the install and the rollback from there — after v
 about the change except whether the files would still exist when the operator ran them. Caught by
 the operator, not by the agent, who then widened it: anything destined for business-as-usual is
 built permanent from the start.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'the filesystem behind any path handed to a human or referenced by a recurring command - the rule names the command, findmnt -no FSTYPE,OPTIONS'
+trigger: 'Stop, plus PreToolUse(Bash) on schedule installs'
+check: 'an outgoing message references a scratchpad path -> refuse; a cron or systemd unit references a tmpfs path -> deny'
+escape: 'say plainly that the artifact is temporary and not for reuse'
+note: 'also guard the pipe-from-live-source fix - assert a floor on what came back, so an empty stream never reaches a writer that accepts it'
+```

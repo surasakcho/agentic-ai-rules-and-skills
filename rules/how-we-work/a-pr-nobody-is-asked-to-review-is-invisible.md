@@ -89,3 +89,18 @@ a PR instead has, without a reviewer, converted a visible commit into an invisib
 *Earned from:* a bot-authored fork PR that its operator could not find in their GitHub app,
 because no reviewer or assignee was ever set — and a sweep prompted by that which found an
 outside contributor's PR sitting unrouted in another repository of the same owner.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'a gh pr create argv missing --reviewer or --assignee; and open PRs whose reviewRequests and assignees are both empty'
+trigger: 'PreToolUse(Bash) plus a scheduled sweep'
+check: 'gh pr create without both flags -> deny; sweep gh search prs --state open and read both fields back'
+escape: 'a solo repo uses --assignee @me'
+note: 'exit 0 is not evidence - gh accepts --reviewer from the author, sets nothing, and exits 0, so the sweep reads the state back'
+```

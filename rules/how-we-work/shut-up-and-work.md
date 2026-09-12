@@ -86,3 +86,18 @@ obviously different.
 scoped claim read as an unscoped one — strengthened by a second instruction, after a session of
 fluent multi-section prose reports whose open questions went unanswered because the reader had to
 mine them out of paragraphs.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a vague quantifier (several, some, mostly, a few) standing where a count was available'
+trigger: 'Stop'
+check: 'msg matches VAGUE_QUANTIFIER near a countable set -> refuse'
+escape: 'state the count, or say plainly that it was not measured'
+narrows: 'gates the completeness half ONLY. Never gate length here - a word-count gate rewards exactly the lossy compression this rule forbids, and terseness that drops a count is the failure mode, not the rule'
+```

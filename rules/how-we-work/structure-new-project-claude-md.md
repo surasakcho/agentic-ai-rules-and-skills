@@ -49,3 +49,17 @@ the constraints — instead of every edit risking the other two.
 *Earned from:* proactive practice, no incident yet — added on user instruction rather than
 extracted from a failure, consistent with
 [`record-thinking-before-complex-work`](record-thinking-before-complex-work.md).
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'a newly added CLAUDE.md and whether it carries System, Your rules, and Project brief in that order'
+trigger: 'pre-commit on added files'
+check: 'new CLAUDE.md and headings do not match the expected three -> block'
+escape: 'applies to newly added files only, so existing ones are untouched'
+```

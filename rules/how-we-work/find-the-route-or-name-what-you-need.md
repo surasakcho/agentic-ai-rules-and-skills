@@ -99,3 +99,18 @@ off-limits, and pretending otherwise is worse than a clean refusal.
 The rule governs the **shape** of what you produce at that moment. State the limit once, then
 either route around it or name exactly what you need and from whom — and keep building everything
 the limit does not touch.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'the tells the rule names - an imperative aimed at the user, an estimate of how long their work will take, and the same refusal restated across turns'
+trigger: 'Stop'
+check: 'msg has an imperative to the user and a duration estimate -> refuse; a refusal repeated in more than one turn -> refuse'
+escape: 'phrase it as a requisition - the resource, and who can supply it'
+narrows: 'gates the handback shape; whether a route was genuinely searched for has no artifact'
+```

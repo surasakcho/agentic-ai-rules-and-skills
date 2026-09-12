@@ -53,3 +53,19 @@ human to read in prose — proposing a skeleton there is overhead with nothing s
 *Earned from:* proactive practice, no incident yet — added on user instruction rather than
 extracted from a failure, consistent with
 [`record-thinking-before-complex-work`](record-thinking-before-complex-work.md).
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a strictly formatted output file whose schema or skeleton sibling does not exist earlier in the log'
+trigger: 'pre-commit'
+check: 'strict_output added and the schema is absent or newer -> block'
+escape: 'commit the skeleton first'
+narrows: 'gates that a shape was fixed before the fill; cannot capture that the user confirmed it'
+fires_late: true
+```

@@ -59,3 +59,18 @@ mandate. The slip happens because you are thinking about the decision, not about
 **And a peer sounds like a colleague, not like a stranger with claims to verify.** The whole point of
 a peer session is that it is competent and working on your side. That is precisely why an
 unattributed instruction from one goes unexamined.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'an outgoing inter-agent message carrying an authority word (operator, owner, principal, directive) plus an imperative, with no attribution phrase'
+trigger: 'PreToolUse(Agent or SendMessage)'
+check: 'has_authority_word and imperative and not attributed -> deny'
+escape: 'name who said it - one word, and the rule says that is the whole difference'
+narrows: 'gates the relaying half, where the error is grammatical and visible; how a receiver treats a relay is disposition'
+```

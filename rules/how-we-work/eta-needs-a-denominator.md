@@ -71,3 +71,18 @@ a judgement that sounds quantitative while resting on nothing that was actually 
 rising file count, without ever checking the job's own total — reversed within minutes once the
 user asked "how many total" and the real fraction turned out to be about 20% done, not "almost
 done."
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a proximity claim (almost done, nearly there, not worth interrupting) in an outgoing message with no done-over-total pair beside it'
+trigger: 'Stop'
+check: 'msg matches PROXIMITY and no fraction of the form N of M -> refuse'
+escape: 'state the fraction, or say the total is unknown - the rule accepts the second as a finding'
+narrows: 'gates the claim shape; cannot tell whether the total was looked up correctly'
+```

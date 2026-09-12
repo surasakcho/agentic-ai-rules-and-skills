@@ -69,3 +69,18 @@ requirements document or a named reproduced defect. That converts *"the agent re
 
 *Earned from:* testing a newly-adopted PRD rule on 2026-09-11 with two blind agents. It blocked the
 right one and cleared the right one, and still let a full feature be built before it spoke.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'every rule declared trigger, against the moment its own statement names'
+trigger: 'CI over this repo'
+check: 'the rule says before X starts, the trigger is commit-time, and fires_late is absent -> fail'
+escape: 'set fires_late true - which is the admission this rule asks for, not a way around it'
+note: 'this rule is why trigger is a mandatory field in every clause in the corpus'
+```

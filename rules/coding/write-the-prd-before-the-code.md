@@ -83,3 +83,18 @@ requirement with known gaps.
 three games built with no written design because charters existed and were never read, and an
 incubator that produced 8,093 lines of documents, a seven-round review costing four times the
 experiment it described, and nothing shipped at all.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'an edit to an implementation path while no PRD and no named reproduced defect is referenced in the repo'
+trigger: 'PreToolUse(Write|Edit), with a pre-commit backstop'
+check: 'edit(impl_path) and no PRD referenced -> deny, before the first line is written'
+escape: 'a one-line fix, or a named reproduced defect - the carve-out the rule already states'
+note: 'the backstop alone is the late version - the tested rule refused the commit and still let a whole feature be built first'
+```

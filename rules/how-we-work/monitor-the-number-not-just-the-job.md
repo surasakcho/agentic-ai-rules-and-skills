@@ -91,3 +91,18 @@ For every unattended job, ask both, separately:
 *Earned from:* a funding-accrual job that ran flawlessly for 59 days, pinged green throughout,
 and booked one eighth of what it had earned — discovered only by deriving the expected income
 from the exchange's own settlement record rather than from the code that booked it.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'every scheduled unit discovered from the filesystem or config, mapped to a registered reconciler; and the three states OK, DIVERGED, UNKNOWN with UNKNOWN carrying the worst exit code'
+trigger: 'CI plus a schedule'
+check: 'units = discover(); any unmapped -> UNKNOWN -> nonzero; a reconciler that is not itself scheduled -> fail'
+escape: 'a job producing an artifact but no value declares that it has none'
+note: 'enumerate the units, never hand-list them - the harness that would have caught the incident existed and was pointed at a different sleeve'
+```

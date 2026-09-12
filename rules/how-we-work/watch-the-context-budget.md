@@ -73,3 +73,18 @@ a person's time spent dismantling a fluent reconstruction of something that had 
 
 *Earned from:* user instruction — *"always monitor percent of context. If exceed 40%, prompt for
 compact."* — given at the end of the session described above.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'context usage as a percentage of the window'
+trigger: 'per-turn hook or PreCompact'
+check: 'usage > 0.40 and not already prompted this session -> prompt, stating the number'
+escape: 'the user declines - the rule forbids compacting unilaterally in any case'
+note: 'measure the thing being managed; a turn count and context usage have almost no relationship'
+```

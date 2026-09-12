@@ -66,3 +66,19 @@ In the same session, all four had failed:
 Before adding a correction to a document you have already corrected several times, ask: **what would have to
 be true for me to delete this document instead?** If nothing would, you are not reviewing it. You are keeping
 it alive one amendment at a time.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'retraction-registry rows added in a window, against objects actually ended - a document deleted, or marked superseded rather than amended'
+trigger: 'scheduled audit plus Stop advisory'
+check: 'rows_added(window) >= N and objects_ended(window) == 0 -> report the ratio'
+escape: 'never refuses - it reports a number a human reads'
+narrows: 'gates the ratio and the staleness of the instruments; whether an object should have been abandoned is judgement and stays prose'
+fires_late: true
+```

@@ -105,3 +105,18 @@ Expect one trailing-newline difference; some hosts append one.
 
 *The canary is cheap and always there; the byte-diff is exact and perishable. Use the canary
 when you did not arrange for the other one.*
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'an unquoted heredoc, or a double-quoted body or message argument whose text contains a backtick, a dollar-paren, or a backslash'
+trigger: 'PreToolUse(Bash)'
+check: 'a publishing command whose body is double-quoted and contains shell metacharacters -> deny, and require a body file or a quoted heredoc delimiter'
+escape: 'a short body containing no metacharacters at all'
+note: 'verify the published artifact with a canary - absence of visible damage proves nothing, because a deletion leaves no trace'
+```

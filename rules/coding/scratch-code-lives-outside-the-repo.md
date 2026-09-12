@@ -98,3 +98,18 @@ Before writing a script whose only purpose is to answer a question you're holdin
 a project's own repo-tracked `scratch/` directory under a "delete when done" convention that
 predictably did not get followed — revised, on the same project's direct feedback, to keep
 scratch code out of the repository in the first place rather than trust it to be deleted.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'a staged path under a scratch directory, and any tracked file inside one'
+trigger: 'PreToolUse(Bash) on git add, plus pre-commit'
+check: 'staged path under scratch_dir -> deny; any tracked file under scratch/ -> block'
+escape: 'a module legitimately named scratch is declared once'
+note: 'this removes the option to forget rather than asking for better compliance with deleting later'
+```

@@ -73,3 +73,19 @@ unless you mark it, and they will act on the number either way.
 Before reporting an investigation, ask: **if they ask "is that everything?", can I answer from
 what I already ran, or would I have to go and look?** If the second, the investigation is not
 finished — regardless of whether the question asked has been answered.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a reconciliation or comparison report with no explicit unexplained bucket printed as a number, or reporting only one direction of the difference'
+trigger: 'pre-commit or CI on the report artifact'
+check: 'report lacks unexplained:N, or lacks both directions -> block'
+escape: 'none needed - both fields are cheap, and their absence is the defect'
+narrows: 'refuses a report that hides its residual; cannot compel the characterisation that should have produced it'
+fires_late: true
+```

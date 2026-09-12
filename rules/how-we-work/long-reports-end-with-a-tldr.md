@@ -77,3 +77,18 @@ mistaken for arriving.
 *Earned from:* a session of dense, accurate, twenty-to-sixty-line reports in which six separate
 blocking questions were raised and mostly never answered — not because the reader was careless,
 but because nothing in the reports said which of six sections to act on first.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'prose line count of the outgoing message, presence and bullet count of the TL;DR, and whether every open ask appears in it'
+trigger: 'Stop'
+check: 'prose_lines > 20 and (no TLDR or bullets >= 8 or an open ask missing from it) -> refuse'
+escape: 'count prose lines only, so tables and code blocks do not inflate the total'
+note: 'the thresholds are the rule own - twenty lines and eight bullets - so the gate states nothing the rule did not'
+```

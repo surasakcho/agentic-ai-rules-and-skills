@@ -86,3 +86,19 @@ enumerable affected set:
 built for one downstream file was not applied to ten others sharing the identical problem shape,
 costing over two hours of full-national recomputation that a five-row splice would have replaced
 in minutes — caught only when asked directly why a small fix was taking this long.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'capability asymmetry among sibling rebuild scripts - one supports a scoped only-mode and its siblings do not'
+trigger: 'pre-commit or CI'
+check: 'siblings(frame) and any(has_only_flag) and not all(has_only_flag) -> block'
+escape: 'declare the family, or add the flag - the rule calls the missing mode a gap to fix, not a constraint to accept'
+narrows: 'removes the excuse that the script cannot scope; does not decide when scoping is owed'
+fires_late: true
+```

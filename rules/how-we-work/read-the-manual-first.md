@@ -62,3 +62,18 @@ existed.
 
 *Earned from:* proposing and acting on a new download route while the project's own written
 procedure for that exact task — including the gate that would block me — sat unread in the repo.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'the first external fetch of a session against a system the repo own prose already documents, with no read of those files first'
+trigger: 'PreToolUse(WebFetch, or Bash curl and wget)'
+check: 'first_fetch and repo prose mentions the system and those files were not read -> advise'
+escape: 'acknowledge and proceed - keep this advisory, because a check that fires on correct states gets routed around'
+narrows: 'catches the unread-procedure case it can see; cannot judge whether the documented method still applies'
+```

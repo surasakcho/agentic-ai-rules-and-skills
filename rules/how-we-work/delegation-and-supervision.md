@@ -86,3 +86,18 @@ requirement delegated is a vague result returned, at full cost.
 After every role signs off, review the output yourself before it reaches the user. In
 practice this is where the "did anyone actually look at this?" question gets asked — and in
 one project, asking it late turned up **six defects in the first fourteen figures examined**.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a diff that weakens an existing test - an assertion deleted, a tolerance raised, an exact comparison loosened to an approximate one'
+trigger: 'PreToolUse(Edit) on test paths, with a pre-commit backstop'
+check: 'diff on a test file weakens an assertion -> deny'
+escape: 'a genuinely wrong assertion changes in its own commit that says so, never inside delegated work'
+narrows: 'gates the one delegation prohibition that has a diff shape; re-deriving the load-bearing claim on a different path is judgement'
+```

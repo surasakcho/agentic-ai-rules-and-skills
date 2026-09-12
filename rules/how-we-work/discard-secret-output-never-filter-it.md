@@ -71,3 +71,18 @@ Anything that resolves configuration and prints it:
   rendered it once into one local file" and "two sessions saw it" are different rotation
   stories, and the operator deserves the accurate one.
 - **Rotate anyway.** Scoping the exposure justifies calm, never inaction.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'a secret-resolving command piped into anything other than /dev/null - compose config, docker inspect, env, printenv, terraform show, kubectl get secret -o yaml, git config --list'
+trigger: 'PreToolUse(Bash)'
+check: 'cmd in SECRET_RENDERERS and (has a pipe or no redirect to /dev/null) -> deny'
+escape: 'value-free subcommands are allowlisted; otherwise redirect and test the exit code'
+note: 'a filter shapes what you see, never what was captured - by the time grep drops the line the transcript holds it'
+```

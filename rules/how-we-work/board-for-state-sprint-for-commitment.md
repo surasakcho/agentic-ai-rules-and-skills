@@ -99,3 +99,19 @@ card is the visible reason nothing moves. A sprint boundary stops the first and 
 ideas without shipping one, ran seven review rounds on a single document at several times the cost
 of the experiment it described, and left a round-two blocker unescalated while polishing the parts
 that were not blocked — one disease with three symptoms, all of them unbounded WIP and no timebox.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'the WIP limit declared on the board, the card count in the in-progress column, and at sprint close whether every unfinished card is labelled carried, split or dropped'
+trigger: 'pre-commit on the board file'
+check: 'in_progress_count > wip_limit -> block; sprint_closed and unlabelled_cards -> block'
+escape: 'an explicit override carrying a reason'
+fires_late: true
+note: 'a board with no declared limit fails the check - unlimited columns are a list drawn sideways'
+```

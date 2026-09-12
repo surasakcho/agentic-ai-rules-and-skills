@@ -78,3 +78,18 @@ the longer its silent failure will last.**
 *Earned from:* a nightly backup that failed on three consecutive nights, logged the rejection and
 its own remedy in plain English each time, and was discovered only by accident — alongside a
 health ping emitted before the step it was meant to be reporting on.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'a health ping ordered before the fallible step, a failure path that exits 0, unchecked pipelines, and a scheduled unit with no dead-man switch'
+trigger: 'pre-commit lint plus a registry check'
+check: 'ping_line before the last fallible line -> block; exit 0 on a failure path -> block; a unit with no switch -> fail'
+escape: 'a deliberately liveness-only ping is declared as such'
+note: 'alert on absence, not on error - logs are pull and nobody pulls'
+```

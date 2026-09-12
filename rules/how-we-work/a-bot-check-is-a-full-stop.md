@@ -87,3 +87,18 @@ established, filling forms on a site that serves you normally, scraping a public
 
 It triggers on one thing: **a control that exists to distinguish humans from automation has fired,
 and you are considering how to stop it firing.**
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'stealth or spoof signatures in tool input - puppeteer-extra-plugin-stealth, playwright-stealth, undetected-chromedriver, a navigator.webdriver patch, a browser user-agent passed to a scripted client, a human session cookie imported into automation'
+trigger: 'PreToolUse(Bash|Write|Edit) plus permissions.deny on the installs'
+check: 'argv or file body matches STEALTH_SIGNATURES -> deny'
+escape: 'an API that requires a user-agent header - allowlist non-browser UA strings; anything else needs the operator'
+note: 'draw the line at step 1 of the ratchet, where each step is still a string a machine can see'
+```

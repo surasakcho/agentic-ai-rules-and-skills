@@ -45,3 +45,18 @@ detail is still in reach; a month later only the headline survives.
 ## The incident
 
 This rule was written the day a two-day remediation produced eleven reusable lessons and two repo-agnostic checkers, all of which would have stayed in one project repo. The cost of *not* having it is invisible by construction: you never see the second team hitting the defect the first team already solved.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'the newest date in lessons/_review-log.md, against now'
+trigger: 'check exit code'
+check: 'age(max(dates)) > 7 -> problem'
+escape: 'an empty pass is a valid outcome and is still logged - logging it satisfies the check honestly'
+implemented_by: 'skills/lesson-review/harvest.py'
+```

@@ -56,3 +56,18 @@ Partial run → merge, or refuse.
 **A convention needs a stated domain.** A rule that is right inside its domain becomes a
 defect outside it — a fixed 0–1 display scale, correct for variables spanning that range,
 wasted half the range on variables topping out at 0.449 and hid the study's main gradient.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'formatting-only hunks in files whose functional lines are unchanged, and a delete or overwrite driven by a computed set with no full-versus-partial declaration'
+trigger: 'pre-commit'
+check: 'a whitespace-only hunk in an otherwise unchanged file -> flag; a delete driven by a computed set with no completeness flag -> block'
+escape: 'deliberate reformatting goes in its own commit'
+narrows: 'gates the two shapes that have diffs - adjacent churn, and this-run-list treated as everything. That a convention needs a stated domain does not reduce'
+```

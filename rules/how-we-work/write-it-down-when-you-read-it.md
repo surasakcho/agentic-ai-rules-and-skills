@@ -108,3 +108,18 @@ again.
 down, against a standing instruction from the same operator that said not to batch — captured only
 when they asked whether they had been, and followed by *"Do not wait until I ask. Write everything
 once you read it."*
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a turn that received substantive input and produced no durable write, and a capture file that is untracked rather than committed'
+trigger: 'Stop'
+check: 'the user turn carried items and no tracked write happened this turn -> refuse; capture file untracked -> block'
+escape: 'a pure question is classified as such; otherwise write the file'
+narrows: 'durable means in the repo, tracked and committed - that gates cleanly. Whether an item was worth keeping is judgement'
+```

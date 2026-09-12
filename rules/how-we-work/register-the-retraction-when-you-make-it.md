@@ -107,3 +107,19 @@ written retraction that simply never said so; the reader's eye lands on the stal
 **Report coverage, not colour.** "No unqualified survivors across N registered claims" is a
 statement someone can evaluate. "Clean" is not. If the registry has six rows and the week had
 sixteen retractions, the honest summary says so.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'a commit that changes a figure or a decision line in a tracked document set without adding a registry row in the same commit'
+trigger: 'pre-commit - which is the moment the rule names'
+check: 'doc_claim_changed and no registry row added -> block; and report N registered claims rather than the word clean'
+escape: 'a no-retraction trailer for typos and formatting'
+implemented_by: 'skills/stale-claim-check/ reads this registry'
+note: 'without this, the stale-claim gate reports green over a population nobody sized - a sweep denominator is memory, a commit denominator is the log'
+```

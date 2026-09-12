@@ -90,3 +90,18 @@ defect exists only in the pair, and no file contains the pair.
 file both hosts overwrote, a backup script that rewrote its own backup backwards from the wrong
 machine and pushed it, a branch two schedules diverged, and a metadata index two processes
 regenerated concurrently.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'a script writing a declared shared artifact with no owner guard, and a fixed temp name in a read-modify-write'
+trigger: 'pre-commit lint'
+check: 'writes(shared_artifact) and no host guard -> block; a fixed .tmp name in a read-modify-write -> block'
+escape: 'declare the owner in the artifact vicinity, which the rule requires anyway'
+note: 'the defect exists only in the pair of writers and no single file contains the pair, so the registry is what makes it visible'
+```

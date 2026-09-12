@@ -89,3 +89,18 @@ the state that produced it is unrecoverable.
 *Earned from:* an unattended accrual job that credited a fixed period per invocation because it
 was scheduled at that period, quietly under-counting every missed run — in a system where that
 accumulated number was the evidence for a decision to commit real capital.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'a numeric literal in an accumulation call equal to a schedule period the repo itself declares, or a constant sitting beside a comment asserting a capacity'
+trigger: 'pre-commit lint'
+check: 'literal in an accrue or credit call == cron_period(repo) -> block'
+escape: 'annotate the constant as derived, or read it from state - which is the fix the rule asks for'
+note: 'the signature is that it looks deliberate, because it was'
+```

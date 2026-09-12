@@ -89,3 +89,19 @@ These are the behaviours worth having, and each is pinned by
 
 Related: [sanitise-before-sharing](sanitise-before-sharing.md) says a machine path must not be
 published. This says where the value goes instead. Neither works alone.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'absolute paths, usernames and emails in a shared artifact; a git-tracked or un-ignored .env; a real value that reached .env.example'
+trigger: 'check exit code, before publishing'
+check: 'harvest.py --check fails on any absolute path in a shared rule or skill; skillconfig.py check fails on a tracked or un-ignored .env'
+escape: 'a placeholder segment is deliberately not a hit'
+implemented_by: 'skills/lesson-review/harvest.py and skills/lib/skillconfig.py'
+narrows: 'whether a skill ASKS rather than silently defaulting is not gated - the rule says so itself, and it stays a review question'
+```

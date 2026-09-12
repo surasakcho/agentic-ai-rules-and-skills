@@ -80,3 +80,18 @@ The recovery worked only because the folder happened to sit in OneDrive and vers
 still held the save. The user's instruction afterwards is this rule:
 
 > "when uncommitted file is being overwrite, make sure to prompt or ask for permission first."
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'git status --porcelain on the write target; and for a command, the dirty and untracked set under its output directory before it runs'
+trigger: 'PreToolUse(Write|Edit|Bash)'
+check: 'status(target) is untracked or modified -> deny; for generator and build verbs, snapshot the dirty and untracked files aside first'
+escape: 'the operator says go ahead - and the copy is taken anyway, and its location stated'
+narrows: 'the direct write gates cleanly. The recorded incident was a BUILD COMMAND whose write target never appears in the tool input, so for that case the reduction is a snapshot that makes the loss recoverable, not a refusal that prevents it'
+```
