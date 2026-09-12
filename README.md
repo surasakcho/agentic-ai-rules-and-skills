@@ -132,6 +132,7 @@ they exist so the *mechanism* survives, not just the instruction.
 |---|---|
 | [verify-outputs](skills/verify-outputs/) | Screens rendered figures and tables for the defect classes that survive code review. Exit 1 to gate a commit. Needs [requirements.txt](skills/verify-outputs/requirements.txt). |
 | [lesson-review](skills/lesson-review/) | Runs the periodic review in [CADENCE.md](CADENCE.md): finds lessons stranded in project repos, publishes the portable ones here, and scans this repo for leaked paths, emails and private names. |
+| [new-repo-session](skills/new-repo-session/) | Stands up a Claude Code session for a repo that has never had one, and verifies it WORKS rather than that it started. Ships a read-only preflight that reports every blocker in one pass -- the failure it was built from was six defects found one restart at a time. |
 | [retrieve-lessons](skills/retrieve-lessons/) | The other direction: adopts these rules into a repo that lacks them. Selects only the categories with evidence behind them, links rather than copies, and pins the commit so drift fails a check instead of going unnoticed. |
 
 Run both self-tests, and the health check, with an interpreter that has the requirements
