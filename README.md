@@ -145,6 +145,7 @@ they exist so the *mechanism* survives, not just the instruction.
 | [new-repo-session](skills/new-repo-session/) | Stands up a Claude Code session for a repo that has never had one, and verifies it WORKS rather than that it started. Ships a read-only preflight that reports every blocker in one pass -- the failure it was built from was six defects found one restart at a time. |
 | [rules-in-force](skills/rules-in-force/) | Prints what a repo is actually bound by: every adopted rule's own statement, verbatim, grouped by category, read at the commit the repo pinned. Built because a rule that is a URL is not in front of you at the moment it applies. |
 | [retrieve-lessons](skills/retrieve-lessons/) | The other direction: adopts these rules into a repo that lacks them. Selects only the categories with evidence behind them, links rather than copies, and pins the commit so drift fails a check instead of going unnoticed. |
+| [check-rule-gates](skills/check-rule-gates/) | Reports which rules declare an enforcement gate that does not actually exist. A `verdict:` is a classification, not an implementation, and a clause with nothing behind it reads as coverage — so this separates gated from UNGATED from "the linkage could not be read". Exit 1 on a real gap, 2 on an unread one. |
 
 Run both self-tests, and the health check, with an interpreter that has the requirements
 installed — a self-test that cannot run exits **2** and is reported as `CANNOT RUN`, never as
