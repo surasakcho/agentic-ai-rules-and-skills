@@ -1,0 +1,34 @@
+# Where a Claude Code session for this repo should run.
+# Read by the launch-session skill. Committed on purpose: the decision is made
+# once, travels with the repo, and is reviewable in a diff.
+#
+# Decided 2026-09-12 when the Rules Sector was carved out of the Core by
+# zkyhax-empire ADR 0005. Until then this repo had no session of its own at all --
+# it was read by every other container as a read-only mount and edited from
+# whichever host session happened to be open.
+#
+# target=container is the whole point of the ADR, not a convenience. The office
+# that authors the rules every other Sector obeys must NOT be the office with the
+# most privilege: a host session here would read ~/.ssh, all of ~/secrets/
+# including the sleeping-dragon DR passphrase, and every repo on the box, uncapped.
+# Giving the rules-writer that reach was one of the two resolutions the Emperor
+# rejected. Do not change this line without re-reading ADR 0005.
+#
+# permission_mode is deliberately EMPTY rather than acceptEdits, which every other
+# agent-container repo on this box sets. Standing order 2 of the charter: author
+# the gate specification, do not build or deploy the gate -- the dispatcher, the
+# settings.json files and the installer belong to the Core. The default permission
+# mode is the cheapest instrument that puts a prompt in front of reaching for the
+# machine.
+#
+# Note for other machines reading this file: zkyhax-svr's stack definition is NOT
+# in this repo, on purpose -- this is the public cross-machine rules library, and a
+# compose file naming one host's uid, secrets path and memory budget does not
+# belong in it. It lives in zkyhax-svr-config/host/compose.rules.yaml.
+target=container
+container=rules-agent
+workdir=/app/agentic-ai-rules-and-skills
+model=opus
+rc=rules-srv
+tmux=rules-srv
+permission_mode=
