@@ -21,7 +21,7 @@ python -X utf8 harvest.py --projects <dir-holding-your-project-repos> --shared <
 
 Paths are arguments, never hardcoded here: a machine path in a public repo publishes a
 username and a directory layout. See
-[sanitise-before-sharing](https://github.com/surasakcho/agentic-ai-rules-and-skills/blob/main/rules/agent-workflow/sanitise-before-sharing.md).
+[sanitise-before-sharing](https://github.com/surasakcho/agentic-ai-rules-and-skills/blob/main/rules/how-we-work/sanitise-before-sharing.md).
 
 ## The pass, in order
 
@@ -53,7 +53,7 @@ names so the scan is specific to what must stay out; it already catches absolute
 and links that escape the repo. Then read for the one thing no scan can judge: **whether a
 number is a defect count or somebody's unpublished result.** Never publish a raw write-up
 next to its redacted version. See
-[sanitise-before-sharing](https://github.com/surasakcho/agentic-ai-rules-and-skills/blob/main/rules/agent-workflow/sanitise-before-sharing.md).
+[sanitise-before-sharing](https://github.com/surasakcho/agentic-ai-rules-and-skills/blob/main/rules/how-we-work/sanitise-before-sharing.md).
 
 **6. Publish.** Commit, push, and append one line to `lessons/_review-log.md` with the date
 and what was harvested.
