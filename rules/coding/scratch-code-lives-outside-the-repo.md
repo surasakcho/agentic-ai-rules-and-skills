@@ -7,7 +7,7 @@ code; this is about code that was never meant to become real code.
 [`characterise-once-not-per-question`](../how-we-work/characterise-once-not-per-question.md)
 — the fix for a scoped investigation is a real, saved script; this rule is what happens to
 everything that isn't that script.
-[`nothing-used-twice-lives-in-temp`](../how-we-work/nothing-used-twice-lives-in-temp.md) — the
+[`bau-artifacts-are-built-permanent`](bau-artifacts-are-built-permanent.md) — the
 boundary on this rule, and it must be read with it: **temp is for probes, never for
 deliverables.**
 

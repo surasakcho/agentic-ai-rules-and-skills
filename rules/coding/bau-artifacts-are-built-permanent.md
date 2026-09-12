@@ -34,6 +34,7 @@ something reads a file — it is that the file can vanish between writing and re
 | Anything on a schedule | | ✅ |
 | Anything another person or process reads | | ✅ |
 | A rollback, a handoff artifact, a safety net | | ✅ |
+| A patch, a generated config, a fixture, a data file another step reads | | ✅ |
 
 The distinguishing question is not "is this scratch?" — it is **"does anyone other than me, at
 any time other than right now, depend on this existing?"** If yes, temp is disqualified no
@@ -83,6 +84,30 @@ disabling the safety machinery.
 The near-miss is the lesson: an agent that had checked line counts, diffs, idempotency and
 scheduling arithmetic never checked whether the artifact it was handing over would still exist.
 
+### It happened again, and the artifact was a gate
+
+A subagent was asked to arm a pre-commit gate. It produced a 49-line patch, verified it, had it
+reviewed, corrected it once — and left it in the **session-scoped scratchpad** the harness
+provides, on the reasoning that a patch file "is scratch". The handover was a single command
+asking a second party to apply the patch *from that path*. The reviewer's response was the whole
+lesson: **"Why is it in temp, not in the repo?"**
+
+Same failure, different verb, two weeks later — which is why it is recorded here rather than as a
+second rule. Three things it adds:
+
+- **A patch is not exempt for being small.** It feels like scratch because it is short,
+  mechanical and produced in passing. None of that is the test; the second reader is.
+- **The handover is itself the evidence.** If you are handing work over at all, a second party
+  exists — which answers the question without further thought.
+- **The artifact parked in temp was a gate** — a control a rule had already declared and that was
+  not yet running. The one thing most in need of a durable home was judged least deserving of one.
+
+**Cost:** work already done, verified and corrected is lost to a directory reap and has to be
+re-derived from a transcript. And **a handover instruction pointing into a temp directory is
+unusable the moment it is delayed** — the recipient cannot tell it has an expiry. There is no
+error to read: the command reports a path that is not there, long after the context that would
+explain it is gone.
+
 ## Why this is easy to get wrong
 
 The rule that scratch code lives outside the repository is correct and load-bearing, and it
@@ -93,6 +118,20 @@ and when.
 
 It is also easy to mistake *verified* for *safe*. Everything about the content had been checked.
 Nothing about the container had been.
+
+## When in doubt, durable is the cheap side of the bet
+
+This is the non-obvious half, and it is an asymmetry rather than a preference:
+
+- **A durable file that turns out to be single-use costs one deletion.** Bounded, visible,
+  trivially reversed.
+- **A temp file that turns out to be reused costs the whole rebuild** — and the loss is
+  **silent**. Nothing announces that the directory was reaped. No failed command, no log line, no
+  diff; only an absence, found by whoever needed the file.
+
+Under uncertainty the bet is not close, and it does not become close by thinking harder about it.
+Write it somewhere durable and delete it later if you were wrong. **"I don't know" resolves to
+durable**, not to temp.
 
 ## Guard
 
@@ -116,6 +155,9 @@ Nothing about the container had been.
 
   Choose the sentinel and floor from something load-bearing that must be present, so a truncated
   read fails the check rather than passing it.
+- **A patch, a diff or a one-line command is not exempt for being small.** Size is not the test.
+- **"I'll move it into the repo once it's applied" is deferred cleanup wearing new clothes.** The
+  moving step is skippable, and the handover is exactly the moment attention leaves.
 - **Prefer an idempotent form**, so a re-run after an interrupted handoff is harmless — and say
   so when handing it over.
 - **State the revert command in the same message as the change command.** A revert discovered
@@ -136,10 +178,12 @@ built permanent from the start.
 <!-- machine-readable; verdicts and rationale in docs/gateability.md -->
 
 ```yaml
-verdict: interposed
+verdict: narrowed
 observable: 'the filesystem behind any path handed to a human or referenced by a recurring command - the rule names the command, findmnt -no FSTYPE,OPTIONS'
 trigger: 'Stop, plus PreToolUse(Bash) on schedule installs'
 check: 'an outgoing message references a scratchpad path -> refuse; a cron or systemd unit references a tmpfs path -> deny'
-escape: 'say plainly that the artifact is temporary and not for reuse'
+escape: 'say plainly that the artifact is temporary and not for reuse - which is the judgement the rule asks for, said out loud'
+narrows: 'gates the HANDOVER, which is where both incidents surfaced; a reusable file written to temp and read only by a later session names nobody to anybody and passes clean'
+fires_late: true
 note: 'also guard the pipe-from-live-source fix - assert a floor on what came back, so an empty stream never reaches a writer that accepts it'
 ```

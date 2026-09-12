@@ -123,8 +123,7 @@ ordering, and why a gate on the remaining six would be worse than the prose.
 | [analytics](rules/analytics/) | [A delta is three numbers](rules/analytics/a-delta-is-three-numbers.md) | `+951` reported identically with and without a bug that blanked twelve rows |
 | [analytics](rules/analytics/) | [Name the check's blind spot](rules/analytics/name-the-blind-spot.md) | A codec guard testing the wrong byte range certified 164 corrupt rows as clean |
 | [coding](rules/coding/) | [Ask before overwriting uncommitted work](rules/coding/ask-before-overwriting-uncommitted-work.md) | A build re-run "to verify" overwrote an untracked file; `git status` on it would have printed `??` |
-| [how-we-work](rules/how-we-work/) | [Nothing used twice lives in temp](rules/how-we-work/nothing-used-twice-lives-in-temp.md) | A verified, reviewed, once-corrected patch left in a session-scoped scratchpad and handed to a second party to apply from there |
-| [how-we-work](rules/how-we-work/) | [A classification is not a gate](rules/how-we-work/a-classification-is-not-a-gate.md) | 50 rules carry an enforcement clause; 7 name a gate that actually runs |
+| [how-we-work](rules/how-we-work/) | [A classification is not a gate](rules/how-we-work/a-classification-is-not-a-gate.md) | Most rules carrying an enforcement clause named a gate that had never been built |
 
 ## Lessons
 
