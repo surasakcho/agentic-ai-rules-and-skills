@@ -176,4 +176,4 @@ Mechanised as [verify-outputs](../skills/verify-outputs/).
 
 *The full write-up, with the real variable names and counts, stays in the originating project
 repo. Only this de-identified version is published — see
-[sanitise-before-sharing](../rules/agent-workflow/sanitise-before-sharing.md).*
+[sanitise-before-sharing](../rules/how-we-work/sanitise-before-sharing.md).*

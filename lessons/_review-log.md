@@ -6,9 +6,61 @@ logged** — three empty passes in a row is a signal worth reading.
 Format: `YYYY-MM-DD · what was swept · what was harvested`
 
 Project repos are referred to generically. Naming a private repo here would leak it into a
-public one — see [sanitise-before-sharing](../rules/agent-workflow/sanitise-before-sharing.md).
+public one — see [sanitise-before-sharing](../rules/how-we-work/sanitise-before-sharing.md).
 
 ---
+
+## 2026-09-12 (tenth) — the pass that had not happened for 23 days, and what that cost
+
+**Swept:** this repo's own health check, plus one project repo's `LESSONS.md` handed over by the
+session that ran it there. **Harvested 1 rule:** `rules/coding/a-fix-that-cannot-reach-the-artifact-is-not-a-fix.md`.
+
+**Name the artifact the fix has to reach — the page, the row, the running database — and verify
+THAT.** Seven instances in one day in one application: a unique index that raises on exactly the
+databases the bug polluted; a rejection reason written to a request attribute read by nothing; a
+stored-text fix in a seed that does not top up an existing database. Then twice more inside the
+fix for it, and once in the test, which was green for weeks about a database the engine would
+never have allowed.
+
+Filed under `coding`, not `how-we-work`, and deliberately NOT folded into
+`discriminate-by-executing-not-inspecting` — that rule is about a **check** reading something
+adjacent to the thing; this is about a **fix** whose coverage structurally excludes the population
+it was written for. Both produce green, and the remedies differ.
+
+**The pass also fixed what the gap let accumulate**, which is the part worth recording:
+
+- **4 broken links**, all from `4dacbe9` (2026-08-30) renaming `rules/agent-workflow/` →
+  `rules/how-we-work/` without repointing `lessons/`. Only the 4 markdown **link targets** were
+  changed; the 9 plain-prose mentions in this log are a record of what was true on the day each
+  entry was written, and rewriting them would falsify it. **This repo's own
+  `a-repo-split-kills-relative-links-silently` firing on the repo itself** — a directory rename
+  breaks relative links by the same mechanism.
+- **A container-internal absolute path naming another private repo**, in an illustrative output
+  block in `skills/worktree-sync/SKILL.md`, replaced with a neutral placeholder.
+  Non-functional. (Written this way on purpose: quoting the literal path here would have
+  re-published the thing the fix removed — and the health check caught exactly that when the
+  first draft of this entry did quote it.)
+- **`stale-claim-check` gained a 14-case self-test**, each case pinning a regression the script's
+  own docstring records: the 3-line marker window at 3 and at 4 lines, the `REVISED`/`see 13.7`
+  append-only convention, an opening banner exempting a file while one below line 25 does not, the
+  5-column registry row that made a watcher watch nothing, and the vendored-tree exclusion in both
+  directions. Verified by neutering two mechanisms and confirming the suite goes red.
+- **`worktree-sync` declared in `_no-selftest.txt`** — honest debt rather than a fake pass. It
+  auto-merges a side branch into main and pushes, which makes it the highest blast radius on that
+  list; a real test needs a git sandbox.
+
+**Health check went 9 problems → 2.** The two left are an environment gap (`verify-outputs` needs
+matplotlib/numpy/pandas, passes where they are installed) and this cadence entry itself.
+
+**The process finding, which outlives all of the above.** Rules WERE published between 09-09 and
+09-12 — seven commits — and none were logged, because passes stopped happening. The broken links
+and the stale log have one cause. **Fixing the nine problems without restoring the cadence just
+resets the clock**, so the open question is not "are we clean" but "what makes the next pass
+happen without someone remembering".
+
+*Found and triaged by a project session running `/lesson-review` against a read-only mount; it
+made no changes and handed the findings over. Every claim in its report was re-verified here
+before being acted on, and all of them held.*
 
 ## 2026-08-19 (ninth) - off-cycle, user instruction; the universal form of the day's theme
 
@@ -321,7 +373,7 @@ repo. Found and removed: a private repo name, a machine username in two skill pa
 project-internal defect write-up that carried real variable names and preliminary results
 from an unpublished study.
 
-Harvested **1 rule** — [sanitise-before-sharing](../rules/agent-workflow/sanitise-before-sharing.md)
+Harvested **1 rule** — [sanitise-before-sharing](../rules/how-we-work/sanitise-before-sharing.md)
 — and mechanised it as a leak scan in `harvest.py --check`, with the self-test extended to
 prove the scan fails on seeded leaks.
 
@@ -332,7 +384,7 @@ and nothing pulled it into the next project, so each lesson was paid for once an
 It adopts by pinned link rather than by copy, and only the categories a repo has evidence for.
 
 And **1 more rule** —
-[prompt-and-store-config](../rules/agent-workflow/prompt-and-store-config.md), mechanised as
+[prompt-and-store-config](../rules/how-we-work/prompt-and-store-config.md), mechanised as
 `lib/skillconfig.py`. The leak scan could say *a hardcoded path is wrong* but gave the value
 nowhere to go, so three skills kept theirs as functional defaults. A prohibition with no
 supported alternative gets worked around, not followed.

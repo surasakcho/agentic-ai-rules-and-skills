@@ -73,7 +73,7 @@ SYNC-NOTIFY: 1 other worktree(s) checked out on this repo.
     b.txt
     c.txt
   peers:
-    /home/app/ebiz-factory
+    /workspace/other-project
 ```
 
 **Printing it is not telling anyone.** A shell script cannot call `SendMessage`, and a notice that

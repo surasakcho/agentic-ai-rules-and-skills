@@ -6,6 +6,11 @@
 #
 # Every entry here is real debt. Ordered worst-first by what goes wrong if the code misbehaves.
 
+worktree-sync            # auto-merges a side branch into main and PUSHES it. Highest blast
+                         # radius on this list: a wrong merge reaches the remote. A real test
+                         # needs a git sandbox -- two worktrees, a deliberate divergence, then
+                         # assert BOTH sides survive the sync. rotate-session/selftest-guard.sh
+                         # is the nearest shape to copy.
 session-sandbox          # kills tmux sessions and installs cron; its whole value IS the
                          # sbx-* guard, and nothing proves the guard refuses a bad target.
                          # Its sibling rotate-session ships exactly that test — copy it.
