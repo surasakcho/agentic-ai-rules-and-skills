@@ -40,6 +40,41 @@ in. Exit 0 digest printed · 1 nothing adopted · 2 cannot run.
 pin is `retrieve-lessons`' job, and it involves reading a diff — which is a decision, not a
 render.
 
+## Inject it at session start — running it on demand requires remembering to
+
+**That is the step that already failed.** A digest you must remember to run is guarded by the
+same memory that let the rule go unfired in the first place. So wire
+[`assets/session-start-hook.py`](assets/session-start-hook.py) as a `SessionStart` hook and the
+rules are in context before the first reply:
+
+```json
+"hooks": {
+  "SessionStart": [ { "hooks": [ {
+    "type": "command",
+    "command": "python3 ~/.claude/skills/rules-in-force/assets/session-start-hook.py",
+    "timeout": 20
+  } ] } ]
+}
+```
+
+**Cost, measured rather than guessed:** 12–19 KB on real repos — roughly 3–4.6k tokens, about
+1% of a 400k window. Cheap enough that injecting the statements, not merely the names, is the
+obvious choice; injecting names would rebuild the exact problem the hook exists to solve.
+
+**It can never block a session.** Every failure path prints valid JSON and exits 0 — garbage on
+stdin, a missing repo, a broken clone, a timeout. A hook that can stop a session starting is
+worse than a session that starts without its rules loaded.
+
+**A repo with no adopted block gets told so**, not silence: one line pointing at
+`retrieve-lessons`. Silence is indistinguishable from a hook that failed.
+
+**Per-home wiring is the catch in a container estate.** Each container home has its own
+`settings.json`, so the host's wiring covers host sessions only. Two things must be true inside
+the container, and both are worth **executing** rather than assuming: the skills directory is
+mounted, and the shared clone is mounted at the path the skill symlinks resolve to. The script
+resolves its own `realpath`, so reaching it through `~/.claude/skills/<name>` works — an earlier
+version used `abspath` and resolved the shared clone to `~/.claude`, which is not a git clone.
+
 ## The three decisions that make the output trustworthy
 
 **1. Verbatim, never paraphrased.** Each line is the rule's own statement lifted from its file.

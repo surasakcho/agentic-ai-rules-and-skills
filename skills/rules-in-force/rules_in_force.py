@@ -134,7 +134,10 @@ def main():
         return 2
     claude_md = open(cmd, encoding="utf-8").read()
 
-    shared = a.shared or os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    # realpath, not abspath: this skill is normally reached through a symlink in
+    # ~/.claude/skills/, and abspath would resolve the shared clone to ~/.claude.
+    here = os.path.dirname(os.path.realpath(__file__))
+    shared = a.shared or os.path.abspath(os.path.join(here, "..", ".."))
     if not os.path.isdir(os.path.join(shared, ".git")):
         print(f"not a git clone: {shared}  (pass --shared)", file=sys.stderr)
         return 2

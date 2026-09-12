@@ -7,13 +7,14 @@ a dropped rule cannot hide.
 
 Exit 0 pass · 1 failure · 2 cannot run.
 """
+import json
 import os
 import re
 import subprocess
 import sys
 import tempfile
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.realpath(__file__))
 SCRIPT = os.path.join(HERE, "rules_in_force.py")
 sys.path.insert(0, HERE)
 
@@ -213,6 +214,78 @@ def _():
                            capture_output=True, text=True)
         # Adopting nothing is a real state and must not read as a clean digest.
         assert p.returncode == 1, p.returncode
+    finally:
+        import shutil
+        shutil.rmtree(d, ignore_errors=True)
+
+
+# ---------------------------------------------------------------- the SessionStart hook
+
+HOOK = os.path.join(HERE, "assets", "session-start-hook.py")
+
+
+def hook(payload_text):
+    p = subprocess.run([sys.executable, HOOK], input=payload_text,
+                       capture_output=True, text=True, timeout=30)
+    return p.returncode, p.stdout
+
+
+@case("hook: a real repo yields injected context")
+def _():
+    d = tempfile.mkdtemp(prefix="rif-hook-")
+    try:
+        shared = os.path.abspath(os.path.join(HERE, "..", ".."))
+        head = subprocess.run(["git", "-C", shared, "rev-parse", "--short", "HEAD"],
+                              capture_output=True, text=True).stdout.strip()
+        path = "rules/coding/write-the-prd-before-the-code.md"
+        with open(os.path.join(d, "CLAUDE.md"), "w", encoding="utf-8") as f:
+            f.write(f"# t\n\n<!-- shared-lessons:begin -->\n\nAdopted at `{head}`.\n\n"
+                    f"**coding** — evidence:\n\n- [prd](https://github.com/o/r/blob/{head}/{path})\n\n"
+                    f"<!-- shared-lessons:end -->\n")
+        rc, out = hook(json.dumps({"cwd": d}))
+        assert rc == 0, rc
+        ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
+        # The statement itself must be present -- injecting only names would rebuild the
+        # exact problem the hook exists to solve.
+        assert "No implementation begins without a written PRD" in ctx, ctx[:400]
+    finally:
+        import shutil
+        shutil.rmtree(d, ignore_errors=True)
+
+
+@case("hook: a repo with no block says so instead of injecting silence")
+def _():
+    d = tempfile.mkdtemp(prefix="rif-hook-noblock-")
+    try:
+        with open(os.path.join(d, "CLAUDE.md"), "w", encoding="utf-8") as f:
+            f.write("# plain\n")
+        rc, out = hook(json.dumps({"cwd": d}))
+        assert rc == 0
+        ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
+        assert "retrieve-lessons" in ctx, ctx
+    finally:
+        import shutil
+        shutil.rmtree(d, ignore_errors=True)
+
+
+@case("hook: garbage stdin exits 0 with valid JSON, never blocking a session start")
+def _():
+    for payload in ("not json at all", "", "{}", '{"cwd":"/nonexistent-xyz-123"}'):
+        rc, out = hook(payload)
+        assert rc == 0, (payload, rc)
+        json.loads(out)   # must always be parseable; an unparseable hook is a broken start
+
+
+@case("hook: output is valid JSON of the documented shape")
+def _():
+    d = tempfile.mkdtemp(prefix="rif-hook-shape-")
+    try:
+        with open(os.path.join(d, "CLAUDE.md"), "w", encoding="utf-8") as f:
+            f.write("# plain\n")
+        _, out = hook(json.dumps({"cwd": d}))
+        got = json.loads(out)["hookSpecificOutput"]
+        assert got["hookEventName"] == "SessionStart", got
+        assert isinstance(got["additionalContext"], str)
     finally:
         import shutil
         shutil.rmtree(d, ignore_errors=True)
