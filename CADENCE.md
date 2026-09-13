@@ -55,6 +55,18 @@ Twice it was caught deliberately; once it was not, and the citation survived onl
 happened to quote the guard rather than number it. **Know which one saved you.** The next citation
 may not be a quote.
 
+**And cite as a LINK, not as a bare slug — because only one of those is checked.** `harvest.py`
+resolves every link target and fails on a dead one; a kebab-case phrase sitting in prose is never
+looked at by anything. **This corpus made slugs the identifier, and the side effect is that any
+kebab-case phrase now reads as a citation** — so a sentence someone wrote in a code comment can
+acquire the authority of a rule purely by being repeated in that shape.
+
+Observed in one message: two confident citations, neither resolving. One named a rule that does not
+exist anywhere (it was a comment in a script); the other used a directive's wording where the file
+has a different slug. Both would have been caught at once as links, and neither was caught as prose.
+**The fix is not to write the missing rule** — that makes a wrong citation retroactively true and
+lets a mis-citation set the agenda. It is to link, and let the checker answer.
+
 **So the corpus's gap is navigation before it is coverage.** A rule nobody can find from where they
 are standing is as absent as one nobody wrote — and adding the second copy is worse than either,
 because the two then drift. When a candidate resolves to an existing rule, **put the pointer where
