@@ -258,9 +258,18 @@ BIND_RE = re.compile(r'^satisfies\s+(\S+)\s+(\S+)\s+(?:"([^"]*)"|(\S+))\s*(.*)$'
 # and silent about the consequence, which is the worse half of the two.
 EVIDENCE_RE = re.compile(r'(\w[\w-]*):(?:"([^"]*)"|(\S+))')
 
+# The estate's counterpart to `verdict: irreducible`. A gate can be deliberately bound to no
+# rule -- a guard over the control plane itself, a guard on an act no rule describes -- and
+# without a way to SAY so, that decision is indistinguishable from nobody having got to it.
+# That is the exact defect this corpus fixed on the RULES side: a blank once meant both
+# "judged irreducible" and "not yet examined", and the repair was to make the deliberate case
+# DECLARED. The reason is mandatory for the same reason it is mandatory there -- a bare marker
+# is the classification this whole format exists to stop.
+UNBOUND_RE = re.compile(r'^unbound\s+(\S+)\s+(?:"([^"]*)"|(\S+))\s+(.+?)\s*$')
+
 
 def read_config(path):
-    roots, provs, binds, errs = [], [], [], []
+    roots, provs, binds, unbounds, errs = [], [], [], [], []
     base = os.path.dirname(os.path.abspath(path))
     with open(path, "r", encoding="utf-8", errors="replace") as fh:
         for n, raw in enumerate(fh, 1):
@@ -270,6 +279,14 @@ def read_config(path):
             # likely to need one.
             line = re.split(r"(?:^|\s)#", raw, maxsplit=1)[0].strip()
             if not line:
+                continue
+            m = UNBOUND_RE.match(line)
+            if m:
+                unbounds.append((m.group(1), m.group(2) or m.group(3), m.group(4)))
+                continue
+            if line.split()[0] == "unbound":
+                errs.append(f"line {n}: unbound needs <provider> <id> <reason> -- a bare "
+                            f"marker is the classification this format exists to stop")
                 continue
             m = BIND_RE.match(line)
             if m:
@@ -302,7 +319,7 @@ def read_config(path):
                 provs.append((label, pkind, os.path.normpath(os.path.join(base, ppath)), arg))
             else:
                 errs.append(f"line {n}: unrecognised directive '{line[:40]}'")
-    return roots, provs, binds, errs
+    return roots, provs, binds, unbounds, errs
 
 
 # ---------------------------------------------------------------------------
@@ -352,6 +369,7 @@ GROUP_ORDER = [
     "gated",
     "unavailable",
     "gates no rule claims",
+    "deliberately unbound",
     # Appended, never inserted: the indices above are referenced positionally
     # (GROUP_ORDER[5] is the orphan group), so inserting here silently retargets
     # them. Caught by the self-test, which is what it is for.
@@ -458,7 +476,7 @@ def main():
     # matters more than it looks: someone adopting this skill runs it first
     # against their own corpus, and a tool that cannot demonstrate a clean pass
     # does not get trusted when it starts failing.
-    roots, provs, binds, cfg_errs = [], [], [], []
+    roots, provs, binds, unbounds, cfg_errs = [], [], [], [], []
     if args.config:
         if not os.path.isfile(args.config):
             rep.unk("config file does not exist", os.path.basename(args.config),
@@ -466,7 +484,7 @@ def main():
                     "linkage below was resolved against the default",
                     "root alone.")
         else:
-            roots, provs, binds, cfg_errs = read_config(args.config)
+            roots, provs, binds, unbounds, cfg_errs = read_config(args.config)
             for e in cfg_errs:
                 rep.unk("config line not understood", e)
     by_slug = {}
@@ -656,9 +674,29 @@ def main():
     # The inverse gap: gates that exist and that no rule points at. Reported as a
     # note, never a failure -- a gate may legitimately exist for a reason outside
     # this corpus, and failing on that would punish having built one.
+    # A DECLARED non-orphan is not an orphan, and it is not a claimed gate either -- it is a
+    # third state, counted and named. Validated like any other claim: an `unbound` naming a
+    # gate the inventory does not have is a failure, and one naming a gate a `satisfies` row
+    # also claims is a contradiction neither side gets to win.
+    declared_unbound = {}
+    for prov, gid, reason in unbounds:
+        if ids.get(gid) != prov:
+            rep.ungate("%-52s UNBOUND NAMES NO SUCH GATE: %s/%s" % ("(config)", prov, gid[:28]))
+        elif gid in claimed:
+            rep.unk("%-52s declared unbound AND claimed by a satisfies row" % gid[:52],
+                    "Both cannot be right. Neither is assumed.")
+        else:
+            declared_unbound[gid] = reason
+
     unclaimed = 0
     by_owner = {}
     for pid, owner in sorted(ids.items()):
+        if pid in declared_unbound:
+            rep.ok("deliberately unbound", "%-52s %s"
+                   % ("%s: %s" % (owner, pid[:34]), declared_unbound[pid][:60]),
+                   "Declared bound to no rule, with a reason. Counted here",
+                   "so that a DECISION is not read as a backlog item.")
+            continue
         if pid not in claimed:
             unclaimed += 1
             by_owner[owner] = by_owner.get(owner, 0) + 1
@@ -726,6 +764,8 @@ def main():
     # the number that depended on it rather than printing a wrong one.
     binds_note = ("   bindings naming no rule: %d" % unresolvable_binds
                   if unresolvable_binds else "")
+    if declared_unbound:
+        other += "   deliberately unbound: %d" % len(declared_unbound)
     print("\ngated: %d   bound: %d%s   UNGATED: %d   unavailable: %d   UNKNOWN: %d   |   %s"
           % (gated, bound, binds_note, rep.ungated, unavailable, rep.unknown, other))
     if rep.ungated:
