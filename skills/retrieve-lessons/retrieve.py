@@ -407,16 +407,36 @@ def build_block(shared: Path, sha: str, selected, rules):
     return "\n".join(lines)
 
 
+def unresolved_categories(shared: Path, sha: str, adopted):
+    """Adopted category names that do not exist at `sha`.
+
+    A block written before a rename keeps the old vocabulary -- one consumer still links
+    `rules/agent-workflow/`, which was folded into `how-we-work` at 4dacbe9. Its links are
+    not broken, because they are pinned at a SHA where that directory existed. But filtering
+    the diff by that name silently drops the category the rules actually moved in: measured,
+    52 how-we-work files changed and `--check` reported 0 of them.
+
+    A FILTER KEYED ON THE CONSUMER'S VOCABULARY IS ONLY AS GOOD AS THAT VOCABULARY BEING
+    CURRENT. A block naming a category the corpus no longer has is not a consumer that
+    adopted less; it is a consumer whose set CANNOT BE RESOLVED -- which is the same state
+    as `adopted=None` and gets the same answer: do not narrow, and say so.
+    """
+    return {c for c in (adopted or ()) if names_at(shared, sha, c) is None}
+
+
 def rules_changed(shared: Path, old_sha: str, new_sha: str, adopted=None):
     """Which rule files THIS CONSUMER adopts differ between two SHAs. Empty list = the
     pin is behind but NOTHING A CONSUMER LINKS TO has moved.
 
     FILTER BY ADOPTED CATEGORY, NOT BY `rules/`. `rules/` is the CORPUS's population; the
     consumer's is the set of categories its block links, and `parse_block` already returns
-    it. Filtering on the corpus's set made every rule-touching commit stale every consumer:
-    measured on one repo adopting 3 of 7 categories, 20 of the last 80 rule-touching
-    commits were provably no-ops -- a 25% false-refusal rate on a COMMIT gate, which is
-    how a checker gets muted. The function and its own docstring disagreed, and the
+    it. Filtering on the corpus's set made every rule-touching commit stale every consumer.
+    Measured on one repo adopting 3 of 7 categories: **9% of rule-touching commits were
+    provably no-ops**, and the estate ranges 0-41%. (The first measurement said 25% over
+    the last 80 commits; 14 of those 20 were under category names that were RENAMED AWAY
+    and can never recur, so that window spanned a rename and overstated the forward rate.
+    The fix is unchanged; the size of the problem is not.) A false-refusal rate on a COMMIT
+    gate is how a checker gets muted. The function and its own docstring disagreed, and the
     docstring was right.
 
     NOT BY LINKED FILE, and that is the trap that looks tidier. A new rule added to an
@@ -554,7 +574,14 @@ def main():
         if pin == sha and not args.force:
             print(f"already pinned at {sha} -- nothing to do")
             return 0
-        changed = rules_changed(shared, pin, sha, adopted=set(old_rules)) if pin else None
+        stale_cats = unresolved_categories(shared, sha, set(old_rules))
+        if stale_cats:
+            print(f"  NOTE: the block adopts {', '.join(sorted(stale_cats))}, which "
+                  f"no longer exists at {sha} -- the comparison is NOT narrowed to this "
+                  f"repo's set, because that set cannot be resolved.")
+        changed = (rules_changed(shared, pin, sha,
+                                 adopted=None if stale_cats else set(old_rules))
+                   if pin else None)
         if pin and changed is None and not args.force:
             raise SystemExit(f"ERROR: cannot read the diff {pin}..{sha} -- refusing to re-pin "
                              f"on an unverifiable comparison. Use --force only if you know why.")
@@ -658,12 +685,20 @@ def main():
             return 0
         parsed = parse_block(existing)
         adopted = set(parsed["rules"]) if parsed else None
+        stale_cats = unresolved_categories(shared, sha, adopted)
         if adopted is None:
             # A block with no readable links is not "adopts nothing" -- it is "cannot
             # tell", so nothing is filtered and the report says which it was.
             print(f"\n  NOTE: the block in {cm.name} is present but no rule links could be "
                   f"read from it, so the comparison below is NOT narrowed to what this "
                   f"repo adopts. Fix the block, or read the result as an upper bound.")
+        elif stale_cats:
+            print(f"\n  NOTE: the block adopts {', '.join(sorted(stale_cats))}, which no "
+                  f"longer exists at {sha} -- almost certainly a category renamed since "
+                  f"this repo adopted it. The comparison below is NOT narrowed, because a "
+                  f"set naming a category the corpus does not have cannot be resolved. "
+                  f"Re-run --write to re-detect.")
+            adopted = None
         changed = rules_changed(shared, pin, sha, adopted=adopted)
         if changed is None:
             # Cannot tell is not the same as no change, and they must not print the same.
