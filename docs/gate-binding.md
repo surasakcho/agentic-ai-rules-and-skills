@@ -176,8 +176,11 @@ suggests.**
 > ⛔ **This clause was published wider than it should have been, and the narrowing came from
 > checking rather than reasoning.** It read: *any gate whose violation is itself the harm*. Both
 > credential gates in the estate that prompted it were nominated as the examples — and both turn out
-> to have been **replayable for weeks**, 27 and 12 deny cases respectively, found by one grep of the
-> test file. Nominating them from the shape of the problem instead of opening the file is the same
+> to have been **replayable for weeks** — the harness had carried deny cases for both since long
+> before the clause was written, found by one grep of the test file. *(This sentence originally
+> carried a count. It was hand-transcribed from a grep showing one section of the file, it was
+> wrong, and it is removed rather than corrected: this office cannot read that harness, so any
+> number here would be a relayed figure in a paragraph arguing that evidence must be replayable.)* Nominating them from the shape of the problem instead of opening the file is the same
 > error as binding a rule off its title, which is the other retraction on this page.
 
 **The discriminator is whether a decoy exists that the predicate accepts**, not whether the real
@@ -223,7 +226,7 @@ satisfies <slug> <provider> "<gate-id>"  fixture-unsafe:"<reason>"
 
 | token | state | checked |
 |---|---|---|
-| `fixture:<path>` | **replayable** — a violating input and its refusal | the path must exist under a declared root; **a fixture named and absent is a failure**, since the whole point of the strong state is that somebody can re-run it |
+| `fixture:<path>` | **replayable** — a violating input and its refusal | the path must exist under a declared root; **a fixture named and absent is a failure**, since the whole point of the strong state is that somebody can re-run it. **Existence is the whole of what this side checks** — see below |
 | `observed:<date>` | observed once | nothing — it is an assertion, and reads as one |
 | `fixture-unsafe:"<reason>"` | no decoy the predicate accepts | **the reason is mandatory.** A bare marker is the classification this corpus keeps warning about |
 | none | never observed refusing | — |
@@ -235,6 +238,36 @@ louder half is not the safer half when the quiet half is a dropped claim.
 
 A gate marked `fixture-unsafe` is verified the way that boundary prescribes: against the predicate
 as data, against a decoy, or from outside a session.
+
+### `fixture:` reports green twice, and the second half is the estate's to check
+
+**Upstream, `fixture:<path>` is a path-existence check and nothing more.** The corpus cannot ask
+whether that file contains a case that fires the bound gate, for the same reason the binding is
+declared estate-side at all: it knows nothing about any estate's harness. So a `fixture:` pointing
+at a real file with no case for that gate is **green twice** — once because the gate exists, once
+because the path exists — with the thing between them unchecked. Two true claims and an unverified
+joint.
+
+**That second half is a real check and it belongs to the estate**, which owns the harness and can
+parse it. The first implementation reads the test file with `ast` — never imported, because a
+fixture file that constructs violating payloads and fires them at a live dispatcher is the last
+thing a checker should execute — resolves the gate name out of each deny case, and reports three
+failures:
+
+- a `fixture:` whose file holds **no deny case for that gate**;
+- a `fixture-unsafe:` on a gate the file **demonstrably replays** — the contradiction that narrowed
+  the clause above, now mechanical rather than remembered;
+- a binding to a gate that is **specified and not built**, whose cases never run. Counting those as
+  evidence manufactures confidence in the direction that hurts.
+
+And one finding deliberately **not** red: deny cases exist while the row claims nothing. Under-
+claiming is safe, so it is a worklist line and not a failure — the same asymmetry that keeps
+`irreducible` and `unobserved` cheap.
+
+**The division is the point.** Upstream owns *is this rule bound and does the gate exist*; the
+estate owns *does the named fixture actually exercise that gate*. Neither side can answer the
+other's question, and a design that pretended otherwise would put a check where the information is
+not.
 
 **Still optional, for the same reason as above** — a mandatory fixture per binding produces an empty
 binding file. But `observed:<date>` should be read as the weak form and a replayable case as the
