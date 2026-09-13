@@ -243,7 +243,31 @@ def dep_text(repo: Path) -> str:
 
 def detect(repo: Path):
     """Return {category: [evidence, ...]}: every MANDATORY category, plus any other category
-    with actual evidence."""
+    with actual evidence.
+
+    DETECTION KEYS ON WHAT A REPO IS MADE OF; RULES BIND TO WHAT IT DOES. Dependencies,
+    directories and file globs describe composition. A rule applies because of an activity,
+    and the two come apart in both directions. Three measured misses, kept here because
+    "wrong in both directions" is otherwise an assertion nobody can weigh:
+
+      coding             MATCHED on a vendored plugin bundle -- composition without the activity
+      analytics          MISSED on a repo whose output is reported numbers
+      data-engineering   MISSED on a repo whose bin/ is nothing but joins -- it joins repos to
+                         a launcher config and rule slugs to gate bindings, which is exactly
+                         exact-match-on-a-complete-key's subject, and looks nothing like a data
+                         project from outside
+
+    The third is the sharp one: the evidence that would have caught it is a CODE SHAPE -- a
+    lookup whose result is printed under a heading promising resolution -- and no dependency,
+    directory or glob expresses that. **This detector cannot see that class, and widening the
+    evidence to try is the change that makes it wrong the other way.**
+
+    That is why hand-adoption is first-class rather than a fallback: `--write` prints every
+    category it did NOT adopt with the evidence it looked for, `--adopt CAT --reason` records
+    the decision in SELECTION, and a declined category is distinguishable from one never seen.
+    The miss is visible exactly once, at `--write`, and the recorded case above went unnoticed
+    because nobody re-ran it -- which is a fact about the cadence, not about the detectors.
+    """
     deps = dep_text(repo)
     dirs = {p.name.lower() for p in repo.rglob("*")
             if p.is_dir() and not any(s in p.parts for s in SKIP)}
