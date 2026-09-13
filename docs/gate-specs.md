@@ -170,7 +170,12 @@ was produced by that run and handed to the Core privately.** It is deliberately 
 document: see [what is deliberately absent](#what-is-deliberately-absent-from-this-document).
 
 Standing caveat: three helpers used by the matcher were not quoted, so every verdict from the
-replica is scoped to the patterns that were.
+replica is scoped to the patterns that were. **That caveat was not boilerplate — it changed the
+answer by half.** Four replica findings were flagged as unverifiable for exactly this reason, and
+when the missing helper was checked against, two of the four turned out to be covered. Reporting
+them as gaps would have been four wrong claims about a running control; reporting them as *scoped
+to what was read* cost one sentence. See
+[`a-finding-is-scoped-to-what-you-checked`](../rules/how-we-work/a-finding-is-scoped-to-what-you-checked.md).
 
 ### The discriminator
 
@@ -271,6 +276,24 @@ trying hard: `python -c`, `python -m`, `perl -pi -e`, `ruby -i`, `awk` with a re
 bare shell redirect, a `make` target, `$EDITOR`, and any script that wraps any of these. Each
 addition is correct and none of them changes the shape: **the set of ways to write a file is open,
 and the set of protected files is closed.**
+
+### One case is covered by accident, and tightening an unrelated pattern uncovers it
+
+Worth knowing before anyone edits the generic verb list. Two version-control operations that
+rewrite a protected path are **not** in the subcommand-aware arm and are refused anyway — because
+the generic list contains the bare verbs they are spelled with, and the segment happens to carry
+one with a space in front of it. The pattern that saves them is not looking at version control at
+all.
+
+So the coverage is real and its attribution is wrong, which has a specific consequence: **someone
+tightening the generic list to fix a false positive silently uncovers those two, without ever
+touching the arm they believed owned them.** The false positives above are exactly the pressure
+that would prompt that edit, so this is not a hypothetical ordering of events.
+
+The instrument is per-arm mutation — disable the arm believed to cover a case and re-run it — and
+the rule is
+[`validations-must-fail`](../rules/testing/validations-must-fail.md), corollary 4. A guard with
+two paths to the same verdict owes a test that says **which** one fired.
 
 ### The instruments that do close it
 

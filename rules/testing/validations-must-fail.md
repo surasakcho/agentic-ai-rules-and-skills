@@ -11,7 +11,7 @@ Run every new validation against input you **know** is broken, and confirm it fa
 that only ever passes is worthless, and worse than worthless: it produces the *feeling* of
 verification without the substance.
 
-Three corollaries, each earned:
+Five corollaries, each earned:
 
 ### 1. Prove the branch fires
 
@@ -51,7 +51,35 @@ Find the subpopulation where the treatment does approximately nothing and confir
 measurement shows approximately nothing. If it does not, the **baseline** is wrong, and no
 conclusion about the treatment is worth reading yet.
 
-### 4. Ask what would still be green if it were already broken
+### 4. A passing case does not tell you which branch passed it
+
+Corollary 1 says prove the branch fires. This is its twin, and it is the one nobody checks:
+**prove that the branch you believe is covering a case is the branch actually covering it.**
+
+A green result reports an outcome. It says nothing about the mechanism, so coverage can rest on
+an accident — and the accident is invisible in exactly the artifact people read to decide whether
+something is covered.
+
+> **Incident.** A guard protecting a set of control files had two independent arms: a
+> subcommand-aware arm for the version-control operations that rewrite a tree, and a generic
+> verb-list arm. `git rm <protected>` and `git mv <protected>` were refused, so the case looked
+> handled. **Neither is in the subcommand arm.** They were caught because the generic list contains
+> the bare verbs `rm` and `mv`, and the segment happens to contain one with a space in front of it
+> — a pattern that is not looking at version control at all.
+>
+> The consequence is the dangerous part: **someone tightening the generic list to fix a false
+> positive would silently uncover `git rm`, without ever touching the arm they believed owned it.**
+> The test stays green until the day it does not, and the change that breaks it looks unrelated.
+
+**The mechanical form is per-arm mutation, and it is a small extension of guard removal.** Disable
+*the arm you believe covers this case* — not the whole guard — and re-run. If the case still
+passes, your coverage is attributed to the wrong mechanism and your map of the system is wrong in
+a way no amount of green will tell you.
+
+Ask it of any control with more than one path to the same verdict: *which line refused this, and
+is it the one I would have named?*
+
+### 5. Ask what would still be green if it were already broken
 
 The general form of this rule, and the cheapest question in it. Take any check, dashboard,
 health signal, status field or passing test, assume the thing it watches is **already broken**,
@@ -98,7 +126,7 @@ of the parts that never complain**.
 verdict: deferred
 observable: 'for every guard, assertion or acceptance check that is added or changed: whether the test suite contains a case that makes it FAIL, proven by removing the guard body and observing a test go red; and for every defensive branch, whether any test makes its condition true'
 trigger: 'pre-commit on changed guard paths, plus CI over the whole guard set'
-check: 'for each changed guard: delete its body, run the suite - if nothing goes red, block; a conditional whose true branch is never entered under the suite -> block'
+check: 'for each changed guard: delete its body, run the suite - if nothing goes red, block; a conditional whose true branch is never entered under the suite -> block; and for a guard with more than one arm reaching the same verdict, disable each arm separately - a case that survives removal of the arm believed to cover it is covered by accident, and the report names which arm actually fired'
 escape: 'a guard genuinely impossible to exercise in test declares itself unexercised with a reason, and that declaration is counted and reported rather than hidden'
-narrows: 'guard-removal proves the check CAN fail. It does not prove the check fails on the RIGHT input - a guard written against an imagined failure shape passes its own removal test while missing every real defect, which is why a-check-that-shares-a-source-is-not-a-check sits beside this one and is recorded there as irreducible'
+narrows: 'guard-removal proves the check CAN fail, and per-arm removal proves WHICH line does the work. It does not prove the check fails on the RIGHT input - a guard written against an imagined failure shape passes its own removal test while missing every real defect, which is why a-check-that-shares-a-source-is-not-a-check sits beside this one and is recorded there as irreducible'
 ```
