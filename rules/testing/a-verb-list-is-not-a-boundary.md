@@ -1,0 +1,130 @@
+# A verb list is not a boundary — enumerate what is protected, never the ways in
+
+**Task type:** testing — guards, gates and permission checks that defend a path, a file, or a
+territory against being written.
+**Related:**
+[`validations-must-fail`](validations-must-fail.md) — corollary 2, *build the failure before you
+guard against it*, and the `"404"` substring guard that threw away 15 good regions. That is the
+false-positive half of this rule, already paid for.
+[`absence-is-not-compliance`](absence-is-not-compliance.md) — what an incomplete guard reports
+about the cases it cannot see: nothing, which reads as green.
+[`a-classification-is-not-a-gate`](../how-we-work/a-classification-is-not-a-gate.md) — a residue
+that is not declared becomes coverage nobody has.
+[`exact-match-on-a-complete-key`](../data-engineering/exact-match-on-a-complete-key.md) — the same
+error in a join: loosening the comparison until it matches, rather than completing the key.
+
+---
+
+## The rule
+
+> **Never defend a boundary by listing the ways of crossing it. The ways in are an open set and
+> the protected things are a closed one — so enumerate the protected things, and gate on the
+> effect or on the capability.**
+
+A guard written as *"refuse these commands"* is complete only if nobody ever invents another
+command. A guard written as *"this file may not change"* is complete by construction, because it
+is stated over the thing that has to hold.
+
+## It fails in both directions, and the second failure kills the guard
+
+**Short by at least one.** A tamper guard protecting a set of control files matched the verb
+`patch`. It did not match `git apply` or `git am` — the same operation, spelled the way a git user
+actually spells it. A patch applied that way rewrites the very dispatcher the guard lives in, and
+the guard matches nothing while it happens. Extending the list closes those two and leaves
+`python -c`, `perl -pi`, `tee`, `sponge`, `dd`, `install`, `rsync`, `ed`, an editor, and `>`.
+
+**Wrong axis.** A locality gate — *an agent may write only inside its own territory* — was
+specified against the tools that carry a path in their input, `Write` and `Edit`. `Bash` carries a
+path too, in a string the gate does not parse, and reaches every territory on the machine. The
+gate's own test file recorded this as a known gap **before it was ever built**, which is the
+honest version of the failure and still leaves a gate that is incomplete on the day it ships.
+
+**And then the reflex fix kills it.** The obvious repair is to widen the match until it cannot
+miss: look for the protected path anywhere in the command string. That guard refused a read-only
+`grep` whose **search pattern** contained a protected word next to a protected path. Nothing was
+being written. Nothing could have been written.
+
+> **A guard that fires on correct rows does not get fixed. It gets disarmed** — by the operator,
+> under time pressure, on the first or second false refusal — and the estate is then strictly
+> worse off than if it had never been built, because the disarming is quiet and the guard is still
+> in the config where the next reader will count it as coverage.
+
+The two failures are the same mistake seen twice: **the discriminator is on the wrong axis.** A
+command's name is not what makes it dangerous, and a string's contents are not what makes it a
+write.
+
+## The three instruments, strongest first
+
+| instrument | what it gates | completeness |
+|---|---|---|
+| **Structural — remove the capability** | the protected path is not writable by this actor: not mounted, mounted read-only, owned by another uid | **Complete.** No verb reaches it, because the kernel is the discriminator |
+| **Effect — check the outcome** | a manifest of hashes over the protected set, or a status sweep over every territory, compared at a moment the actor cannot skip | **Complete over outcomes**, blind to intent. Detects; does not prevent |
+| **Argv — inspect the command** | the parsed command, before it runs | **Never complete.** Prevents, cheaply, in the honest cases |
+
+**Pick the strongest one the situation allows, and use the weaker ones as a net rather than as the
+boundary.** An argv check is worth building — most writes are honest, and refusing before the fact
+is the only instrument that preserves the artifact — but it is the *third* line, and it must be
+classified as `narrowed` with its residue written down.
+
+**The argv check needs three answers, not two.** Shell is not reliably parseable: variables,
+`$(...)`, heredocs and quoting defeat any decomposition. A parser that cannot decide must return
+*ask*, never *allow* and never *deny*. Folding "cannot tell" into allow is how a boundary becomes
+decoration; folding it into deny is how it starts firing on correct rows.
+
+## Gate on write position, not on the presence of a word
+
+When you do inspect a command, the discriminator that separates a command that **writes** a
+protected path from one that merely **names** it:
+
+1. **Decompose** the line into simple commands — split on `;`, `&&`, `||`, `|` and newlines, then
+   strip the wrappers that hold another command as their argument (`env`, `sudo`, `nice`, `time`,
+   `xargs`, `nohup`).
+2. **Resolve the verb** of each, and classify it: *never writes* (`grep`, `cat`, `head`, `diff`,
+   `git log`, `git show`), *writes only under a flag* (`sed -i`, `sort -o`, `awk > file`), *always
+   writes* (`tee`, `patch`, `install`, `git apply`, `git am`, `git checkout -- <path>`).
+3. **Require the protected path in a write position** of that verb: an operand of a writing verb,
+   a redirect target, the argument of `-o`/`-i`/`--output`, or the directory of `git -C`. A path
+   that appears only as a search pattern, a `--include`, a `-e` expression, or an operand of a
+   verb that never writes is a **mention**, and a mention is not a violation.
+
+Every one of these three steps is a heuristic. They are worth having and they do not make the list
+closed — which is why they sit under the structural instrument rather than replacing it.
+
+## Guard
+
+- **State the boundary over the protected set, not over the ways in.** "These files do not change"
+  is checkable; "these commands are refused" is a list someone will add to forever.
+- **Reach for the mount table and the owner uid before reaching for a regex.** A capability the
+  actor does not hold needs no guard at all, and that is the only complete answer available.
+- **Pair every argv guard with an effect check.** The argv half prevents the honest case; the
+  effect half is what tells you the day the list was short.
+- **Never widen a match to close a gap.** Widening trades a false negative you cannot see for a
+  false positive the operator can, and the operator's response is to switch the guard off.
+- **Three outcomes for anything that parses a command:** allow, deny, and **ask**. Ambiguity is a
+  state, not a default.
+- **Declare the residue in the gate's own clause.** An incomplete guard is acceptable; an
+  incomplete guard presented as a boundary is not.
+
+---
+
+*Earned from:* two guards in one estate, found the same day. A tamper guard whose protected-path
+verb list matched `patch` but not `git apply` or `git am`, so a patch applied the git-native way
+rewrites the gate dispatcher while the gate matches nothing — and the same guard refusing a
+read-only `grep` because a protected word appeared in its **search pattern**. Alongside them, a
+territory gate specified against `Write` and `Edit` whose own test file recorded, before it was
+built, that `Bash` reaches every territory without either.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'each deployed guard that defends a path or territory: whether its discriminator is a list of command names, whether a structural instrument (unmounted, read-only, foreign owner) covers the same protected set, whether an effect check (hash manifest or status sweep) exists, and whether its clause declares what it does not cover'
+trigger: 'CI over the gate configuration, plus review at the moment a guard is added or its verb list is extended'
+check: 'a guard whose match is a verb or substring list and whose clause carries no narrows: field -> fail; a protected set with no structural or effect instrument, defended by argv matching alone -> fail; a command parser with only two outcomes and no ask state -> fail'
+escape: 'a protected set that genuinely cannot be made unwritable (the actor must write its neighbours) keeps the argv guard as the primary instrument - and then owes the effect check and the declared residue, not an extended list'
+narrows: 'cannot prove a verb list is short - that is the whole difficulty, and only the effect check finds it, after the fact. Gates the SHAPE of the guard (is there a structural or effect instrument, is the residue declared, are there three outcomes), never its coverage'
+```

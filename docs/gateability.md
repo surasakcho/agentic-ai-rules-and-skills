@@ -6,11 +6,15 @@ observable artifact it implies.** You cannot gate a judgement. You can very ofte
 about — and because every rule here names a real incident, the incident tells you what
 observable would have caught it.
 
-This document is the reduction pass over `rules/how-we-work/` (45 rules) and `rules/coding/`
-(11 rules). Every rule gets a verdict. **Six do not reduce, and that is recorded as a finding
-rather than papered over** — a gate that is easy to satisfy without doing the thing is worse
-than the prose it replaced, because it converts a practice into a ritual and then reports
-green.
+This document carries **two passes**. The first, 2026-09-12, covered `rules/how-we-work/`
+(45 rules) and `rules/coding/` (11). The second, 2026-09-13, covered the four domain categories
+the first one left untouched — `analytics/` (6), `data-engineering/` (13), `research/` (3) and
+`testing/` (2, now 4) — and is in [a second pass, over the four domain
+categories](#a-second-pass-over-the-four-domain-categories) at the end.
+
+Every rule gets a verdict. **Seven do not reduce, and that is recorded as a finding rather than
+papered over** — a gate that is easy to satisfy without doing the thing is worse than the prose it
+replaced, because it converts a practice into a ritual and then reports green.
 
 ---
 
@@ -23,6 +27,10 @@ green.
 | **deferred** | pre-commit hook, `--check` exit code, CI, scheduled audit | **18** |
 | **narrowed** | a real gate that covers the incident but **not** the rule's full intent — prose stays alongside | **21** |
 | **irreducible** | no artifact; judgement, tone, or disposition | **6** |
+
+*(Counts above are the first pass, over `how-we-work` and `coding` only. The whole-corpus figures,
+re-measured 2026-09-13 after the four domain categories were triaged, are at the end of this
+document.)*
 
 **50 of 56 reduce to something mechanical; 29 of those at full strength.** The prior
 assessment put it at roughly 15 of 45.
@@ -82,9 +90,19 @@ implemented_by: skills/<name>/          # only when it already runs
   rule already did rather than inventing a convention.
 - A fenced block is exactly parseable while still rendering as visible text.
 
-**A rule judged irreducible gets no clause. Its absence is the finding** — an empty
-`## Enforcement` section asserting "nothing here" would be indistinguishable from one nobody
-has written yet.
+**A rule judged irreducible carries a clause too** — `verdict: irreducible`, with `reason:` and
+the `weaker:` instrument that still applies. It is the one verdict that owes no implementation,
+and it is counted as `unavailable` rather than as a gap.
+
+> ⛔ **CORRECTION, 2026-09-13.** This paragraph previously said the opposite: *"a rule judged
+> irreducible gets no clause; its absence is the finding."* That was wrong in the direction it
+> was trying to protect against. Running this repo's own checker on 2026-09-13 returned
+> `unavailable: 0` in a corpus with six rules already judged irreducible — all six were reported
+> as `UNKNOWN`, beside 24 rules nobody had triaged, under one reason: *no `## Enforcement`
+> section*. **The convention made a deliberate judgement indistinguishable from an omission**,
+> which is exactly what it was written to avoid. The rule for this species is
+> [`absence-is-not-compliance`](../rules/testing/absence-is-not-compliance.md); this was its
+> third incident, and the only one inside this repo.
 
 ---
 
@@ -222,9 +240,13 @@ cost is wasted effort and unread reports, not destroyed or corrupted artifacts.
 
 ---
 
-## The irreducibles — six, with reasons
+## The irreducibles — seven, with reasons
 
-**These get no `## Enforcement` clause.** The absence is deliberate and is itself the record.
+**Each of these carries a clause declaring `verdict: irreducible`, with its reason and its weaker
+instrument.** Six are `how-we-work` rules found by the first pass; the seventh,
+`a-check-that-shares-a-source-is-not-a-check`, came out of the 2026-09-13 pass over the four
+domain categories. A rule with *no* clause is not irreducible — it is untriaged, and the checker
+reports it as `UNKNOWN`.
 
 | Rule | Why it does not reduce | Weaker instrument still available |
 |---|---|---|
@@ -302,3 +324,118 @@ before trusting the green light:
    `harvest.py --check` and none of them says which check enforces it. The `implemented_by`
    field closes that gap — a rule and its enforcement drifting apart is the failure this whole
    format exists to prevent.
+
+---
+
+## A second pass, over the four domain categories
+
+*2026-09-13. Covers the 24 rules that carried no `## Enforcement` clause at all —
+`analytics/` (6), `data-engineering/` (13), `research/` (3), `testing/` (2) — plus the two rules
+added the same day. **23 reduce; one does not.***
+
+**This pass wrote the clauses first and the table second, which reverses the first pass.** So the
+table below is an **index, not a copy**: the authority for every field is the `## Enforcement`
+clause in the rule's own file, and restating `check:` and `escape:` here would create exactly the
+drift the clause format exists to prevent. Read the clause; use this to find it.
+
+| Rule | Verdict | What the gate looks at | Trigger | Cost |
+|---|---|---|---|---|
+| analytics/a-delta-is-three-numbers | narrowed | a signed delta with no gained/replaced/lost triple; a mapping inverted without a disjointness assert | pre-commit + lint | parser |
+| analytics/name-the-blind-spot | narrowed | a positive control run in the **same** invocation; an exoneration with no examined-count | CI + Stop | trivial |
+| analytics/report-both-sides-of-a-comparison | deferred | the six fields a comparison report owes, including an explicit `unexplained` bucket | pre-commit/CI + Stop | report format |
+| analytics/review-every-output | narrowed | artifacts produced vs screened vs opened; a "reviewed" claim against the screen log | pre-commit/CI + Stop | **implemented** (`skills/verify-outputs/`) |
+| analytics/solve-the-space-not-the-samples | narrowed | a solver truthiness test standing in for a status enum; an impossibility claim with no bound and no positive control | lint + Stop | trivial |
+| analytics/summaries-must-carry-the-whole-set | narrowed | an indefinite singular with no cardinality in the same sentence | Stop + pre-commit | trivial |
+| data-engineering/adjudicate-with-an-external-source | narrowed | a producer recorded per cited source; two "sources" sharing one | pre-commit + Stop | registry |
+| data-engineering/agree-the-output-contract-first | narrowed | a new output-writing call with no contract block, and a contract with no assertions | **PreToolUse(Write/Edit)** + pre-commit | parser |
+| data-engineering/check-for-a-local-copy-before-refetching | interposed | the fetch target against tracked paths, LFS pointers and `-compressed`/`-cache` siblings | **PreToolUse(Bash/WebFetch)** | repo index |
+| data-engineering/completeness-checking | deferred | input vs output population per build; silent-skip constructs; a single-percentage completeness figure; existence used as cache validity | lint + CI | parser |
+| data-engineering/exact-match-on-a-complete-key | interposed | fuzzy-match symbols near a join; a merge with no key-uniqueness assert; a discarded match-method label | **PreToolUse(Write/Edit)** + pre-commit | parser |
+| data-engineering/inspect-what-you-downloaded | deferred | records extracted per file, and each file against its siblings' size distribution | CI + lint | trivial |
+| data-engineering/never-patch-a-key-to-force-a-join | interposed | a literal code-to-code mapping applied inside a join | **PreToolUse(Write/Edit)** + pre-commit | parser |
+| data-engineering/never-reseat-a-value-silently | narrowed | the enumerated reseat list, and its diff between runs | CI + pre-commit | artifact |
+| data-engineering/parallel-variants-same-schema | deferred | variant column sets modulo prefix; a `0` where a denominator is `0`; a classifier that does not partition | CI self-test | declared family |
+| data-engineering/read-the-authority-never-type-the-table | deferred | a module-scope literal of code-like values feeding a mapping call; a fallback to it; a missing `assert_covers` | pre-commit AST lint | parser |
+| data-engineering/status-fields-must-be-earned | deferred | the four assertions the rule writes out, including duplicate checksums and reconciler idempotence | pre-commit/CI | trivial |
+| data-engineering/text-encoding | deferred | text-mode `open()` with no `encoding`; `text=True` with none; committed mojibake | pre-commit **AST** lint | trivial |
+| data-engineering/verify-conversions-against-the-original | deferred | measured per-category loss in the converter, plus a newly-zero count | pre-commit | trivial |
+| research/external-sources-only-are-primary | deferred | a VERIFIED entry whose source is not a resolvable external URL | `--check` exit code | trivial |
+| research/reproducibility | narrowed | outputs with no producing script; inputs with no provenance row; caches older than their inputs | pre-commit + CI regenerate-and-diff | CI time |
+| research/research-and-qa-logs | narrowed | fetches made with no tracked write under the log directory; a log missing its required sections | Stop + pre-commit | trivial |
+| testing/validations-must-fail | deferred | **remove the guard body and require a test to go red** | pre-commit + CI | suite runtime |
+| testing/absence-is-not-compliance | deferred | a passing branch reachable on an empty population; a checker that never prints its denominator; a missing subject-absent self-test | pre-commit + CI | parser |
+| testing/a-verb-list-is-not-a-boundary | narrowed | a guard whose discriminator is a verb list, with no structural or effect instrument beside it and no declared residue | CI over the gate config | config |
+| testing/a-check-that-shares-a-source-is-not-a-check | **irreducible** | — | — | — |
+
+### The one that does not reduce
+
+**`a-check-that-shares-a-source-is-not-a-check`.** The subject is *where an expectation came
+from*, and the provenance of a belief leaves no artifact. Every mechanical proxy collapses to a
+declaration — a fixture labelled production-captured, a comment naming the source — and the
+declaration is written by the same author, holding the same wrong model, in the same minute. The
+rule closes the door itself: *"You broke it the way you imagine it breaks."*
+
+**Weaker instruments, all real:** name the expectation's source out loud before writing the check
+(review prompt, contributing checklist); prefer a fixture captured from the real defect over a
+generated one; replay the previous implementation inside the test and assert it goes red, which
+costs almost nothing. And the adjacent mechanical question — *can this check fail at all?* — is
+gated under `validations-must-fail` by guard removal. That gate is worth building. It answers a
+different question, and conflating the two is how this rule would get a gate it does not deserve.
+
+### Build order for the domain rules — by damage recorded, not by ease
+
+**Build `validations-must-fail` first, ahead of this ordering.** It is the discharge condition for
+every other gate in the corpus: `a-classification-is-not-a-gate` requires a gate to have been
+*observed refusing*, and guard-removal is the only mechanical form of that. Until it exists, every
+"gated" verdict in this document rests on someone's word.
+
+1. **`read-the-authority-never-type-the-table`** — a typed 4-region map omitted three parent-area
+   codes, dropping **277 units, 3.7% of the frame**, from *every* regional statistic in a
+   stakeholder handoff. Four separate checks were green before and after. Shipped in published
+   figures; surfaced only because an unrelated task forced a recomputation.
+2. **`exact-match-on-a-complete-key`** — ~154 rows a year on the wrong administrative unit across
+   eight years, **142 of them exact matches on an under-specified key**. 357 published rows and
+   1.38% of the money on the wrong unit; 128 units received both their own row and someone else's
+   and the two were summed.
+3. **`verify-conversions-against-the-original`** — an int-rounding compression destroyed **87.8%
+   of one age band**, 6,949 of 7,583 units to exactly zero, under a docstring asserting the error
+   "washes out". Armed later by a well-motivated change; caught by an unrelated guard that was
+   nearly dismissed as too strict.
+4. **`never-patch-a-key-to-force-a-join` + `never-reseat-a-value-silently`** — build together;
+   the first refuses the crosswalk, the second makes the reseats it cannot refuse visible. A
+   hand-written 21-row table whose own codes were **1-of-21 valid** against the issuing authority,
+   a 17.3% error on an unrelated variable, and **557,132 people** flagged `no_coverage = True`
+   while the sibling block held their real published population.
+5. **`completeness-checking` + `inspect-what-you-downloaded`** — build together; one counts the
+   population, the other decides whether a delivered file is data. 125 units locked in as "done"
+   by a cache bug that tested existence; three 1.3 KB stubs served with HTTP 200, of which the
+   audit before the hard failure found two. **Read the false-positive warning in
+   `inspect-what-you-downloaded`'s clause before writing this one** — its earlier version sniffed
+   for the substring `404` and discarded 15 good regions.
+6. **`status-fields-must-be-earned`** — 3 of 206 items missed, all 206 recorded as complete, found
+   after twelve days by a collaborator's independent copy. The rule writes its own four queries;
+   any one would have caught it on day one.
+7. **`text-encoding`** — 164 corrupted labels shipped; the first fix turned 165 bad rows into
+   13,697. Trivial to gate, and the gate must be an AST lint: the rule says so, and a grep here
+   flags `Image.open(p)` and breaks working code.
+8. **`check-for-a-local-copy-before-refetching`** — ~38 GB re-downloaded over hours while all 344
+   files sat committed in the same repo. No corrupted data — pure waste — which is why it ranks
+   below the seven above and above everything in `analytics/` and `research/`, whose recorded cost
+   is retracted conclusions and re-audited work rather than shipped defects.
+
+### Whole-corpus state, measured
+
+`python -X utf8 skills/check-rule-gates/check_rule_gates.py`, 2026-09-13, over 83 rule files:
+
+```
+gated: 8   UNGATED: 68   unavailable: 7   UNKNOWN: 0
+```
+
+**`UNKNOWN` went from 30 to 0 and `UNGATED` went from 44 to 68.** That is the triage completing,
+not a regression: 24 rules that were unreadable to the checker now declare what they owe, and 7
+declare that they owe nothing. **Every one of the 68 is a debt this document creates and does not
+discharge.** Per [`a-classification-is-not-a-gate`](../rules/how-we-work/a-classification-is-not-a-gate.md)
+a classification is not an end state — and shipping these clauses is only defensible because
+`check_rule_gates.py` counts them as `UNGATED` and exits non-zero. **The clause is safe to publish
+exactly as long as something reports it as a gap.** If that checker is ever removed, 68 rules
+silently become documented controls that do not exist.

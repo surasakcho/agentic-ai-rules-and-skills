@@ -25,6 +25,8 @@ skills/           executable Claude Code skills (rules that can run) —
   lib/              helpers skills call (skillconfig.py); inside skills/ deliberately,
                     because `..` from a junction escapes the link, not the repo
 lessons/          incident write-ups the rules were extracted from
+docs/             gateability.md  — what each rule reduces to, and what it cannot
+                  gate-specs.md   — specifications handed to whoever deploys the gates
 CADENCE.md        how this repo stays alive
 ```
 
@@ -46,13 +48,22 @@ About half of what is written down can be mechanised. The other half — judging
 invariant matches the domain, whether a caption matches its figure — needs a human or an
 agent that actually looks. Both halves are here. Neither pretends to be the other.
 
-**"About half" was an estimate, and a reduction pass has since measured it.** Of the 56 rules
-in `how-we-work/` and `coding/`, **50 reduce to something a machine can check** — 29 at full
-strength, 21 only in a narrowed form that covers the incident but not the rule's whole intent,
-and **6 that genuinely do not reduce.** Each rule now carries its own `## Enforcement` clause
-naming the observable and the moment it fires; the six without one are the finding, not an
-omission. See **[docs/gateability.md](docs/gateability.md)** for the verdicts, the priority
-ordering, and why a gate on the remaining six would be worse than the prose.
+**"About half" was an estimate, and two reduction passes have since measured it.** Across all
+**83** rules, **76 reduce to something a machine can check** and **7 genuinely do not** — and the
+seven say so in their own clause, because a judgement nobody can count is not a finding. Every
+rule carries an `## Enforcement` clause naming the observable and the moment it fires; a rule with
+*no* clause has not been triaged yet, and the corpus checker reports it as `UNKNOWN` rather than
+as clean.
+
+**Reducible is not enforced, and the gap is counted rather than described.**
+`skills/check-rule-gates/` reads every clause and resolves the implementation it names:
+
+```
+gated: 8   UNGATED: 68   unavailable: 7   UNKNOWN: 0     (2026-09-13)
+```
+
+See **[docs/gateability.md](docs/gateability.md)** for the verdicts, the build order by recorded
+damage, and why a gate on the remaining seven would be worse than the prose.
 
 ## Rules by task type
 
@@ -99,6 +110,8 @@ ordering, and why a gate on the remaining six would be worse than the prose.
 | [research](rules/research/) | [External sources only are primary](rules/research/external-sources-only-are-primary.md) | Most internally-"VERIFIED" ledger entries had no external link a human could check |
 | [testing](rules/testing/) | [Validations must be able to fail](rules/testing/validations-must-fail.md) | A guard that never fired, silently, for its whole life |
 | [testing](rules/testing/) | [A check that shares a source with its subject is not a check](rules/testing/a-check-that-shares-a-source-is-not-a-check.md) | A continuity guard that passed against the very 54-day hole it was written to catch |
+| [testing](rules/testing/) | [An absent subject is not a passing check](rules/testing/absence-is-not-compliance.md) | A credential check that passed an agent wired to no credential, and a link check that accepted a regular file where a symlink was the requirement |
+| [testing](rules/testing/) | [A verb list is not a boundary](rules/testing/a-verb-list-is-not-a-boundary.md) | A tamper guard that matched `patch` but not `git apply` — and refused a read-only `grep` whose search pattern contained a protected word |
 | [how-we-work](rules/how-we-work/) | [Monitor the number, not just the job](rules/how-we-work/monitor-the-number-not-just-the-job.md) | 59 days green, no errors, no missed runs — booking one eighth of the income |
 | [data-engineering](rules/data-engineering/) | [Text encoding](rules/data-engineering/text-encoding.md) | 164 mojibake labels from a locale-codec fallback |
 | [data-engineering](rules/data-engineering/) | [Completeness checking](rules/data-engineering/completeness-checking.md) | A whole province silently locked in as "done" by a caching bug |
