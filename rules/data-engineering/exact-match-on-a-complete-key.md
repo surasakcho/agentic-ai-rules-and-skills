@@ -78,6 +78,13 @@ evidence; that one you may not, and a fuzzy matcher's entire purpose was to answ
   persisted** — a discarded label is a match quality nobody can audit.
 - **Assert key uniqueness in the reference before joining**, not after.
 - **A silent drop is as bad as a wrong match.** Unmatched rows must be counted, listed and returned.
+  When the join feeds a *status*, a dropped row does not read as missing — it reads as the
+  **default state**, and that reading is indistinguishable from a true one. Reported from a live
+  estate: a monitor joined running sessions to a declared roster on exact equality and dropped the
+  misses, so a known naming drift would have rendered every staffed unit as *running, nobody
+  aboard* — identical to a genuinely idle one. Fixed by publishing the misses, **not** by loosening
+  the join, because a fuzzy match would have concealed a real misconfiguration. See
+  [`absence-is-not-compliance`](../testing/absence-is-not-compliance.md).
 - **Put the matcher in one place.** A guard added in the *caller* protects that caller only — one
   project had a length guard in one consumer and not in two siblings calling the same helper.
 

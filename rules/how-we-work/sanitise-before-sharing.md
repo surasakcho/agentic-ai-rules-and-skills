@@ -90,6 +90,39 @@ result. Do that one by hand, deliberately, and say that you did.
 Related: [publish-lessons-weekly](publish-lessons-weekly.md) decides *what* gets shared; this
 rule decides what that thing may *contain*. Run this one second, and treat it as blocking.
 
+
+## A mechanism sentence is not scoped by the finding it appears in
+
+The four categories — people, places, paths, findings — are applied to a *document*. This is the
+trap one level down: **a sentence explaining how something works is scoped to the mechanism, not to
+the finding you were writing about.** You verify the finding, the finding is safe to publish, and
+the explanatory clause you wrote to support it is general.
+
+> **Incident.** A gate specification described a guard misclassifying a *filename* as a command
+> verb, and explained why in one clause about how the verb pattern anchors. The finding was
+> verified, correct and harmless — eight write cases checked, none of them a bypass. **The clause
+> was general.** Applied to a different gate that nobody had tested, the same sentence was one
+> inference step from a live false negative on the most sensitive path in the estate. The author
+> found it hours later while testing something else, reported it privately, and narrowed the
+> published text.
+>
+> **Nothing in the review caught it, because the review asked "is this finding safe to publish"
+> and the answer was yes.**
+
+So the check has a second half, and it is a different question:
+
+- **For the finding:** does publishing this let someone do harm *here*?
+- **For every sentence explaining a mechanism:** is this true of more than the case I tested — and
+  if it is, what else does it explain?
+
+**A generalisation is the thing worth publishing and the thing that leaks.** That is not a reason
+to stop writing them; it is the reason the second question has to be asked deliberately, because
+the first one passes cleanly and feels like the whole check.
+
+**And when it does leak, narrow it and say so.** Git history on a public repo is a public log, so
+no erasure is available or should be claimed. The honest record is: what was published, what was
+withdrawn, why, and that the history still carries it.
+
 ---
 
 ## Enforcement

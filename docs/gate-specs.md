@@ -171,8 +171,15 @@ self-describing the filename, the likelier it is.
 >
 > The trigger is **a bare, unqualified filename in last position of its own segment** — not the
 > end of the command, and not the working directory. A pipe does not save it, because last-token
-> is evaluated per segment. One leading `./` does, because the character before the verb is then
-> `/` rather than whitespace, and the verb pattern requires whitespace or a start-of-segment.
+> is evaluated per segment. Path-qualifying the filename does save it, for a reason to do with how
+> the verb pattern anchors.
+>
+> **That anchoring detail was published here in full and has been withdrawn.** Stated generally it
+> is one inference step from a *false negative* on a different gate, which this office found later
+> the same day by testing the reader path it had not tested when it wrote this. The hole went to
+> the Core directly; the mechanism is not restated here. It remains in this repo's git history,
+> which is a public log — no erasure is claimed, and publishing it was a call this office got
+> wrong by one step. See [what is deliberately absent](#what-is-deliberately-absent-from-this-document).
 >
 > Which makes the practical shape worse than the first telling: the command that fails is the
 > **short, unqualified one you type while standing in the directory**, and the one that works is
@@ -181,8 +188,8 @@ self-describing the filename, the likelier it is.
 > switched off.
 >
 > **The allowed rows are not a bypass, and must not be read as one.** Qualifying the path does not
-> defeat the destination test — it stops the *filename* being read as a verb, because the character
-> before it is no longer whitespace. Every genuine write to the same qualified path still refuses:
+> defeat the destination test — it stops the *filename* being misread as a verb. Every genuine
+> write to the same qualified path still refuses:
 > checked across `cp`, `install`, `tee`, `rm`, `chmod`, `sed -i` and a shell redirect, all eight
 > refused with `./` in front. What changes is only whether a **read** is misclassified. Both
 > offices verified this independently before it was written down, because a table of allowed
@@ -464,9 +471,16 @@ being written** — see the last subsection, which is not a joke.
   **refused** when owned by a redirect into a file. Writing a file is not on the list, and writing a
   file is what a session does all day.
 - **It fires only when the protected token and the verb land on the same physical line**, because
-  segmentation splits on newlines. A verb on line 3 and a path on line 5 do not correlate — so the
-  reported cause of the third Sector's refusal (a word appearing inside Python identifiers on other
-  lines) does not reproduce, and something on the same line as the path carried the verb.
+  segmentation splits on newlines. A verb on line 3 and a path on line 5 do not correlate.
+
+  **Confirmed since, against the reporting Sector's actual source line.** The reported cause — a
+  word appearing inside Python identifiers on other lines — does not reproduce and was not the
+  mechanism. What matched was **a local variable whose name happens to be a reader verb, assigned
+  on the same line as a credential-shaped string**: an indented `<verb> = <call>(...)` inside the
+  test body. The indentation puts whitespace before the name, which is all the verb pattern asks
+  for. So the token that convicted the command was not a command, not an argument, and not even a
+  reference — it was **a name being defined**, which is the furthest thing from an invocation that
+  a line of code contains.
 
 ### The discriminator — and why "a quoted heredoc is inert" is too strong
 
@@ -515,6 +529,31 @@ nobody questions.
 refused party one cheap way to mark a refusal wrong; report the marked count as a rate beside the
 refusal count. **Ship it with the discriminator, not after it** — the discriminator will be wrong
 again, and this is the only thing that will say so before somebody reaches for the off-switch.
+
+### One predicate fixes both gates: the verb must be in command position
+
+The two false positives look unrelated — a filename that contains a verb, and a variable named
+after one — and they are the same defect. **A pattern that finds a verb *anywhere* in a segment
+is asking "does this word appear", when the question is "is this word the command".**
+
+The amendment: take the verb from **command position** — the first token of the segment after
+stripping the wrappers the pattern already tolerates (`sudo`, `env`, `nohup`, `nice`, `time`,
+`timeout`, `stdbuf`) and any `VAR=value` prefix — treat a `name = value` form as an assignment and
+not a command, and compare on the token's **basename**.
+
+Verified against a 12-case corpus, 12 of 12, before being written down here — because
+[the previous version of this amendment got three of eight wrong](../rules/testing/a-verb-list-is-not-a-boundary.md),
+and a fix checked only against the case that prompted it is the failure the rule beside it names:
+
+| must still fire | must stop firing |
+|---|---|
+| bare verb · `sudo`/`env` wrapper · `VAR=1 verb` | a filename that contains a verb |
+| a verb reached by **basename** rather than raw token | a variable being assigned a verb's name |
+| a genuine destination write | a verb inside a comment or a string |
+
+The basename comparison is not cosmetic and is the half that matters most: it is what makes the
+predicate a **security** fix as well as a usability one. The reason why went to the Core directly
+and is not in this document.
 
 ### The section could not be written without tripping the defect
 

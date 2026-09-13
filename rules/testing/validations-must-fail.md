@@ -97,6 +97,39 @@ exercises a retired code path, and a status field set from intent rather than ou
 [`silence-must-be-the-alarm`](../how-we-work/silence-must-be-the-alarm.md) for the unattended
 case, where the answer is "green" for as long as nobody happens to look.
 
+## The boundary: when running the test IS the harm
+
+This rule says prove the guard fires. There is one class where you may not, and it has to be stated
+here or the rule argues for the wrong thing: **a control whose only direct test is performing the
+act it prevents.**
+
+> **Incident.** A credential gate was found to miss a path-qualified reader verb. The open question
+> was whether the layer beneath it independently caught the same command — and the only way to
+> answer it directly was to attempt to read a live private key. Nobody ran it. *A test whose
+> failure mode is a private key in a transcript is not a test worth running*, because the failure
+> case is unrecoverable: a key that has been printed is rotated, not un-printed.
+
+The discriminator is **whether the failing run is reversible.** A guard that might fail to stop a
+file write can be tested against a scratch file. A guard that might fail to stop an exfiltration
+cannot be tested by exfiltrating, because the test *is* the incident.
+
+What to do instead, in order:
+
+1. **Test the predicate, not the effect.** Evaluate the matcher against the command string as data
+   — every finding in that incident came from calling the classifier on strings, never from running
+   one of them.
+2. **Substitute a decoy with the same shape.** A file at the same path pattern, containing nothing.
+   This works when the control keys on the path and not on the content.
+3. **Have it answered from outside a session** by whoever owns the system, where the answer costs
+   nothing.
+4. **Record it as unverified, with the reason.** An honest "not tested, because the test is the
+   harm" is a finding. A green light produced by never having looked is
+   [`absence-is-not-compliance`](absence-is-not-compliance.md).
+
+**Never resolve this by deciding the control is probably fine.** The point of the boundary is that
+the evidence is genuinely unavailable by the direct route, which makes routes 1 to 3 mandatory
+rather than optional.
+
 ## When an invariant fails at scale, suspect the invariant
 
 > **Incident.** A validation asserted that no unit may be closer to a deep-sea port than to
