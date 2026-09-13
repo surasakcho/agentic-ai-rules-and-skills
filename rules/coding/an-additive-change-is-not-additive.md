@@ -31,8 +31,21 @@ re-reads the old sites: adding a value feels like it cannot break a value that a
 **The question is not "did I use the new member correctly". It is "which existing members did I just
 narrow".**
 
-**Enumerate the old callers, not the new ones.** In every instance below the defect sits at a site
-that was never edited — so it is invisible in the diff, invisible to a reviewer reading the change,
+**Enumerate the old callers, not the new ones** — and then ask the second question, because the
+obligation runs both ways:
+
+1. **Which existing emitters are now wrong?** They kept their spelling and lost their meaning.
+2. **Which sites should now emit the NEW member and do not?** A state that exists and cannot be
+   reached is the same defect from the other side.
+
+**The declaration is itself an old caller, and it is the one to check first.** The comment or
+docstring defining the vocabulary is a claim about the whole set — so adding a member falsifies it
+by construction. One observed case had the defining comment say a counter *"is the only thing in
+the exit code"*, **falsified eleven lines below it by the same commit.** It is the site most likely
+to be wrong and the last place anyone looks, because it reads as the authority rather than as a
+caller.
+
+In every instance below the defect sits at a site that was never edited — so it is invisible in the diff, invisible to a reviewer reading the change,
 and invisible to a test suite that was passing before and still is.
 
 ## Three instances
@@ -57,6 +70,32 @@ and invisible to a test suite that was passing before and still is.
 > printed label is a fact about transcripts" had to be ruled on hours later. The re-specification
 > came first; the transcript problem is its bill.
 
+> **A member with no emitters.** The same file, an hour after the rule was published, by running
+> the guard rather than by noticing anything. Two `case` arms each reported that they had checked
+> nothing and **neither incremented the new counter** — four hundred lines from its declaration,
+> with no textual link to it. Measured on a fixture: before, the run printed **`OK` and exited 0**
+> over a section reporting "unread"; after, red and exit 2. **The state existed and could not be
+> reached** — which is
+> [`absence-is-not-compliance`](../testing/absence-is-not-compliance.md) *at the verdict*, i.e. the
+> precise failure the new member was added to prevent, surviving in the arms its own commit did not
+> touch.
+
+## The opposite error: do not add a member per diagnosis
+
+This rule pushes toward splitting, and splitting has its own cost — **each new member re-specifies
+the others, which is what this rule is about.** So the counter-pressure belongs here rather than in
+a separate one.
+
+**A severity encodes what the reader should DO, not why.** When two states imply the same action,
+they are one member and the difference belongs in the text beside it. Observed: a *cannot-tell*
+state was mapped onto an existing *do-not-proceed* colour rather than gaining its own, because the
+palette was shared by four scripts — **adding a colour would have re-specified three unrelated
+scripts in order to fix one line in the fourth**, which is this rule as a bug report about itself.
+
+The test is the instruction, not the cause: *unsafe* and *unread* are different diagnoses and the
+same instruction. A third state that ran and found something real, and does **not** change the
+instruction, correctly keeps its own colour and stays uncounted.
+
 ## Where it hides, and how it was found
 
 **In the branch nobody runs.** An unexercised path cannot notice that the vocabulary around it
@@ -80,7 +119,9 @@ it meant, when nothing about it changed.*
 - **Never compare a reading taken before the change with one taken after** without saying the
   vocabulary moved. Same word, different set.
 - **Run the unexercised branches first.** They are where a silently-narrowed meaning survives
-  longest, and a decoy usually reaches them.
+  longest, and a decoy usually reaches them. **But enumerate before you fire** — the enumeration is
+  cheaper than the decoy and finds the same class, and it reaches sites the decoy cannot provoke.
+  The decoy is the fallback for a vocabulary with no single declaration to enumerate from.
 
 ---
 
@@ -103,5 +144,5 @@ observable: 'a diff that adds a member to an enumerated output vocabulary - a st
 trigger: 'pre-commit on the diff, at the moment the member is added'
 check: 'a new member added to a declared vocabulary and one or more existing emitters untouched -> block, LISTING the untouched emitters so the enumeration is done rather than promised; a vocabulary whose members are not declared in one place -> advise, since nothing can enumerate it'
 escape: 'confirm each listed emitter was re-read against the new definition - the guard asks for the enumeration, never for a particular outcome, because narrowing an old member is often correct'
-narrows: 'lists the sites; cannot judge which are now wrong, which is the judgement the rule exists to force. Blind to a vocabulary spread across files with no single declaration, and blind to one whose members are constructed rather than named - both of which are the shape most likely to have the defect'
+narrows: 'lists the sites; cannot judge which are now wrong, which is the judgement the rule exists to force. It finds emitters that are WRONG and not sites that should emit the new member and do not -- a state declared in one place and never incremented four hundred lines away is invisible to it, observed. Blind to a vocabulary spread across files with no single declaration, and to one whose members are constructed rather than named'
 ```
