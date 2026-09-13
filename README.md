@@ -49,7 +49,7 @@ invariant matches the domain, whether a caption matches its figure — needs a h
 agent that actually looks. Both halves are here. Neither pretends to be the other.
 
 **"About half" was an estimate, and two reduction passes have since measured it.** Across all
-**83** rules, **76 reduce to something a machine can check** and **7 genuinely do not** — and the
+**84** rules, **77 reduce to something a machine can check** and **7 genuinely do not** — and the
 seven say so in their own clause, because a judgement nobody can count is not a finding. Every
 rule carries an `## Enforcement` clause naming the observable and the moment it fires; a rule with
 *no* clause has not been triaged yet, and the corpus checker reports it as `UNKNOWN` rather than
@@ -59,7 +59,7 @@ as clean.
 `skills/check-rule-gates/` reads every clause and resolves the implementation it names:
 
 ```
-gated: 8   UNGATED: 68   unavailable: 7   UNKNOWN: 0     (2026-09-13)
+gated: 8   UNGATED: 69   unavailable: 7   UNKNOWN: 0     (2026-09-13)
 ```
 
 See **[docs/gateability.md](docs/gateability.md)** for the verdicts, the build order by recorded
@@ -78,6 +78,7 @@ damage, and why a gate on the remaining seven would be worse than the prose.
 | [how-we-work](rules/how-we-work/) | [Long reports end with a TL;DR](rules/how-we-work/long-reports-end-with-a-tldr.md) | Dense, accurate 20-60 line reports whose unranked open questions went unanswered — unranked is unread |
 | [how-we-work](rules/how-we-work/) | [A PR nobody is asked to review is invisible](rules/how-we-work/a-pr-nobody-is-asked-to-review-is-invisible.md) | A bot-authored PR its owner could not find; a sweep then found an outside contributor's PR lost the same way |
 | [how-we-work](rules/how-we-work/) | [Unexpected means stop and propose](rules/how-we-work/unexpected-means-stop-and-propose.md) | "I noticed X, so I did Y" -- a wrong fix shipped because a one-command check was never run |
+| [how-we-work](rules/how-we-work/) | [A remembered claim is not a checked one](rules/how-we-work/a-remembered-claim-is-not-a-checked-one.md) | Six assertions in one day, each falsified by a command under a minute long — one of them published and retracted |
 | [how-we-work](rules/how-we-work/) | [Strict first, then the residual](rules/how-we-work/strict-first-then-the-residual.md) | A fallback built before the strict pass ever ran, so nobody learned how big the problem was |
 | [how-we-work](rules/how-we-work/) | [Watch the context budget](rules/how-we-work/watch-the-context-budget.md) | Post-compaction, four messages spent defending a table that had never been re-read |
 | [how-we-work](rules/how-we-work/) | [Publish lessons weekly](rules/how-we-work/publish-lessons-weekly.md) | Eleven reusable lessons that would have stayed in one repo |
