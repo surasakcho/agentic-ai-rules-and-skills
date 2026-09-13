@@ -197,6 +197,26 @@ def ensure_shared(shared: Path, url: str, offline: bool) -> Path:
     return shared
 
 
+def names_at(shared: Path, sha: str, cat: str):
+    """Rule filenames in rules/<cat> AS OF <sha>, or None if the category is not there.
+
+    SELECT FROM THE TREE YOU PIN TO. Globbing the clone's working tree and then writing
+    links pinned to a commit reads two different trees, so an UNCOMMITTED file in the
+    shared clone becomes a link that 404s -- and the pin exists precisely so that what is
+    on somebody's disk cannot change what a published link resolves to. See
+    rules/how-we-work/a-pinned-reference-is-checked-at-its-pin.md.
+
+    The blast radius is why this is worth a git call per category rather than a glob: this
+    clone is read by the pre-commit gate of every repo carrying the shared block, so one
+    dirty working tree here refused commits in an unrelated repo, with a message that
+    named neither the file nor the person editing it.
+    """
+    r = run("git", "-C", str(shared), "ls-tree", "--name-only", f"{sha}:rules/{cat}")
+    if r.returncode != 0:
+        return None
+    return sorted(n for n in r.stdout.splitlines() if n.endswith(".md"))
+
+
 def verify_links(shared: Path, sha: str, rules) -> None:
     """Every linked rule must exist at the SHA being written. Cheap, and it is the
     last line of defence: it catches a bad pin even if the sync above is bypassed."""
@@ -319,7 +339,7 @@ def write_selection(repo: Path, verb: str, scope: str, sha: str, reason: str):
         f.write(f"{verb}\t{scope}\t{date}\t{sha}\t{reason}\n")
 
 
-def apply_selection(selected, rules, declined, adopted, shared):
+def apply_selection(selected, rules, declined, adopted, shared, sha):
     """Remove declined scopes; add hand-adopted categories. Returns (selected, rules)."""
     for cat in list(selected):
         if cat in declined:
@@ -331,12 +351,12 @@ def apply_selection(selected, rules, declined, adopted, shared):
     for cat, reason in adopted.items():
         if cat in selected:
             continue
-        d = shared / "rules" / cat
-        if not d.exists():
+        names = names_at(shared, sha, cat)
+        if names is None:
             raise SystemExit(f"ERROR: {SELECTION.as_posix()} adopts rules/{cat}, which does "
-                             f"not exist in the shared repo.")
+                             f"not exist in the shared repo at {sha}.")
         selected[cat] = [f"adopted by hand -- {reason}"]
-        rules[cat] = sorted(p.name for p in d.glob("*.md"))
+        rules[cat] = names
     for cat in list(rules):
         rules[cat] = [n for n in rules[cat] if f"{cat}/{n}" not in declined]
         if not rules[cat]:
@@ -345,16 +365,16 @@ def apply_selection(selected, rules, declined, adopted, shared):
     return selected, rules
 
 
-def rules_for(shared: Path, cats):
-    """Every rule file under each selected category. Missing category = hard error: it means
-    the shared repo moved and this skill is pointing at nothing."""
+def rules_for(shared: Path, sha: str, cats):
+    """Every rule file under each selected category, AS OF sha. Missing category = hard
+    error: it means the shared repo moved and this skill is pointing at nothing."""
     out = {}
     for cat in cats:
-        d = shared / "rules" / cat
-        if not d.exists():
-            raise SystemExit(f"ERROR: shared repo has no rules/{cat} -- it has been "
-                             f"reorganised and this skill is out of date")
-        out[cat] = sorted(p.name for p in d.glob("*.md"))
+        names = names_at(shared, sha, cat)
+        if names is None:
+            raise SystemExit(f"ERROR: shared repo has no rules/{cat} at {sha} -- it has "
+                             f"been reorganised and this skill is out of date")
+        out[cat] = names
     return out
 
 
@@ -523,7 +543,7 @@ def main():
                   f"different")
             return 0
 
-        new_rules = rules_for(shared, sorted(old_rules))
+        new_rules = rules_for(shared, sha, sorted(old_rules))
         # A rule that VANISHED is the one case a human must see. verify_links cannot catch
         # it -- that checks the links about to be written, and a deleted rule simply stops
         # being in the list. A rule is deleted when later experience contradicted it, so a
@@ -559,9 +579,9 @@ def main():
     # a branch that cannot fire is exactly what rules/testing/validations-must-fail.md is about.
     # Assert the invariant instead of pretending to handle its negation.
     assert selected, "MANDATORY is empty -- every project must adopt at least the mandatory rules"
-    rules = rules_for(shared, selected)
+    rules = rules_for(shared, sha, selected)
     declined, adopted, sel_rows = read_selection(repo)
-    selected, rules = apply_selection(selected, rules, declined, adopted, shared)
+    selected, rules = apply_selection(selected, rules, declined, adopted, shared, sha)
     verify_links(shared, sha, rules)
 
     if args.review:
