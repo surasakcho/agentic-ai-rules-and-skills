@@ -150,15 +150,43 @@ guard that fired on correct rows, so the next one to do it is on a short leash.
 - On a **read** — `wc -l` over three filenames — because one of the protected files is called
   `install-<dispatcher>.py`, and `install` is itself a verb in the destination list. The verb
   pattern and the protected-path pattern matched *the same token*, and the destination heuristic
-  then found that token in last position. **The file cannot be counted, catted or listed by name
-  at the end of a command.**
+  then found that token in last position.
 
 The second one is the sharper of the two, because it does not need a payload at all: **the
 protected file's own name supplies the verb.** Any protected path whose name contains `cp`,
 `install`, `ln`, `rm`, `mv`, `dd` or `tee` as a word will do the same, and the more
-self-describing the filename, the likelier it is. It also blocks precisely the command an operator
-reaches for first — *let me look at the installer* — which is the shape most likely to end with
-the guard being switched off.
+self-describing the filename, the likelier it is.
+
+> ⛔ **CORRECTION — this office first published it as "the file cannot be counted, catted or listed
+> by name at the end of a command", which is wrong in both directions.** Re-run against the module
+> with the boundary cases separated:
+>
+> | command | verdict |
+> |---|---|
+> | `wc -l install-<d>.py` | **refused** |
+> | `cd claude/hooks && wc -l install-<d>.py` | **refused** |
+> | `wc -l install-<d>.py \| cat` | **refused** |
+> | `wc -l ./install-<d>.py` | allowed |
+> | `wc -l claude/hooks/install-<d>.py` | allowed |
+>
+> The trigger is **a bare, unqualified filename in last position of its own segment** — not the
+> end of the command, and not the working directory. A pipe does not save it, because last-token
+> is evaluated per segment. One leading `./` does, because the character before the verb is then
+> `/` rather than whitespace, and the verb pattern requires whitespace or a start-of-segment.
+>
+> Which makes the practical shape worse than the first telling: the command that fails is the
+> **short, unqualified one you type while standing in the directory**, and the one that works is
+> the long path-qualified form you type from somewhere else. That is exactly inverted from how
+> anyone investigates a gate system, and it is the shape most likely to end with the guard
+> switched off.
+
+**The cheap fix, and the amendment that keeps it from creating a hole.** Test the protected pattern
+against the last token *only when the segment's first token is itself a destination verb* — `wc` is
+not `cp`, so the case above disappears. But the first token must be taken **after stripping the
+same prefixes the matcher already tolerates**. Verified against the module: `env cp /tmp/evil
+<protected>` is refused today, and a naive first-token test would stop refusing it — a false
+negative manufactured by the fix for a false positive. Strip `sudo`, `env` and `nohup` first, as
+the sibling pattern already does.
 
 Two readers, independently, inside one day, both writing the specification for the thing that
 refused them.

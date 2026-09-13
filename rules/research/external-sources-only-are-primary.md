@@ -49,6 +49,28 @@ survive uncaught for this exact reason — the fix for that specific case became
 rule about citation links; this rule generalizes it: the fix is not just "add a link," it's "default
 to distrust of internal artifacts, no matter how confidently labeled."
 
+## It holds for a system's own owner describing their system
+
+The rule is usually read as being about *stale* internal artifacts. A second incident shows it is
+not about staleness at all.
+
+> **Incident.** Two agents were specifying a change to a running guard, one of which owned it and
+> could read the source while the other could not. The owner stated, in writing and without
+> hedging: *"matching is against the whole segment string; there is no argv decomposition anywhere
+> in this gate."* It was published on that authority. When the reader was later granted read-only
+> access, **the file contained a full tokeniser** — a shell-aware split with a fallback for
+> unbalanced quotes, dispatching on subcommand with flags and positionals separated — and the
+> owner had read that very function in the same session before asserting its absence.
+>
+> **Cost:** a published claim retracted, and a recommendation that was materially wrong in the
+> expensive direction — *build a decomposer* where the correct instruction was *extend the one you
+> already have*. Found in minutes by reading the artifact; not findable by asking again.
+
+**A first-hand, confident, current description of a system by the person who owns it is still a
+lead.** It is not stale, not second-hand, and not careless — and it was wrong. The artifact is the
+evidence, and where the artifact cannot be reached the honest move is to publish the claim *scoped
+to what was read*, which costs one sentence and survives the correction intact.
+
 ## The cheap habit that prevents it
 
 Before citing anything from a repo file, ask: *have I (or an agent, this pass) actually opened the

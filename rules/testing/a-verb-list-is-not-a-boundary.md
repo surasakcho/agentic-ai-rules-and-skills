@@ -125,6 +125,13 @@ the unconditional branch as "it doesn't even check the path", which is precisely
   effect half is what tells you the day the list was short.
 - **Never widen a match to close a gap.** Widening trades a false negative you cannot see for a
   false positive the operator can, and the operator's response is to switch the guard off.
+- **Narrow in the same normalisation space the matcher already used.** A pattern that tolerated
+  `sudo`, `env` and a leading `./` has been quietly treating those forms as equivalent; a narrowing
+  condition written against the raw text stops treating them so, and every form the old pattern
+  caught through that tolerance becomes a hole the new one leaves. The tell is that the repair is
+  expressed in different terms from the thing it repairs — *"only when the first token is the
+  verb"*, against a pattern that never looked at tokens. **Check a narrowing fix against the cases
+  the old pattern caught, not only against the case that prompted it.**
 - **Three outcomes for anything that parses a command:** allow, deny, and **ask**. Ambiguity is a
   state, not a default.
 - **Strip the payload before you read the verbs, and keep the scope arm separate from the path
