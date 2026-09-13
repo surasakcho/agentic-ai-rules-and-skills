@@ -63,6 +63,12 @@ The predicate is two commands: a tracked file whose first bytes are `#!` and who
 `100644`. `git ls-files -s` reports the mode; the shebang reports the intent. Disagreement is the
 finding.
 
+**Read the index mode against the checkout's bytes — that pair, specifically.** A file can be
+`100644` in the index and `755` in somebody's working copy, and **only the first one ships**. So the
+check is `git ls-files -s` for the mode and the first two bytes of the file for the intent; a sweep
+that stats the checkout passes on every machine where someone once ran `chmod` and never committed
+it.
+
 **A file that is sourced or imported rather than executed is a legitimate `100644` and says so in
 itself** — *"sourced, never executed"* in the header, or a documented `python3 <file>` interface. A
 sweep of one tree found ten shebang files not `100755`: **one real defect and six honest
@@ -90,6 +96,19 @@ assert an executable interface for files whose documented interface is not execu
 reflexive repair, and the wrong one. The work owed is a line per file, and it is
 [`a-classification-is-not-a-gate`](../how-we-work/a-classification-is-not-a-gate.md) debt stated
 with its number rather than hidden.
+
+### And some files cannot declare it, which is a third state and not an omission
+
+A file that is **denied to the session that would annotate it** cannot carry its own sentence. In
+one estate, two of the four undeclared files were the gate dispatcher and its installer — **on that
+session's edit deny list, because a control the controlled party can edit is not a control.** The
+machinery was refusing edits to itself, correctly, and the declaration it owes is a casualty of that
+working.
+
+**The answer is to put the declaration where it can be written and say whose it is** — in that case,
+the header of the adjacent test file, naming both. **Two of four undeclared for a refusal rather
+than an omission is a legible state; two silently missing is not**, and the difference is one
+sentence in a file nobody is denied.
 
 ## Guard
 
@@ -120,8 +139,8 @@ whose standby loop failed `Permission denied` every cycle for about a day, invis
 verdict: deferred
 observable: 'every tracked file whose first bytes are a shebang, against its mode in the git index'
 trigger: 'pre-commit, or CI over the tree -- the mode is a fact about the index, so commit time IS the moment this rule names and it is not fires_late'
-check: 'git ls-files -s | for each blob whose first two bytes are #! and whose mode is 100644 -> block, naming the file; report the count of shebang files checked, never a colour'
-escape: 'a file that is sourced or imported rather than executed declares so in its own header -- sourced, never executed, or a documented interpreter-prefixed interface. A suppression list outside the file is not an escape, because the next reader needs the reason more than the checker does'
+check: 'git ls-files -s for the INDEX mode, and the first two bytes of the path for the shebang -- that pair, since a file can be 100644 in the index and 755 in a working copy and only the index ships. Mode 100644 with a shebang and no declared non-executable interface -> block, naming the file; report the count of shebang files checked, never a colour'
+escape: 'a file that is sourced or imported rather than executed declares so in its own header, and a file DENIED to the session that would annotate it has that declaration written in an adjacent file naming both -- undeclared-for-a-refusal is a state, not a gap -- sourced, never executed, or a documented interpreter-prefixed interface. A suppression list outside the file is not an escape, because the next reader needs the reason more than the checker does'
 invoked_by: 'nothing yet. In the estate that reported this, the pre-commit hook is a fixed sequence of numbered gates with no extension point AND is on the reporting session deny list, so the rule classifies as gateable and stays ungated there -- the debt a-classification-is-not-a-gate names, recorded rather than hidden'
 narrows: 'gates the MODE, which is one member of the blind spot the rule describes. A shebang naming an interpreter absent from the caller PATH, a CRLF that makes the shebang unparseable, an assumed working directory, an environment variable the harness exports -- each is supplied by the harness in the same way and none is visible to this check'
 ```
