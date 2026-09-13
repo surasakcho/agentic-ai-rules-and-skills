@@ -244,7 +244,19 @@ PROVIDERS = {
 # identifier: it is unique (enforced by harvest.py) and it is the part that survives
 # reorganisation -- 4dacbe9 moved two categories wholesale at 100% rename similarity.
 # Full reasoning: docs/gate-binding.md
-BIND_RE = re.compile(r'^satisfies\s+(\S+)\s+(\S+)\s+(?:"([^"]*)"|(\S+))(?:\s+observed:(\S+))?\s*$')
+BIND_RE = re.compile(r'^satisfies\s+(\S+)\s+(\S+)\s+(?:"([^"]*)"|(\S+))\s*(.*)$')
+
+# Trailing evidence tokens, repeatable. A binding is a CLAIM; these say how strongly.
+#   fixture:<path>            replayable -- a violating input and its refusal, re-runnable
+#   observed:<date>           somebody watched it refuse, once
+#   fixture-unsafe:"<reason>" no decoy the predicate accepts; the reason is MANDATORY,
+#                             because a bare marker is the classification this corpus
+#                             keeps warning about
+# An UNRECOGNISED token is reported and the binding is KEPT. The first version of this
+# parser accepted only `observed:` and dropped the whole line on anything else, which
+# would have silently reversed part of a join it had just moved -- loud about the syntax
+# and silent about the consequence, which is the worse half of the two.
+EVIDENCE_RE = re.compile(r'(\w[\w-]*):(?:"([^"]*)"|(\S+))')
 
 
 def read_config(path):
@@ -261,8 +273,19 @@ def read_config(path):
                 continue
             m = BIND_RE.match(line)
             if m:
-                binds.append((m.group(1), m.group(2), m.group(3) or m.group(4),
-                              m.group(5) or ""))
+                ev, tail = {}, (m.group(5) or "").strip()
+                for em in EVIDENCE_RE.finditer(tail):
+                    ev.setdefault(em.group(1), []).append(em.group(2) or em.group(3))
+                unknown = [k for k in ev if k not in ("observed", "fixture", "fixture-unsafe")]
+                for k in unknown:
+                    errs.append(f"line {n}: unknown evidence token '{k}:' -- binding KEPT, "
+                                f"evidence ignored")
+                if tail and not ev:
+                    errs.append(f"line {n}: trailing text is not an evidence token: "
+                                f"'{tail[:30]}' -- binding KEPT")
+                if "fixture-unsafe" in ev and not any(v for v in ev["fixture-unsafe"]):
+                    errs.append(f"line {n}: fixture-unsafe needs a reason in quotes")
+                binds.append((m.group(1), m.group(2), m.group(3) or m.group(4), ev))
                 continue
             parts = line.split(None, 3)
             kind = parts[0]
@@ -551,11 +574,31 @@ def main():
         good = [r for r in rows if ids.get(r[1]) == r[0]]
         if good:
             bound += 1
-            for prov, gid, obs in good:
+            for prov, gid, ev in good:
                 claimed.add(gid)          # claimed regardless of which bucket the rule lands in
-            seen = ", ".join(sorted({r[2] for r in good if r[2]})) or "never observed refusing"
+            # Three evidence states, reported distinctly. A fixture path that does not
+            # exist is a failed claim, not a weaker one: the whole point of the strong
+            # state is that somebody can re-run it.
+            fixtures, missing, unsafe, dates = [], [], [], []
+            for _p, _g, ev in good:
+                for f in ev.get("fixture", []):
+                    (fixtures if any(os.path.exists(os.path.join(r, f))
+                                     for _l, r in roots) else missing).append(f)
+                unsafe += [u for u in ev.get("fixture-unsafe", []) if u]
+                dates += ev.get("observed", [])
+            if fixtures:
+                seen = "replayable: " + ", ".join(sorted(set(fixtures))[:2])
+            elif unsafe:
+                seen = "fixture-unsafe -- " + sorted(set(unsafe))[0][:46]
+            elif dates:
+                seen = "observed once: " + ", ".join(sorted(set(dates)))
+            else:
+                seen = "never observed refusing"
+            if missing:
+                rep.ungate("%-52s FIXTURE NAMED BUT ABSENT: %s"
+                           % (name, ", ".join(sorted(set(missing))[:2])))
             rep.ok("bound by the estate", "%-52s %s (%s)"
-                   % (name, ", ".join(sorted(r[1][:40] for r in good)), seen))
+                   % (name, ", ".join(sorted(r[1][:32] for r in good)), seen))
         if rows and not good:
             rep.ungate("%-52s BINDING NAMES NO SUCH GATE: %s"
                        % (name, ", ".join("%s/%s" % (r[0], r[1][:28]) for r in rows)))

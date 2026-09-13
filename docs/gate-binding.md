@@ -170,20 +170,71 @@ Then the claim is not "someone watched it once" but "this input still gets refus
 re-run it. A binding whose replay stops refusing has become false, and says so on the day the gate
 changes rather than at the next audit.
 
-**Some gates must not have their fixture written down, and that is a third state rather than an
-excuse.** A violating input for a credential gate is a credential-shaped payload; writing it into a
-repository to prove the gate refuses it puts the thing the gate exists to stop into the artifact the
-gate is meant to protect, permanently and in history. The same holds for any gate whose violation is
-itself the harm — see
+**A few gates must not have their fixture written down — and far fewer than the obvious argument
+suggests.**
+
+> ⛔ **This clause was published wider than it should have been, and the narrowing came from
+> checking rather than reasoning.** It read: *any gate whose violation is itself the harm*. Both
+> credential gates in the estate that prompted it were nominated as the examples — and both turn out
+> to have been **replayable for weeks**, 27 and 12 deny cases respectively, found by one grep of the
+> test file. Nominating them from the shape of the problem instead of opening the file is the same
+> error as binding a rule off its title, which is the other retraction on this page.
+
+**The discriminator is whether a decoy exists that the predicate accepts**, not whether the real
+thing is dangerous. A **pattern-matching** gate — a regex over a token shape, a path, a verb — takes
+a synthetic input and stays fully replayable; its predicate cannot tell a real credential from a
+shaped one, which is exactly what makes the fixture safe. `fixture-unsafe` is for the narrower case
+where **no decoy the predicate accepts exists**, so provoking a refusal means performing the act.
+
+### Assemble the violating input at runtime, never as a literal
+
+The technique that makes credential fixtures safe, and it generalises to every gate whose trigger is
+a token shape:
+
+```python
+GHP = "ghp_" + "A" * 36        # never written out as one string
+```
+
+Two consequences, and the second is the one worth the paragraph:
+
+1. **No violating literal ever lands in a tracked file**, so the fixture obeys the gate it tests.
+2. **The gate needs no self-exemption.** An exemption keyed on a path or a marker — *ignore matches
+   inside `test_*.py`* — is a hole anything climbs through by naming itself accordingly, and it is
+   the first thing anyone reaches for when a fixture trips its own gate.
+
+The estate that wrote it records that the first draft used literals and **the live gate refused the
+write of the test file itself.** That refusal is better evidence than the suite: it is the gate
+firing on real input rather than on input shaped to please it.
+
+Beyond pattern-matching gates, the same distinction applies — see
 [`discard-secret-output-never-filter-it`](../rules/how-we-work/discard-secret-output-never-filter-it.md)
 and the boundary in
 [`validations-must-fail`](../rules/testing/validations-must-fail.md) for controls whose only direct
 test is performing the act they prevent.
 
-So a binding is in one of **three** evidence states, and they must be distinguishable: *replayable*,
-*observed once and dated*, and **`fixture-unsafe`, with the reason** — which is an honest finding and
-not a gap to be closed. A gate marked `fixture-unsafe` is verified the way that boundary prescribes:
-against the predicate as data, against a decoy, or from outside a session.
+So a binding is in one of **three** evidence states, and they must be distinguishable — one date
+standing in for all three is the collapse this corpus keeps finding. Trailing tokens, repeatable:
+
+```
+satisfies <slug> <provider> "<gate-id>"  fixture:<path>
+satisfies <slug> <provider> "<gate-id>"  observed:<date>
+satisfies <slug> <provider> "<gate-id>"  fixture-unsafe:"<reason>"
+```
+
+| token | state | checked |
+|---|---|---|
+| `fixture:<path>` | **replayable** — a violating input and its refusal | the path must exist under a declared root; **a fixture named and absent is a failure**, since the whole point of the strong state is that somebody can re-run it |
+| `observed:<date>` | observed once | nothing — it is an assertion, and reads as one |
+| `fixture-unsafe:"<reason>"` | no decoy the predicate accepts | **the reason is mandatory.** A bare marker is the classification this corpus keeps warning about |
+| none | never observed refusing | — |
+
+**An unrecognised trailing token is reported and the binding is KEPT.** The first parser accepted
+only `observed:` and dropped the whole line on anything else — loud about the syntax and silent
+about the consequence, which would have quietly reversed part of a join it had just moved. The
+louder half is not the safer half when the quiet half is a dropped claim.
+
+A gate marked `fixture-unsafe` is verified the way that boundary prescribes: against the predicate
+as data, against a decoy, or from outside a session.
 
 **Still optional, for the same reason as above** — a mandatory fixture per binding produces an empty
 binding file. But `observed:<date>` should be read as the weak form and a replayable case as the
