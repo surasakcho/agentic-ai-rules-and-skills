@@ -197,6 +197,10 @@ def health(shared: Path, deny=()):
         # reports a broken link in a file that is correct. A checker that fires on correct
         # rows gets switched off, so the fences come out before the scan.
         txt = re.sub(r"^(```|~~~).*?^\1", "", txt, flags=re.S | re.M)
+        # ...and so does inline code. `[<title>](link)` written between backticks is a
+        # quotation of a template, not a link. Missing this shipped a second instance of
+        # the same false positive one hour after the first was fixed.
+        txt = re.sub(r"`+[^`\n]*`+", "", txt)
         for target in re.findall(r"\]\(([^)#:]+?)(?:#[^)]*)?\)", txt):
             if target.startswith(("http://", "https://", "mailto:")):
                 continue
