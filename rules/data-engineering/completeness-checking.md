@@ -18,6 +18,27 @@ Check **both directions**: expected items absent from the output, and output ite
 source counterpart. Check at every level that can silently lose data — whole files or groups,
 entities within a group, fields within an entity.
 
+## Linking is not syncing — a loop over the source can only ADD
+
+The both-directions rule above is usually read as being about data. **It is about any
+reconciliation**, and the commonest place it is forgotten is a sync script, where the defect is not
+in any line of code but in **the set the loop iterates.**
+
+> **Incident.** A script linked every skill in a repository into two shared directories. It walked
+> the skills the repo *has* and created a link for each. Nothing ever walked the destination — so a
+> renamed skill produced **half a sync**: the new name appeared on the next run and the old one
+> dangled, in both directories, permanently. A *deleted* skill produced only the dangling half, and
+> nothing announced it at all. Found four of them by hand, a day after the rename that caused them.
+
+**Reading the code finds nothing**, which is the diagnostic: every line is correct and the loop is
+exactly right about what it iterates. The question the code never asks is the second direction —
+*what is in the destination that the source no longer has?*
+
+**The prune needs two conditions, and the second is what makes it safe.** Remove a destination entry
+only if it belongs to this source **and** no longer resolves. A sweep of everything broken in a
+shared destination deletes entries another owner put there — and a destination is usually shared,
+which is why it is a destination and not an output file.
+
 ## Missing data rarely looks missing
 
 It arrives as a plausible zero, an empty string, a default, or a dropped row that nothing

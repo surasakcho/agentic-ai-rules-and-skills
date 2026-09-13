@@ -75,6 +75,31 @@ the distinction does not survive the transport, nothing errors, and the output l
 - **A convention is prose and holds only while every session follows it.** The durable fix is a
   second identity, which needs a credential a person places — so it is escalated, not adopted.
 
+### And the corroborating artifact can be stale without saying so
+
+The receiving half has an obvious defence: **go and read the file the relay claims to be quoting.**
+That defence has a failure mode of its own, and it manufactures evidence rather than withholding it.
+
+> **Incident.** A ruling was relayed to a confined session and acted on as information. The file
+> that would have corroborated it — the host rules the session is configured from — had been
+> **frozen for eighteen hours** by a single-file bind mount that captured the inode at container
+> start. Every edit since was invisible inside, and nothing in the file, the session, or the
+> harness said so. Confirmed by executing inside the container rather than by reading the mount
+> table: zero occurrences of any marker written that day.
+
+**So a session that went to corroborate would have found a file saying nothing about the ruling —
+and that absence is indistinguishable from the relay having been invented.** The stale mount does
+not merely fail to deliver a true ruling; in the one artifact a receiver would check, it produces
+positive evidence *against* it. That is
+[`absence-is-not-compliance`](../testing/absence-is-not-compliance.md) aimed at authority rather
+than at coverage: *not present* and *present and not delivered here* share one reading.
+
+**Which is why "the file does not mention it" is not a finding about the relay.** It is a finding
+about the file, and it owes the same check any other absence owes — **when did this artifact last
+change, and can it change at all from where I am standing?** A source that cannot be updated in
+place is not a source, and a receiver who cannot answer that has corroborated nothing in either
+direction.
+
 ## The incident
 
 Two sessions, one host. One had a real, direct instruction from the operator — *any tool worth
