@@ -47,6 +47,14 @@ in one evening resolved that way — a split needing a partition check, already 
 `parallel-variants-same-schema`; a grouping key that is null, already in
 `read-the-authority-never-type-the-table`; and two more one category over.
 
+**Cite by quote or by slug — never by position.** A guard number, a corollary number, a list
+index: these are *positions*, and a position is not an identifier. Appending is safe and inserting
+silently repoints every citation, which is the same defect three times over in one day — a
+corollary cited by number, a report group indexed by position, and a rule slug used as a join key.
+Twice it was caught deliberately; once it was not, and the citation survived only because it
+happened to quote the guard rather than number it. **Know which one saved you.** The next citation
+may not be a quote.
+
 **So the corpus's gap is navigation before it is coverage.** A rule nobody can find from where they
 are standing is as absent as one nobody wrote — and adding the second copy is worse than either,
 because the two then drift. When a candidate resolves to an existing rule, **put the pointer where

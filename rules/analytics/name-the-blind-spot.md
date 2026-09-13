@@ -82,7 +82,10 @@ a defect too small to ship.
 4. **Run a positive control in the same invocation as the real check.** A deliberately corrupted
    string through the corruption guard; a deliberately blanked row through the delta. A check
    validated on a separate occasion is a check whose current wiring is unverified.
-5. **Ask the mirror of 1 as well: what could MOVE this number without the subject
+5. **Treat an exoneration as the weakest result a check can return.** "Nothing found" is the one
+   answer consistent with both a clean subject and a dead instrument. Never report it without
+   saying what would have had to be true for the check to see something.
+6. **Ask the mirror of 1 as well: what could MOVE this number without the subject
    changing?** A rate whose denominator is somebody's *choice* answers about the chooser.
    **If the party being measured controls the denominator, the number is about them and not
    about the thing.**
@@ -99,9 +102,6 @@ a defect too small to ship.
 
    The tell is a denominator the subject can edit. Report the range, or report the count
    with the denominator named beside it — never the ratio alone.
-6. **Treat an exoneration as the weakest result a check can return.** "Nothing found" is the one
-   answer consistent with both a clean subject and a dead instrument. Never report it without
-   saying what would have had to be true for the check to see something.
 
 ---
 
