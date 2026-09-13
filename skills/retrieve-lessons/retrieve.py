@@ -499,6 +499,34 @@ def rules_changed(shared: Path, old_sha: str, new_sha: str, adopted=None):
             if len(p.split("/")) > 2 and p.split("/")[1] in adopted]
 
 
+def block_span(text: str):
+    """(body, status) for the managed block. status is ok | absent | ambiguous.
+
+    BOTH READERS USED `re.search` FROM THE FIRST MARKER, and a CLAUDE.md that DOCUMENTS its
+    own marker has two. Observed: a file quoting `<!-- shared-lessons:begin -->` in a
+    paragraph about stale links made `read_pin` anchor on the prose, scan forward, and match
+    the next 'at <hex>' in the file -- which happened to be "5 at `100644`". Six hex
+    characters. The pin came back `100644`.
+
+    THE CRASH WAS THE LUCKY OUTCOME. The guard refused `100644..<sha>` as an unreadable diff;
+    had the surrounding prose held any plausible 7-hex string -- and a file like that is full
+    of commit SHAs -- the repin would have succeeded against the WRONG BASE and printed a
+    clean comparison. A narrower answer where UNKNOWN was owed, again.
+
+    So more than one marker is AMBIGUOUS, never "use the first". A file that mentions the
+    marker twice is a file this tool cannot read, and saying so is the only honest answer.
+    """
+    begins = list(re.finditer(re.escape(BEGIN), text))
+    ends = list(re.finditer(re.escape(END), text))
+    if not begins or not ends:
+        return None, "absent"
+    if len(begins) > 1 or len(ends) > 1:
+        return None, "ambiguous"
+    if ends[0].start() < begins[0].end():
+        return None, "ambiguous"
+    return text[begins[0].end():ends[0].start()], "ok"
+
+
 def parse_block(text: str):
     """The categories and rule files a CLAUDE.md block ALREADY links, read back out of it.
 
@@ -508,10 +536,9 @@ def parse_block(text: str):
     Advancing a SHA over a set a human chose is mechanical; re-running detection under a
     cron job is not, and conflating them is why nothing could be automated at all.
     """
-    m = re.search(re.escape(BEGIN) + r"(.*?)" + re.escape(END), text, re.S)
-    if not m:
+    body, status = block_span(text)
+    if status != "ok":
         return None
-    body = m.group(1)
     out = {}
     for cat, name in re.findall(r"/rules/([a-z-]+)/([a-z0-9-]+\.md)\)", body):
         out.setdefault(cat, set()).add(name)
@@ -526,7 +553,11 @@ def parse_block(text: str):
 
 
 def read_pin(text: str):
-    m = re.search(re.escape(BEGIN) + r".*?at `([0-9a-f]{6,40})`", text, re.S)
+    """The pin recorded INSIDE the managed block, or None. Never read from prose."""
+    body, status = block_span(text)
+    if status != "ok":
+        return None
+    m = re.search(r"at `([0-9a-f]{6,40})`", body)
     return m.group(1) if m else None
 
 
@@ -592,6 +623,14 @@ def main():
         cm = repo / "CLAUDE.md"
         existing = cm.read_text(encoding="utf-8", errors="replace") if cm.exists() else ""
         parsed = parse_block(existing)
+        if parsed is None and block_span(existing)[1] == "ambiguous":
+            raise SystemExit(
+                f"ERROR: {cm} contains the shared-lessons marker more than once, so I "
+                f"cannot tell which occurrence is the managed block.\n"
+                f"       Usually this means the file DOCUMENTS the marker in prose. That is "
+                f"fine to write; it is not fine to guess past. Quote it in a way that does "
+                f"not reproduce the literal marker, or the pin read from this file will be "
+                f"whatever hex string happens to follow the prose.")
         if parsed is None:
             raise SystemExit(
                 f"ERROR: no shared-lessons block in {cm} -- nothing to re-pin.\n"
@@ -708,6 +747,12 @@ def main():
     if args.check:
         if BEGIN not in existing:
             print(f"\nPROBLEM: no shared-lessons block in {cm.name}. Run --write.")
+            return 1
+        if block_span(existing)[1] == "ambiguous":
+            # Absent and ambiguous are different answers and must not print the same.
+            print(f"\nPROBLEM: {cm.name} contains the shared-lessons marker more than "
+                  f"once, so the managed block cannot be identified. Nothing here is a "
+                  f"statement about the pin -- this is unreadable, not stale.")
             return 1
         if pin == sha:
             print(f"\nPin is current ({sha}).")
