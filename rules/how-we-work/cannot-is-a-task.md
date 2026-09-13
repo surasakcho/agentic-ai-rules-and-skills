@@ -73,3 +73,15 @@ Every one of those steps was available at the moment I said it could not be done
 *Earned from:* declaring a missing dataset unobtainable while holding an unused browser tool, and
 without checking directory names or metadata that between them identified it exactly. Both checks
 took minutes.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: irreducible
+reason: 'the deliverable is a route or a requisition, and the difference between a route genuinely searched for and one asserted is EFFORT, which leaves no artifact. Gating the phrase not possible would gate the wording and reward silence instead'
+weaker: 'a Stop advisory that prints the rule own checklist when the outgoing message asserts a blocker - tools you already hold, alternatives named individually, the indirect route, narrowing the ask. It informs and never refuses. The sibling rule find-the-route-or-name-what-you-need DOES gate the tells and covers part of the same ground'
+```

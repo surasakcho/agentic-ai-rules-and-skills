@@ -45,3 +45,15 @@ looks fine.
 *Earned from:* proactive practice, no incident yet — added on user instruction rather than
 extracted from a failure, consistent with
 [`record-thinking-before-complex-work`](record-thinking-before-complex-work.md).
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: irreducible
+reason: 'the four checks are real, and whether they were run leaves no trace. A declaration that the loop ran is exactly the easy-to-satisfy-without-doing-the-thing failure'
+weaker: 'a Stop advisory that prints the four checks. The named consequences are gated elsewhere - format strictness under propose-xml-schema-before-strict-output, contradictions under a-correction-lands-where-you-noticed-it'
+```

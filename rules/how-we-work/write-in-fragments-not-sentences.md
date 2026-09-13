@@ -63,3 +63,15 @@ unverified"* is not improved by becoming *"12,000"*.
 *Earned from:* an operator instruction given three times across one estate, escalating from "answer
 in two lines" to "forsake grammar", because each softer form was read as a request for shorter
 sentences rather than for no sentences.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: irreducible
+reason: 'texture of output. A sentence-count or word-count gate is actively harmful here for the same reason as default-to-silence: the rule own boundary section says cutting facts is the wrong cut, and a length gate rewards precisely that'
+weaker: 'the completeness half is gated under shut-up-and-work - a vague quantifier standing where a count was available - which is the INVERSE of the naive gate, and the safe one'
+```

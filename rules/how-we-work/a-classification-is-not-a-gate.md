@@ -75,18 +75,34 @@ plainly, with a count, rather than shipping the clause and the intention togethe
 
 **Honest "this does not reduce" is fine. Unimplemented "interposed" is not.**
 
-The vocabulary for that verdict in this corpus is **`irreducible`**, and the convention is
-deliberate: *an irreducible rule carries no `## Enforcement` clause at all, and its reason is
-recorded in [`docs/gateability.md`](../../docs/gateability.md)'s irreducibles table.* The absence
-is the finding — an empty block asserting "nothing here" is indistinguishable from one nobody has
-written yet.
+The vocabulary for that verdict in this corpus is **`irreducible`**, and it is **written down as
+a verdict**: the rule carries an `## Enforcement` clause reading `verdict: irreducible`, with a
+`reason:` and the `weaker:` instrument that still covers part of the ground. The reasons are
+collected in [`docs/gateability.md`](../../docs/gateability.md)'s irreducibles table.
+
+> ⛔ **CORRECTION, 2026-09-13 — this section previously said the opposite**, that an irreducible
+> rule carries *no* clause at all, on the reasoning that "the absence is the finding — an empty
+> block asserting 'nothing here' is indistinguishable from one nobody has written yet."
+>
+> The second half of that sentence is true and the conclusion inverts it. **An absence is
+> indistinguishable from an omission in the other direction too**, and that is the direction this
+> corpus actually failed in: the checker below reported `unavailable: 0` while six rules had
+> already been judged irreducible, and all six sat in `UNKNOWN` beside 24 rules nobody had triaged,
+> under one undifferentiated reason — *no `## Enforcement` section*. A deliberate finding that
+> cannot be told from an omission is not a finding. See
+> [`absence-is-not-compliance`](../testing/absence-is-not-compliance.md), the rule this was the
+> third incident for.
+>
+> **A clause saying `irreducible` is not an empty block asserting "nothing here".** It is a
+> judgement, with a reason, that a machine can count — which is what makes an absence mean *not
+> yet examined* again.
 
 So there are exactly two acceptable end states for a rule, and no third:
 
 | End state | What it looks like |
 |---|---|
 | **Gated** | a clause naming a gate that exists, has been seen refusing, and is pointed at by `implemented_by` |
-| **Irreducible** | no clause, and a reason written down where the reasons live |
+| **Irreducible** | a clause reading `verdict: irreducible`, carrying its `reason:` and the `weaker:` instrument that still applies |
 
 "Classified, gate pending" is not an end state. It is the state this rule exists to end.
 
@@ -96,11 +112,19 @@ It is checkable by exactly the means it demands: read every rule's enforcement c
 declared gate exists, and assert it has been seen firing. That check is a few lines over this
 repo, and it is named in the clause below.
 
-**The honest state at the time of writing, measured rather than estimated:** 80 rule files, of
-which **50 carry an enforcement clause** and **7 name an implementation that actually runs**. A
-prior reduction pass found **50 of 56** rules in two categories mechanisable. So the obligation
-this rule creates is not a handful — the gap between "classified" and "running" is currently
-**43 rules**, and this rule is the first thing its own check would refuse.
+**The honest state, measured rather than estimated.** At the time of writing, 2026-09-12: 80 rule
+files, of which 50 carried an enforcement clause and 7 named an implementation that actually runs.
+**Re-measured 2026-09-13**, after the four remaining categories were triaged and the irreducible
+convention was corrected — `check_rule_gates.py` over 83 rule files:
+
+```
+gated: 8   UNGATED: 68   unavailable: 7   UNKNOWN: 0
+```
+
+So the obligation this rule creates is not a handful — the gap between "classified" and "running"
+is **68 rules**, and this rule is the first thing its own check would refuse. The number went *up*
+because the triage was finished, which is the correct direction: an unread corpus was never a clean
+one.
 
 Naming that is the point. A rule that quietly exempts itself while demanding the gate from
 everyone else is the decoration it is written against.
@@ -139,6 +163,6 @@ verdict: deferred
 observable: 'every Enforcement clause in this repo, against whether the gate it declares exists and has been observed refusing a known violation'
 trigger: 'check exit code over this repo, at the moment a rule lands'
 check: 'clause present and verdict is not irreducible and implemented_by absent -> fail; implemented_by names a path that does not exist -> fail; report the count of clauses backed by a running gate, never a colour'
-escape: 'a rule that genuinely does not reduce carries no clause at all and its reason goes in docs/gateability.md - absence is the finding, an empty block is not'
+escape: 'a rule that genuinely does not reduce declares verdict: irreducible with its reason and its weaker instrument, and is counted as unavailable rather than owed. Absence of a clause means NOT YET EXAMINED and is reported as UNKNOWN, never as clean'
 note: 'commit time IS the moment this rule names - a rule lands at commit - so this is not fires_late. The check is specified and not yet implemented; 50 clauses exist and 7 name a running gate, so this rule is the first thing its own check would refuse, and that debt is stated in the rule rather than hidden by it'
 ```

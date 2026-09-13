@@ -42,3 +42,15 @@ situation.
 *Earned from:* proactive practice, no incident yet — added on user instruction rather than
 extracted from a failure, consistent with
 [`record-thinking-before-complex-work`](record-thinking-before-complex-work.md).
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: irreducible
+reason: 'gating this needs a machine judgement of whether a rule is NARROW, which is the whole content of the rule. A lint on always or every in rule statements would misfire on the many correctly prescriptive broad rules, which the rule explicitly protects'
+weaker: 'the contributing checklist in README.md; a review prompt when a rule is added'
+```

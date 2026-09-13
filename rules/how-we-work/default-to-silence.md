@@ -83,3 +83,15 @@ not, the commit was the message.
 
 *Earned from:* a direct user instruction, after a day in which six long process reports on a single four-word
 decision buried the three open questions only that user could answer.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: irreducible
+reason: 'this is a routing decision about whether a message should exist. Every mechanical proxy is a length or count gate, and the rule own stated failure mode is that compression drops set sizes - so a length gate would push directly against the rule while reporting compliance. Requiring the agent to name one of the four reasons is a one-word ritual, satisfiable without the judgement'
+weaker: 'a periodic human audit of messages sent against decisions actually requested. The incident was six long reports on one four-word decision - a ratio a person sees at a glance and no checker can'
+```

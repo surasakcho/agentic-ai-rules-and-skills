@@ -45,3 +45,15 @@ the work, for a task where the biggest risk is building the right answer to the 
 *Earned from:* proactive practice, no incident yet — added on user instruction rather than
 extracted from a failure, consistent with
 [`record-thinking-before-complex-work`](record-thinking-before-complex-work.md).
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: irreducible
+reason: 'complex is the judgement, and the deliverable is the QUALITY of the questions. Counting questions asked would be satisfied by three bad ones. Proactive practice with no incident behind it, so there is not even a failure shape to gate'
+weaker: 'the grilling skill, invoked deliberately; a checklist item at task start'
+```
