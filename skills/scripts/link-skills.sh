@@ -67,4 +67,34 @@ for DEST in "${DESTS[@]}"; do
     ln -sfnr "$src" "$target"
     echo "linked $name -> $(readlink "$target") ($DEST)"
   done
+
+  # PRUNE. Linking is only half of a sync: this loop walks what the repo HAS, so a
+  # renamed or deleted skill leaves its old link behind forever. Observed live -- a
+  # rename produced `to-spec`/`to-tickets` on the next run and left `to-prd`/`to-issues`
+  # dangling in BOTH farms; a deletion produces only the dangling half and nothing
+  # announces it at all.
+  #
+  # BOTH CONDITIONS ARE REQUIRED, and the second is what keeps this safe: remove a link
+  # only if it points INTO this repo's skills/ AND no longer resolves. Sweeping every
+  # broken link in the farm would delete links another repo owns -- these directories are
+  # shared, which is the whole reason they are a farm.
+  pruned=0
+  for target in "$DEST"/*; do
+    [ -L "$target" ] || continue
+    [ -e "$target" ] && continue                      # resolves: not ours to judge
+    raw="$(readlink "$target")"
+    case "$raw" in
+      /*) abs="$raw" ;;
+      *)  abs="$(cd "$DEST" 2>/dev/null && printf '%s/%s' "$(pwd -P)" "$raw")" ;;
+    esac
+    # Normalise without requiring existence -- the target is broken by definition here.
+    abs="$(printf '%s' "$abs" | awk -F/ '{n=0; for(i=1;i<=NF;i++){ if($i==""||$i==".") continue;
+          if($i==".."){ if(n>0) n--; continue } a[++n]=$i } s=""; for(i=1;i<=n;i++) s=s"/"a[i];
+          print (s==""?"/":s) }')"
+    case "$abs" in
+      "$REPO/skills/"*) rm -f "$target"; pruned=$((pruned+1));
+                        echo "pruned $(basename "$target") (was $raw)" ;;
+    esac
+  done
+  [ "$pruned" -eq 0 ] || echo "pruned $pruned dangling link(s) in $DEST"
 done
