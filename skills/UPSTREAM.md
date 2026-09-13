@@ -13,19 +13,38 @@ default tool for the job decides everything by overwrite, in install order, with
 
 ## The measurement this policy rests on
 
-Measured 2026-09-13 against upstream `3cca18b` by a peer office, and **partially re-measured here.**
-Their set arithmetic assumed 77 skills on this side. **This repo has 66** — 69 directories under
-`skills/`, of which `docs/`, `lib/` and `scripts/` are not skills. That is a discrepancy of 11 in
-the denominator of the decision, so **the overlap sets below are recorded as reported and are not
-yet confirmed.** Re-run before acting on the per-skill numbers.
+Measured against upstream `3cca18b` on 2026-09-13, **re-run and reconciled** after a first pass used
+a denominator that counted files as skills. The definition, applied symmetrically to both sides:
+**a skill is a directory containing `SKILL.md`.**
 
-| bucket | reported | status |
-|---|---|---|
-| upstream-only | 13 | to re-check against a corrected denominator |
-| ours-only | 53 | inconsistent with 66 total; re-measure |
-| overlap, identical | 2 | `migrate-to-shoehorn`, `scaffold-exercises` |
-| overlap, frontmatter only | 6 | `grill-me`, `grill-with-docs`, `implement`, `setup-pre-commit`, `git-guardrails-claude-code`, `resolving-merge-conflicts` |
-| overlap, divergent | 16 | the real decision set |
+| bucket | count |
+|---|---|
+| ours | **66** |
+| upstream | **37** |
+| in both — the decision set | **24** |
+| upstream-only | **13** |
+| ours-only | **42** |
+
+Of the 24: 2 identical (`migrate-to-shoehorn`, `scaffold-exercises`), 6 differing only in
+frontmatter (`grill-me`, `grill-with-docs`, `implement`, `setup-pre-commit`,
+`git-guardrails-claude-code`, `resolving-merge-conflicts`), and 16 divergent in content — ranked by
+divergence: `setup-matt-pocock-skills`, `prototype`, `triage`, `tdd`,
+`improve-codebase-architecture`, `diagnosing-bugs`, `ask-matt`, `codebase-design`,
+`domain-modeling`, `teach`, `writing-beats`, `handoff`, `writing-shape`, `loop-me`, `grilling`,
+`writing-fragments`.
+
+**The first pass overstated ours as 77 and ours-only as 53. The 24-name overlap set was unaffected**
+— and that was luck rather than design. The overlap was computed by intersecting name lists, and the
+spurious entries were files (`README.md`, `package.json`, `LICENSE` and six others) which cannot
+collide with a directory name. **Had one spurious entry been named like a skill, it would have
+entered the decision set silently.** A wrong denominator that happens to miss the bucket you act on
+is not a safe wrong denominator; it is one whose blast radius nobody measured.
+
+### A consequence worth knowing before anyone says yes
+
+`setup-matt-pocock-skills` is **the most divergent file in the comparison**, and this corpus's copy
+describes itself as prompt-driven rather than deterministic. So "apply the skills across all repos"
+is not 24 identical edits — it is **24 judgement calls**, each one landing on whoever runs it.
 
 ## The policy
 
@@ -46,11 +65,20 @@ a permanent condition — the same mechanism `retrieve-lessons` already uses for
 because a deliberate decision and an omission would otherwise look identical
 ([`absence-is-not-compliance`](../rules/testing/absence-is-not-compliance.md)).
 
-**4. An upstream-only skill is not a free adoption.** No name collision is not the same as no cost.
-Each one still clears this repo's bar: a code-bearing skill carries a self-test or an explicit line
-in `_no-selftest.txt`, and every skill has to be something somebody here would actually reach for.
-Adopting thirteen unreviewed skills into a corpus whose whole claim is that everything earned its
-place would spend that claim to save an afternoon.
+**4. An upstream-only skill is not a free adoption, and a NAME is not enough to adopt from.** No
+collision is not no cost. Each one clears this repo's bar: a code-bearing skill carries a self-test
+or an explicit line in `_no-selftest.txt`, and every skill has to be something somebody here would
+actually reach for. Adopting thirteen unreviewed skills into a corpus whose whole claim is that
+everything earned its place would spend that claim to save an afternoon.
+
+**Adoption reads the file, not the list.** The thirteen are known here only as names —
+`claude-handoff`, `code-review`, `implement-spec`, `research`, `retro`, `setup-ts-deep-modules`,
+`to-questionnaire`, `to-spec`, `to-tickets`, `wait-what`, `wayfinder`, `wizard`,
+`writing-for-agents` — and a name states neither what a skill does nor whether it is code-bearing.
+Adopting from a list is building from a relay
+([`a-faithful-relay-loses-the-clause-that-matters`](../rules/how-we-work/a-faithful-relay-loses-the-clause-that-matters.md)):
+the primary exists and is reachable, so it gets read first, one at a time, with the reason recorded
+beside the adoption.
 
 **5. The check fails on OUR omission, never on THEIR activity.** This is the part most easily got
 backwards. Upstream moving is a correct state, not a defect — a check that fails when someone else
