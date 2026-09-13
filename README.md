@@ -49,7 +49,7 @@ invariant matches the domain, whether a caption matches its figure — needs a h
 agent that actually looks. Both halves are here. Neither pretends to be the other.
 
 **"About half" was an estimate, and two reduction passes have since measured it.** Across all
-**86** rules, **79 reduce to something a machine can check** and **7 genuinely do not** — and the
+**87** rules, **80 reduce to something a machine can check** and **7 genuinely do not** — and the
 seven say so in their own clause, because a judgement nobody can count is not a finding. Every
 rule carries an `## Enforcement` clause naming the observable and the moment it fires; a rule with
 *no* clause has not been triaged yet, and the corpus checker reports it as `UNKNOWN` rather than
@@ -59,7 +59,7 @@ as clean.
 `skills/check-rule-gates/` reads every clause and resolves the implementation it names:
 
 ```
-gated: 8   UNGATED: 71   unavailable: 7   UNKNOWN: 0     (2026-09-13)
+gated: 8   UNGATED: 72   unavailable: 7   UNKNOWN: 0     (2026-09-13)
 ```
 
 **And read `gated` narrowly, because it means less than it looks.** It asserts that the named
@@ -87,6 +87,7 @@ damage, and why a gate on the remaining seven would be worse than the prose.
 | [how-we-work](rules/how-we-work/) | [A remembered claim is not a checked one](rules/how-we-work/a-remembered-claim-is-not-a-checked-one.md) | Six assertions in one day, each falsified by a command under a minute long — one of them published and retracted |
 | [how-we-work](rules/how-we-work/) | [A blocked list is a fact about a moment](rules/how-we-work/a-blocked-list-is-a-fact-about-a-moment.md) | Turns ending with tidy lists of decisions owed by the operator, while work that could move sat untouched |
 | [how-we-work](rules/how-we-work/) | [Find it free, then generate it, then ask](rules/how-we-work/find-free-then-generate-then-ask.md) | Sessions stopping on assets a search would have settled — and the unattributed file that not-asking creates |
+| [how-we-work](rules/how-we-work/) | [A faithful relay loses the clause that matters](rules/how-we-work/a-faithful-relay-loses-the-clause-that-matters.md) | An accurately relayed issue dropped one requirement, and the agent shipped the whole-file version of the exact defect it was fixing |
 | [how-we-work](rules/how-we-work/) | [Strict first, then the residual](rules/how-we-work/strict-first-then-the-residual.md) | A fallback built before the strict pass ever ran, so nobody learned how big the problem was |
 | [how-we-work](rules/how-we-work/) | [Watch the context budget](rules/how-we-work/watch-the-context-budget.md) | Post-compaction, four messages spent defending a table that had never been re-read |
 | [how-we-work](rules/how-we-work/) | [Publish lessons weekly](rules/how-we-work/publish-lessons-weekly.md) | Eleven reusable lessons that would have stayed in one repo |

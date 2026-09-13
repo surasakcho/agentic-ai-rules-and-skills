@@ -77,6 +77,23 @@ check could not see.
 
 **When a requirement is a relationship, a check on the endpoint is not a check.**
 
+### An API answer with two values and three real states
+
+The same defect arrives from outside, in a reply nobody controls.
+
+> **Incident.** An agent queried a code host for a repository and received **"Repository not
+> found"**. It concluded the repository did not exist, and committed that conclusion to its
+> backlog. The reply cannot carry that conclusion: the host returns it for *absent* and for
+> *present but not visible to this credential*, **deliberately**, so that private repositories
+> cannot be enumerated by guessing names. Two states, one answer, by design.
+>
+> The true state was the second one — a repository that existed and had never been granted.
+
+**A deliberately ambiguous answer is not a defect in the API, and reading it as unambiguous is a
+defect in you.** The question *"could this response also mean I am not allowed to know?"* is worth
+asking of every not-found, empty list and zero-row result that crosses a permission boundary — and
+the discriminator is nearly always available: ask something you *are* permitted to see, and compare.
+
 ### This corpus, measured against its own convention
 
 This repo's reduction pass established that a rule which genuinely cannot be gated carries **no

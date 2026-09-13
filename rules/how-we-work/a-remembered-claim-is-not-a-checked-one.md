@@ -84,6 +84,33 @@ cannot be read by name at the end of a command"* — published, and wrong in **b
 from a single observed refusal. Four boundary cases, run later, produced the actual mechanism in
 under a minute. **Neither of us was short of skill or time. We were both short of one command.**
 
+## Tested against itself, the same day
+
+The clause below gates two species, and one of them fired for real within hours of publication —
+on the office that supplied six of the seven incidents above.
+
+> **Incident.** An agent asserted, across several hours and to a third party, that granting a
+> collaborator on a repository was the operator's act and not available to it. **It had never
+> invoked the API.** The command-line tool on that host was already authenticated with the
+> necessary scope; it worked on the first attempt.
+>
+> The claim then travelled: it was written into an escalation, addressed upward, and sat there
+> while the capability was in hand the whole time. **Cost:** hours of two offices reasoning about
+> an identity scheme for a problem that did not exist — resolved by an audit which found the
+> credential already had access to 11 of 12 repositories, and one repository created without a
+> grant.
+
+Two things worth taking from it. **An unchecked claim about your own capability is the species that
+escalates**, because "I cannot" is a sentence the reader has no way to test and every reason to
+believe. And the resolution was a **count**, not an argument: enumerating the population produced a
+smaller and better answer than two careful offices reasoning from first principles, and would have
+been available at any point in those hours.
+
+**The sharpest version of it, and the reason it is here rather than in a note:** the unchecked claim
+was *inside the escalation written to describe the failure*. A document about a gap is not exempt
+from the gap. Neither is this rule, whose own author published a claim the same day that four
+boundary cases falsified in under a minute.
+
 ## Scope — this is not "check everything twice"
 
 **The rule binds claims someone will act on.** The test is whether being wrong costs somebody else
