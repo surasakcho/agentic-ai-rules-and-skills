@@ -14,13 +14,19 @@ questions a PRD surfaces go while they are unanswered.
 
 ## The rule
 
-> **No implementation begins without a written PRD: what is being built, for whom, what it must do,
-> and what would make it done.**
+> **No implementation begins without a written statement of intent: what is being built, for whom,
+> what it must do, and what would make it done.**
+
+**Call it whatever your tracker calls it** — a PRD, a spec, a design doc, a ticket with acceptance
+criteria. The four things below are the rule; the noun is local vocabulary and this rule is
+portable. *(The filename says PRD because that is what the estate it was written in called it. A
+rule's slug is an identifier, not a label — it is the join key estates bind local gates to, so it
+stays put when the vocabulary around it moves.)*
 
 It is written down, in the repo, before the first line of implementation — not reconstructed
 afterwards from what got built, which is a description rather than a requirement.
 
-**Four things, and a PRD missing any of them is not one:**
+**Four things, and a statement missing any of them is not one:**
 
 1. **The user and the problem.** Who has it, and what they do today instead.
 2. **What it must do** — the behaviour, in terms a non-implementer can check.

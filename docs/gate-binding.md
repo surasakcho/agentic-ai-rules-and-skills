@@ -50,6 +50,13 @@ rename similarity**, so every filename survived and every category path did not.
 the part that has demonstrably moved; the slug is what survived it.** A qualified identifier would
 have invalidated every binding written before that commit.
 
+**And a slug is not renamed for vocabulary reasons.** Renaming one is a silent breaking change to
+every estate's binding file — a binding to the old slug reports as a rule that does not exist, and
+**nothing here can tell a rename from a deletion**. If one must change, the old slug wants recording
+where the join can see it, or a pass over every binding file in the same commit. Neither exists
+today. The first live test of this was a rule whose filename says `prd` in an estate that had just
+standardised on `spec`: the statement was made vocabulary-neutral and the identifier left alone.
+
 The cost is that slugs must stay unique across categories. They are today — 90 of 90 — and nothing
 enforced it, so **the enforcement ships with this decision**: `harvest.py --check` now fails on a
 duplicate rule slug, naming both paths. Proven both directions before landing.

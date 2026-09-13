@@ -127,8 +127,8 @@ line count, files shipped, and the `description` line of each — plus **one ski
 | skill | verdict | reason |
 |---|---|---|
 | `wayfinder` | **ADOPTED 2026-09-13** | The one genuine gap: planning work too large for a session as decision tickets on a tracker. 128 lines, domain-agnostic, nothing here does it. **Caveat that changes its cost:** it resolves tracker operations through the abstraction that `setup-matt-pocock-skills` installs — the single most divergent file in the comparison — so adopting it pulls that decision forward with it. |
-| `to-spec` | **decline as duplicate** | We have `to-prd`, same job, different noun. |
-| `to-tickets` | **decline as duplicate** | We have `to-issues`, same job, different noun. |
+| `to-spec` | **decline as duplicate** | We have `to-spec`, same job, different noun. |
+| `to-tickets` | **decline as duplicate** | We have `to-tickets`, same job, different noun. |
 | `claude-handoff` | **decline for now** | Upstream `in-progress/`. We have `handoff` and `wrap`. |
 | `implement-spec` | **decline for now** | Upstream `in-progress/`, 35 lines. We have `implement`. |
 | `retro` | **decline for now** | Upstream `in-progress/`. |
@@ -141,7 +141,7 @@ line count, files shipped, and the `description` line of each — plus **one ski
 | `wait-what` | not yet | 7 lines. |
 
 **`to-spec` and `to-tickets` are the decision hiding inside the adoption question.** They are not
-free and they are not merely duplicates: adopting them beside `to-prd` and `to-issues` puts **two
+free and they are not merely duplicates: adopting them beside `to-spec` and `to-tickets` puts **two
 chains with different nouns doing one job** into a flat namespace, and two implementations that
 agree today diverge after the next edit
 ([`parallel-variants-same-schema`](../rules/data-engineering/parallel-variants-same-schema.md)). If
@@ -201,3 +201,33 @@ fix went into the checker rather than into the adopted file — a checker that f
 gets switched off, and editing upstream's file to suit our tooling would have created divergence on
 day one for no reason. Verified both directions before landing: a real broken link outside a fence
 is still refused, the placeholder inside one is allowed, and the self-test passes.
+
+---
+
+## The chain rename — 2026-09-13
+
+The operator named the chain in upstream's nouns: **grill-with-docs (or wayfinder) → to-spec →
+to-tickets → implement.** So the cheap option this file already recommended is the one taken:
+`to-prd` → `to-spec`, `to-issues` → `to-tickets`, **ours renamed rather than upstream's adopted.**
+Two directory renames, eighteen references swept, our content unchanged.
+
+**Bookkeeping consequence, recorded because it changes the measured sets.** Those two were
+*ours-only* purely because the names differed. After the rename they collide with upstream's, so
+**the overlap set is 26, not 24**, and both new entries are `ours` by verdict — same job, different
+implementation, and the divergence is now visible instead of hidden behind a noun.
+
+**What did NOT move, and the reasoning is the load-bearing part.** `rules/coding/write-the-prd-before-the-code.md`
+keeps its filename. The noun in its *statement* is now vocabulary-neutral — call it a PRD, a spec, a
+design doc, a ticket with acceptance criteria; the four things are the rule — but the **slug stays**:
+
+- **A rule slug is an identifier, not a label.** It is the join key estates bind local gates to
+  ([`gate-binding.md`](../docs/gate-binding.md)), and renaming it is a **silent breaking change to
+  every estate's binding file**: a binding to the old slug reports as a rule that does not exist, and
+  nothing in the checker can tell a rename from a deletion.
+- **Re-encoding a second estate's vocabulary into a portable identifier is the same category error
+  as putting a gate path in a rule** — the thing the whole binding design exists to avoid. Swapping
+  PRD for spec would not make the rule less local; it would make it locally *correct somewhere else*.
+
+**If a rule slug ever must change**, it wants the old slug recorded where the join can see it, or a
+pass over every estate's binding file in the same commit. Neither exists today, which is itself a
+reason not to start.
