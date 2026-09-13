@@ -238,6 +238,49 @@ satisfies <slug> <provider> "<gate-id>"  fixture-unsafe:"<reason>"
 | `fixture-unsafe:"<reason>"` | no decoy the predicate accepts | **the reason is mandatory.** A bare marker is the classification this corpus keeps warning about |
 | none | never observed refusing | — |
 
+### The three tokens are about REFUSAL. Invocation is a fourth state and must not become a token
+
+**Ruled: no fourth token.** All three above say something about a gate *refusing* — replayable,
+observed once, or unprovokable. **None of them can say "the named gate exists and nothing invokes
+it"**, and for a `tree` provider that state is reachable, because existence in a directory *is* the
+gate id. A row can be true about existence and false about enforcement while every column either
+side of it reports green.
+
+Measured in one estate: **2 of 7 `tree`-provider rows named a script nothing runs** — and the two
+rules so bound were `a-classification-is-not-a-gate` (do not ship an unenforced classification) and
+`validations-must-fail` (a validation never seen to fail). **Both were honest rows by every check
+that existed.**
+
+**It stays derived rather than declared, and that is the whole ruling.** The three tokens are claims
+a *person asserts* and a checker *verifies*. Invocation is a fact about the estate that a checker
+can compute today, so writing it down would create a status field set from intent — precisely
+[`status-fields-must-be-earned`](../rules/data-engineering/status-fields-must-be-earned.md), and it
+would go stale the first time a cron entry changed. **Derive it daily; never let anyone type it.**
+
+⚠️ **And evidence does not confer support.** A `fixture:` proves the gate **refuses**; it says
+nothing about anything **calling** it. Counting evidence as invocation would reproduce the exact
+conflation the `implemented_by` / `invoked_by` split exists to break, one level further down.
+
+**Red and amber, because a permanently-red alarm is an ignored one.** An uninvoked row whose rule is
+enforced by *another* binding is a worklist entry and changes no exit code. **Only a rule whose
+bindings are all uninvoked is a finding** — that rule has no enforcement at all, which is what the
+row claimed it had.
+
+### A `tree` provider's identity is its glob, not its name
+
+`provider <label> tree <dir> <glob>` matches **one** glob. So the label reads as the population and
+**is** the glob, and one glob cannot span two extensions.
+
+Observed: `check-scripts tree ../bin *.sh` was taken for *"this estate's standalone checkers"* and
+is not a narrowing of that — it is **a different population**, excluding every Python checker in the
+same directory, **including both of the two that cron actually runs.** So the provider enumerating
+"the checkers" could not see the only invoked ones, and no rule could name them. Fixed by declaring
+a second provider, not by widening the first.
+
+**Same shape as a filter keyed on something narrower than its own description** — the answer renders
+as a smaller *true* set rather than an unresolvable one. When a `tree` provider's label names a
+category, declare one provider per extension and let the orphan count carry the total.
+
 **An unrecognised trailing token is reported and the binding is KEPT.** The first parser accepted
 only `observed:` and dropped the whole line on anything else — loud about the syntax and silent
 about the consequence, which would have quietly reversed part of a join it had just moved. The
