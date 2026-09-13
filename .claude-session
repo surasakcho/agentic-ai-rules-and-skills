@@ -25,10 +25,28 @@
 # in this repo, on purpose -- this is the public cross-machine rules library, and a
 # compose file naming one host's uid, secrets path and memory budget does not
 # belong in it. It lives in zkyhax-svr-config/host/compose.rules.yaml.
+# SUFFIX, 2026-09-13. rc and tmux read `-moff`, not `-svr`. The estate has two
+# session types and the suffix names which one this is: `-moff` executes, `-seer`
+# brainstorms. `-svr` and `-srv` were never a convention -- both were drift, and the
+# 2026-09-12 ruling that "srv is wrong, svr is right" settled the spelling of a suffix
+# that turns out not to exist.
+#
+# TAKEN ON TRUST, and recorded as such because the primary is not readable from this
+# container: the operator's wording, the `-seer` ruling, and the estate-wide table both
+# live in a private issue that returns 404 here. Relayed by the Core, which verified them.
+#
+# VERIFIED HERE, by listing the live registrations: of ten registered sessions, three read
+# `-svr` and seven read `-srv`, and NOT ONE matches any declaration. So this edit changes
+# what is DECLARED and may not change what is REGISTERED -- a session resumed with
+# `--continue` appears to carry its prior registration forward. The repo whose declaration
+# was corrected first still shows the old name in the registry, which is the same
+# declared-versus-actual gap this corpus found in its own gate coverage today. Treat the
+# rename as done when the registry shows it, not when this file does.
+
 target=container
 container=rules-agent
 workdir=/app/agentic-ai-rules-and-skills
 model=opus
-rc=rules-svr
-tmux=rules-svr
+rc=rules-moff
+tmux=rules-moff
 permission_mode=
