@@ -71,6 +71,21 @@ something is covered.
 > positive would silently uncover `git rm`, without ever touching the arm they believed owned it.**
 > The test stays green until the day it does not, and the change that breaks it looks unrelated.
 
+**And the symmetric claim holds for a REFUSAL: a failing case does not tell you which condition
+failed it.** Proving a new check *can* fire is corollary 2's job; proving it fired **for the reason
+you think** is this one, and a negative probe that refuses for the wrong reason reads exactly like
+one that works.
+
+> **Incident, twice in one day with one mechanism.** A config-driven checker was probed by copying
+> its config into a scratch directory and appending deliberately bad rows. Provider paths in that
+> format resolve **relative to the config file's own directory**, so every provider came back
+> unreadable and the inventory was empty — and the probe's *"names no such gate"* refusal fired
+> because **no gate existed at all**, not because the predicate worked. The contradiction branch
+> could not be reached even in principle. Re-run with absolute paths, all four probes behaved.
+
+**When a probe refuses, read the reason it printed, not the fact that it refused** — and be most
+suspicious when moving the fixture was the only thing that changed.
+
 **The mechanical form is per-arm mutation, and it is a small extension of guard removal.** Disable
 *the arm you believe covers this case* — not the whole guard — and re-run. If the case still
 passes, your coverage is attributed to the wrong mechanism and your map of the system is wrong in
