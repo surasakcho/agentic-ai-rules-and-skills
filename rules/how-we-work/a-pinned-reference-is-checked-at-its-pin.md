@@ -59,6 +59,26 @@ that attracts suspicion.
 So the usual defence — *"we would have noticed if it were wrong"* — is inverted here. **You notice a
 check that is silent. You obey a check that is loud.**
 
+## A stale pin is not a defect — the defect is a pin the citing sentence has outrun
+
+The corollary, and it is what keeps this rule from generating work rather than saving it. **An older
+SHA is a perfectly stable link.** That is the whole reason it was pinned. So "this link is behind"
+is not a finding, and a sweep that reports it as one is manufacturing exactly the work this rule
+warns about.
+
+**The predicate that splits them is one command:** `git diff <link's sha>..<current> -- <the linked
+path>`. Empty means the linked file has not moved and the citation still says what it said. Non-empty
+means the reader is sent to a version that may no longer support the sentence citing it.
+
+> **Measured across one estate:** 14 files carrying a managed block, 8 prose links into the shared
+> repo, **7 not at their own file's current pin — and only 4 of those 7 were defects.** Three were
+> legitimately stable. One of the four pointed at a document that had since gained a slug-rename
+> paragraph, a retracted count, and a sentence the citing text did not know about.
+
+**Tool-managed regions do not cover prose.** A repin moves the block and nothing else, so every
+hand-written link beside it drifts silently — visible to nobody, because the managed part is
+correct and the file looks maintained.
+
 ## Where it hides
 
 Anything that carries its own verification context:
