@@ -161,6 +161,12 @@ they exist so the *mechanism* survives, not just the instruction.
 
 ## Skills
 
+**`skills/` began as a fork of [mattpocock/skills](https://github.com/mattpocock/skills)** — MIT,
+© Matt Pocock — and has since been added to and, in places, rewritten. The upstream `LICENSE` is
+vendored at [`skills/LICENSE`](skills/LICENSE) and stays there. How changes from upstream are taken,
+and why the default is lossless rather than overwrite, is in
+[`skills/UPSTREAM.md`](skills/UPSTREAM.md).
+
 | Skill | What it does |
 |---|---|
 | [verify-outputs](skills/verify-outputs/) | Screens rendered figures and tables for the defect classes that survive code review. Exit 1 to gate a commit. Needs [requirements.txt](skills/verify-outputs/requirements.txt). |
