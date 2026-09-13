@@ -69,8 +69,46 @@ the evidence for it:
 **`AMBIGUOUS_NEEDS_USER` is the whole point of the taxonomy.** Everything else you can settle with
 evidence; that one you may not, and a fuzzy matcher's entire purpose was to answer it silently.
 
+## The degenerate case: no join at all, rendered as a resolved one
+
+**Every guard below presupposes that a join exists** and asks whether it was loosened,
+under-keyed, or silently dropping. The commonest member of this family is the one where **there is
+no join to inspect** — a value read from one vocabulary, printed in a column whose *heading*
+promises resolution against another.
+
+> **Incident.** A report listed each repository with an **owner** — who to hand the work to. The
+> value was read out of each repo's own declaration file. It is only actionable if the launcher's
+> config declares it, because that config is what actually starts a session. **The two were never
+> joined.** Measured over the 12 repositories carrying a declaration: **3 resolve, 9 do not.** Nine
+> rows had shipped that morning naming an owner the launcher refuses.
+>
+> Underneath it, three vocabularies name one identity and **no two of the three agree** — the
+> declaring file, the launcher's config, and the live registrations a peer actually sees. The
+> divergence is total, not marginal, so nothing about the printed value looks wrong.
+
+**Re-reading the function finds nothing, and that is the diagnostic.** The three lines that read the
+file are correct. There is no `merge`, no `cutoff=`, no candidate selection — nothing for a reviewer
+or a lint to bind against. **The defect is at the call site**, in the gap between what the label
+promises and what the code did.
+
+**So the tell is the heading, not the code: a column name is a claim about provenance.** `owner`,
+`assignee`, `handler`, `status`, `link` each promise a value resolvable in the vocabulary of
+whoever will act on it. If the code only *read* it, the heading is asserting a resolution that never
+happened — and the reader has no way to see that, because an unresolvable name and a resolvable one
+are the same string.
+
+**The repair is the family's:** resolve into the acting vocabulary, or mark the value
+`UNKNOWN(<what was read>)` — and keep *"the source could not be read"* distinct from *"the name is
+not there"*, because condemning every row when the reference file is unreadable is the opposite
+error and costs the same trust. See
+[`absence-is-not-compliance`](../testing/absence-is-not-compliance.md).
+
 ## Guard
 
+- **Before printing a value under a heading that implies resolution, name the vocabulary the reader
+  will act in — and resolve into it, or mark it unresolved.** The question is not "is this value
+  correct" but "correct *where*". A single-vocabulary read rendered as a resolved reference is this
+  rule's most common failure and the only one with no join to review.
 - **No cutoff constants.** A `cutoff=`, `threshold=`, `ratio >` or `n=1` closest-match anywhere near
   a join is the smell.
 - **No fallback chains.** `exact → fuzzy → startswith` means three different match qualities

@@ -15,6 +15,13 @@ A manifest row, a `state` column, a ✅ in a checklist — each is an assertion 
 exactly as much as the evidence that produced it. A status derived from an assumption is worse
 than no status at all, because it stops anyone from looking.
 
+**And a REFERENCE field is a claim in the same way** — an `owner`, an `assignee`, a `link`. Its
+heading promises a value resolvable by whoever will act on it, so a name merely *read* from one
+place and printed under a heading that implies resolution against another is a status set from
+intent. That case has its own section in
+[`exact-match-on-a-complete-key`](exact-match-on-a-complete-key.md), because it is a join defect
+with no join in it to review.
+
 ## The incident
 
 A bulk ingest pulled ~300 datasets from a government portal. Each item required a human action
