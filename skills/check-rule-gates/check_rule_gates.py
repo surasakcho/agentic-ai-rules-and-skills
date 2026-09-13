@@ -531,8 +531,10 @@ def main():
     # The inverse gap: gates that exist and that no rule points at. Reported as a
     # note, never a failure -- a gate may legitimately exist for a reason outside
     # this corpus, and failing on that would punish having built one.
+    unclaimed = 0
     for pid, owner in sorted(ids.items()):
         if pid not in claimed:
+            unclaimed += 1
             rep.note(GROUP_ORDER[5], "%s: %s" % (owner, pid[:52]),
                      "Exists, and no rule names it. Not a failure --",
                      "possibly enforcing something written down",
@@ -566,8 +568,17 @@ def main():
             else:
                 print(line)
 
-    print("\ngated: %d   UNGATED: %d   unavailable: %d   UNKNOWN: %d"
-          % (gated, rep.ungated, unavailable, rep.unknown))
+    # All four numbers above are LEFT-list numbers -- they describe rules. The gates
+    # that exist and that no rule names are the other half of the same join, and they
+    # were computed below the summary where nobody scrolled. A number kept out of the
+    # headline is not reported: see rules/how-we-work/count-the-join-not-the-inventories.md
+    # A bare 0 here would carry two meanings -- "no gate is orphaned" and "no second
+    # inventory was ever declared to me" -- and the second is the usual one. Two states
+    # must not share a value: rules/testing/absence-is-not-compliance.md
+    other = ("gates no rule names: %d" % unclaimed if ids
+             else "gates no rule names: not measured (no gate providers declared)")
+    print("\ngated: %d   UNGATED: %d   unavailable: %d   UNKNOWN: %d   |   %s"
+          % (gated, rep.ungated, unavailable, rep.unknown, other))
     if rep.ungated:
         print(red("RULE GATES FAILED -- %d rule(s) declare a gate that does not exist"
                   % rep.ungated))
