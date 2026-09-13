@@ -246,7 +246,10 @@ it"**, and for a `tree` provider that state is reachable, because existence in a
 gate id. A row can be true about existence and false about enforcement while every column either
 side of it reports green.
 
-Measured in one estate: **2 of 7 `tree`-provider rows named a script nothing runs** — and the two
+Measured in one estate: **2 of the 7 rows under one `*.sh` tree provider named a script nothing
+runs** — 7 is that provider's row count, not the estate's bound checkers, and the same estate has
+further rows under a second tree provider that *are* invoked. Naming the provider beside the number
+is the whole of the fix, and the figure needed it for the reason the next section gives. The two
 rules so bound were `a-classification-is-not-a-gate` (do not ship an unenforced classification) and
 `validations-must-fail` (a validation never seen to fail). **Both were honest rows by every check
 that existed.**
@@ -280,6 +283,14 @@ a second provider, not by widening the first.
 **Same shape as a filter keyed on something narrower than its own description** — the answer renders
 as a smaller *true* set rather than an unresolvable one. When a `tree` provider's label names a
 category, declare one provider per extension and let the orphan count carry the total.
+
+**And once a label has been printed, it is a fact about transcripts and not only a name.** The
+obvious repair for a category-shaped label over a narrow glob is a rename — and it is usually the
+wrong one, for a cost that is invisible until you look: every recorded measurement carrying that
+label in a summary line is a transcript of what the tool said at a moment. **Rewriting those to
+match a new label falsifies the record; leaving them de-joins the label from every historical
+number.** Neither branch beats a wrong label with the correction written underneath it. Rename
+before the label has been quoted, or not at all.
 
 **An unrecognised trailing token is reported and the binding is KEPT.** The first parser accepted
 only `observed:` and dropped the whole line on anything else — loud about the syntax and silent
