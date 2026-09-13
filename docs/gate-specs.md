@@ -179,6 +179,14 @@ self-describing the filename, the likelier it is.
 > the long path-qualified form you type from somewhere else. That is exactly inverted from how
 > anyone investigates a gate system, and it is the shape most likely to end with the guard
 > switched off.
+>
+> **The allowed rows are not a bypass, and must not be read as one.** Qualifying the path does not
+> defeat the destination test — it stops the *filename* being read as a verb, because the character
+> before it is no longer whitespace. Every genuine write to the same qualified path still refuses:
+> checked across `cp`, `install`, `tee`, `rm`, `chmod`, `sed -i` and a shell redirect, all eight
+> refused with `./` in front. What changes is only whether a **read** is misclassified. Both
+> offices verified this independently before it was written down, because a table of allowed
+> commands in a public document is one careless reading away from being an evasion recipe.
 
 **The cheap fix, and the amendment that keeps it from creating a hole.** Test the protected pattern
 against the last token *only when the segment's first token is itself a destination verb* — `wc` is
