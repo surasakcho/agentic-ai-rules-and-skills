@@ -505,9 +505,10 @@ def main():
         roots.append(default_root)
 
     # Providers enumerate the gate identifiers that actually exist.
-    ids, prov_counts = {}, []
+    ids, prov_counts, dead_providers = {}, [], set()
     for label, kind, path, arg in provs:
         if not os.path.exists(path):
+            dead_providers.add(label)
             rep.unk("gate provider '%s' is unreadable" % label,
                     "declared %s, which does not exist" % kind,
                     "Gate identifiers from this source are unread, so a",
@@ -517,6 +518,7 @@ def main():
         try:
             found = PROVIDERS[kind](path, arg)
         except Exception as exc:
+            dead_providers.add(label)
             rep.unk("gate provider '%s' would not parse" % label,
                     "%s: %s" % (kind, str(exc)[:60]),
                     "Nothing is concluded from this source.")
@@ -593,6 +595,12 @@ def main():
         # file naming them. The orphan count was wrong in the direction that looks clean.
         rows = by_slug.get(name.split("/")[-1], [])
         good = [r for r in rows if ids.get(r[1]) == r[0]]
+        # A row whose PROVIDER could not be read is unresolvable, not false. Reporting it
+        # as a bad binding and skipping the rest demoted rules that are gated IN THE CORPUS
+        # -- `gated` is a fact about this repo and a broken path on somebody's box moved it,
+        # with the count conserved into UNGATED so it read as corpus debt. Third arm of one
+        # defect: an unresolvable input must be UNKNOWN, never a narrower answer.
+        unreadable = [r for r in rows if r[0] in dead_providers] if not good else []
         if good:
             bound += 1
             for prov, gid, ev in good:
@@ -620,14 +628,21 @@ def main():
                            % (name, ", ".join(sorted(set(missing))[:2])))
             rep.ok("bound by the estate", "%-52s %s (%s)"
                    % (name, ", ".join(sorted(r[1][:32] for r in good)), seen))
-        if rows and not good:
+        if unreadable:
+            rep.unk("%-52s binding unresolvable: provider %s unread"
+                    % (name, ", ".join(sorted({r[0] for r in unreadable}))),
+                    "Not evidence the binding is wrong, and not evidence",
+                    "the rule is ungated. The corpus side below is still",
+                    "resolved -- a local path must not move `gated`.")
+        elif rows and not good:
             rep.ungate("%-52s BINDING NAMES NO SUCH GATE: %s"
                        % (name, ", ".join("%s/%s" % (r[0], r[1][:28]) for r in rows)))
-            continue
+        # NEVER short-circuit here. A binding problem is a fact about the estate; the
+        # clause's own implemented_by is a fact about this corpus, and both get answered.
 
         link = fields.get(LINK_KEY, "").strip()
         if not link:
-            if not good:
+            if not good and not unreadable:
                 rep.ungate("%-52s %s" % (name, verdict))
             continue
 
@@ -680,7 +695,12 @@ def main():
     # also claims is a contradiction neither side gets to win.
     declared_unbound = {}
     for prov, gid, reason in unbounds:
-        if ids.get(gid) != prov:
+        if prov in dead_providers:
+            # Same arm as a binding whose provider is unread: unresolvable, not false.
+            rep.unk("%-52s unbound unresolvable: provider %s unread" % (gid[:52], prov),
+                    "The declaration may be perfectly good. A path that",
+                    "could not be read is not a gate that is not there.")
+        elif ids.get(gid) != prov:
             rep.ungate("%-52s UNBOUND NAMES NO SUCH GATE: %s/%s" % ("(config)", prov, gid[:28]))
         elif gid in claimed:
             rep.unk("%-52s declared unbound AND claimed by a satisfies row" % gid[:52],
