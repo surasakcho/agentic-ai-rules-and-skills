@@ -87,3 +87,18 @@ inverted figures.
 
 Prefer code that crashes to code that quietly does the wrong thing — and be **most suspicious
 of the parts that never complain**.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'for every guard, assertion or acceptance check that is added or changed: whether the test suite contains a case that makes it FAIL, proven by removing the guard body and observing a test go red; and for every defensive branch, whether any test makes its condition true'
+trigger: 'pre-commit on changed guard paths, plus CI over the whole guard set'
+check: 'for each changed guard: delete its body, run the suite - if nothing goes red, block; a conditional whose true branch is never entered under the suite -> block'
+escape: 'a guard genuinely impossible to exercise in test declares itself unexercised with a reason, and that declaration is counted and reported rather than hidden'
+narrows: 'guard-removal proves the check CAN fail. It does not prove the check fails on the RIGHT input - a guard written against an imagined failure shape passes its own removal test while missing every real defect, which is why a-check-that-shares-a-source-is-not-a-check sits beside this one and is recorded there as irreducible'
+```

@@ -61,3 +61,18 @@ pass attached to it.
 *Earned from:* a source-ledger restructuring where the majority of internally-"VERIFIED" entries
 turned out to rest on named-but-unlinked outlets or internal cross-references rather than a
 directly checkable external source.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'every entry in a source ledger or research log carrying a verification status, and whether its source field resolves to an external, fetchable URL rather than a named outlet, a repo path, or another entry'
+trigger: 'check exit code over the ledger, run before anything cites it'
+check: 'entry status is VERIFIED and source contains no http(s) URL -> block; URL resolves inside this repo -> block; URL returns a non-2xx on a liveness sweep -> downgrade to UNVERIFIABLE and report the count'
+escape: 'downgrade the entry to UNVERIFIABLE, which is the rule own default - the gate never requires a claim to be dropped, only that its label matches its evidence'
+narrows: 'gates that a checkable external source EXISTS and resolves. Cannot check that the source actually supports the claim, which is the reading a human does. A fabricated-but-live URL passes'
+```

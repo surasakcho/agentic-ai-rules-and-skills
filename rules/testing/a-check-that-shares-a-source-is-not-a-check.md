@@ -117,3 +117,15 @@ test fixture that generated data past `now` and made the pre-fix implementation 
 backup-coverage tool that reproduced its own target bug while being written; and a confidently
 reasoned failure mechanism refuted in under an hour by an expectation derived from the exchange
 instead of from the code.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: irreducible
+reason: 'the subject of this rule is where an expectation CAME FROM, and provenance of a belief leaves no artifact. Every mechanical proxy reduces to a declaration - a fixture labelled as production-captured, a comment naming the source - and a declaration is satisfiable by the same author, holding the same wrong model, in the same minute. The rule own text closes the door explicitly: you broke it the way you imagine it breaks'
+weaker: 'name the source of the expectation out loud before writing the check, as a review prompt and a contributing-checklist item; prefer a fixture captured from the real defect over a generated one; replay the previous implementation inside the test and assert it goes red, which costs almost nothing. The adjacent mechanical ground - that a check is capable of failing at all - is gated under validations-must-fail by guard removal, and that gate is worth building; it simply answers a different question'
+```

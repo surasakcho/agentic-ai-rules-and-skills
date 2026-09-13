@@ -116,3 +116,18 @@ been resolved by assertion.
 *Earned from:* resolving a disagreement between two files from one agency by citing the project's
 own comment and defect log — the same claim counted as two sources — when a registry, a standard,
 and the file's own internal contradiction were all minutes away.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a finding that cites corroboration, and the producer recorded for each cited source; sources that all resolve inside this repo; and a derived statistic offered as a second finding that is arithmetically implied by the first'
+trigger: 'pre-commit on the findings or research log, plus Stop on the message carrying the verdict'
+check: 'a finding uses corroborated, confirmed or agrees with and any cited source lacks a producer field -> block; two cited sources share a producer -> block and report them as one; every cited source path resolves inside this repo -> block'
+escape: 'record the producer per source - the rule states independence is a property of authorship, not of filename; a file cited as evidence about its own reliability rather than about the truth is declared as such'
+narrows: 'gates that provenance was RECORDED and that two artifacts from one producer are not counted twice. Cannot rank tiers, cannot tell an issuing authority from a community page, and cannot detect a shared upstream that neither producer field names'
+```

@@ -52,3 +52,18 @@ not read, say so. **Never present an inferred figure in the same voice as a meas
 A useful discipline: never state a number you did not measure. Recalled figures, plausible
 round numbers and "roughly X" are guesses wearing the costume of evidence. If an unverified
 figure must be used, label it unverified **in the same sentence**.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'every committed output artifact against the set of paths written by any script in the repo; every external input against a provenance row carrying URL, download date, format, size, licence and - for anything not committed - the machine it sits on; and cached intermediates whose mtime precedes their inputs'
+trigger: 'pre-commit, plus a CI job that regenerates and diffs'
+check: 'output artifact with no script writing that path -> block; input directory entry with no provenance row -> block; mtime(cache) < mtime(input) -> fail; CI regenerates each artifact and diffs against the committed one -> fail on difference'
+escape: 'add the script or the provenance row; a genuinely non-deterministic output declares its seed and the tolerance it is compared at'
+narrows: 'the cheap half gates that a producing script EXISTS; only the regenerate-and-diff job gates that it works, and that job costs real CI time. The rule other half - never state a number you did not measure, mark inferred figures as inferred - is gated only in the narrow form under a-finding-is-scoped-to-what-you-checked'
+```

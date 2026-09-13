@@ -89,3 +89,18 @@ wrong. Fix the key or stop.**
 while the underlying frame stayed wrong — costing a 17.3% error on an unrelated variable, a split
 unit whose population landed on whichever half the last edit favoured, and 28 shipped columns in
 which two blocks from one source disagreed with each other.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'a literal mapping between two code systems defined in source and applied to a join - a dict literal of code pairs, dict(zip(a, b)), a rename or replace map whose target is the authority column'
+trigger: 'PreToolUse(Write/Edit) on code paths, with a pre-commit backstop'
+check: 'a literal mapping of more than three code-like pairs, used in a merge, map or replace -> deny; a mapping applied in the direction that rewrites the authority value into the local one -> deny'
+escape: 'a code correction that rewrites OUR codes, applied everywhere through a declared correction module rather than inside one join - which is the correct pattern the rule names, and the reason exactly one row of the bad table read as valid'
+narrows: 'cannot tell a legitimate crosswalk between two genuinely different code systems from a list of local errors. The gate refuses the PATCH-IN-A-JOIN shape and sends the decision to a human, which is step 3 of the rule escalation and the step that was skipped'
+```

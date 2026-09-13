@@ -112,3 +112,18 @@ caught this on day one.
 
 *Earned from:* a manual bulk ingest of 206 items where 3 were missed, every row was recorded as
 complete, and the contradicting evidence sat unqueried in the manifest for twelve days.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'for any manifest carrying a done-status: whether the recorded path exists and its size matches the recorded size; whether two rows fulfilled by different logical items share a checksum; whether the field that makes row-to-artifact mapping decidable is populated; and whether the reconciler is idempotent'
+trigger: 'pre-commit or CI over the manifest, in the same commit that adds the status field'
+check: 'status = done and (path missing or size mismatch) -> fail; GROUP BY checksum HAVING COUNT(*) > 1 across rows for different items -> fail; the decidability key null on any row -> fail; run the reconciler twice and diff - any change -> fail'
+escape: 'a status that is a guess names itself - assumed, unverified - so the doubt travels with the data, which is the rule own prescription'
+narrows: 'gates the four assertions the rule writes out, each of which would have caught its incident on day one. Cannot verify at the moment of acquisition against the source own declared size, which is the check the rule calls free and instant - that one has to be written into the fetcher, not the manifest'
+```

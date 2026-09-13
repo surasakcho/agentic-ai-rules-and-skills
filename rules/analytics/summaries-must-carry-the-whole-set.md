@@ -83,3 +83,18 @@ existed. The reader found the missing group themselves a day later and reasonabl
 had been withheld. **The dropped group was the larger by 1.8x.** It lost every retelling because
 a one-period gap is undramatic — while the covariates it governed moved on 88 of 88 rows, which
 was the entire reason the defect mattered.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'an indefinite singular construction - one of them, one by X, the worst case, notably, including one - in an outgoing message or a committed document, with no cardinality in the same sentence'
+trigger: 'Stop, plus pre-commit on committed prose'
+check: 'text matches INDEFINITE_SINGULAR and no integer appears in the same sentence -> refuse, and print the rule own repair: add across N groups'
+escape: 'name the members, or carry the count - both are the rule prescription and cost a handful of words'
+narrows: 'catches the phrasing that does the damage, which is the commonest vector and the one the incident ran through five times. Cannot catch a member dropped silently, with no singular construction to flag - that needs the finding size recorded at discovery and compared across retellings, which needs a findings registry this repo does not have'
+```

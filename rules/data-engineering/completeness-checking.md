@@ -118,3 +118,18 @@ When a record's key is corrected, every column derived from that key must be rec
 > and a province-level economic variable was joined through it. The unit continued to receive
 > the wrong province's figure, **a 23% error**, which is precisely the defect the correction
 > existed to fix.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'the input population count and the output population count emitted by every build; silent-skip constructs in ingestion paths (except that continues, a glob with no match assertion, a warning with no failure); a completeness figure reported as a single percentage; and a cache validity test that reads existence rather than integrity'
+trigger: 'pre-commit lint on the ingestion code, plus CI on the build report'
+check: 'build report lacks an input_count/output_count pair -> fail; AST finds except/continue or a bare glob with no count assertion in an ingest path -> block; a completeness figure appears with no partition and no per-bucket cause -> block; os.path.exists or size > 0 used as a cache validity test -> block'
+escape: 'an accepted gap is enumerated in a declared allowlist carrying per-entry evidence - the rule own KNOWN_UPSTREAM_GAPS pattern - never summarised as a count'
+narrows: 'gates that the two populations are counted and that a mismatch is partitioned rather than averaged. Cannot decide which of the three outcomes a given gap is in - resolved, explained and accepted, or open with a route - which is the judgement the rule exists for'
+```

@@ -106,3 +106,18 @@ writing down what a system does.**
 - Verify against the **source's declared size** wherever the source declares one.
 - **Cache validity means integrity, not existence.**
 - An unexpected file is **reported and handled as a defect**, never silently skipped.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'per fetched file: the number of records extracted, and the file size against the median of its siblings; and whether the ingest path asserts a minimum record count at all'
+trigger: 'CI on the ingest, plus a pre-commit lint on the fetching code'
+check: 'a fetch loop with no minimum-record assertion -> block; a delivered file yielding fewer records than the declared floor -> raise; a file more than two orders of magnitude from its sibling median -> raise'
+escape: 'a per-entry allowlist of known upstream gaps carrying evidence, whose error message names the incident it exists to prevent'
+narrows: 'COUNT records, never sniff content. An earlier version of this exact guard tested the file head for the substring 404 and discarded 15 good regions whose population counts contained the digits 4046 - a guard that fires on correct rows, already paid for once in this corpus. The record count separates every bad case from every good one by a factor of 69; the substring separates nothing'
+```

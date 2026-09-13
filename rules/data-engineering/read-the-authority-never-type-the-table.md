@@ -146,3 +146,18 @@ dropping 3.7% of the frame from every regional statistic in a stakeholder handof
 authoritative crosswalk sat committed in the same repo and was already read by another script.
 Compounded by the relevant test statistic being hardcoded, so it could not reveal its own
 population was incomplete.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'a literal list or dict of code-like values at module scope, used in a map, replace, merge or groupby, with no file read behind it; a fallback from a failed authority read to a literal; and the absence of an assert_covers over the CONSUMING dataset keys'
+trigger: 'pre-commit AST lint'
+check: 'a literal collection of eight or more code-like values, assigned at module scope and consumed by a mapping call -> block; a try/except whose except branch assigns a literal table -> block; a mapped column consumed by groupby or crosstab with no coverage assertion over the consuming keys -> block'
+escape: 'a provenance comment naming the committed file the values were read from - and then the values should be read from it, which is the rule position'
+narrows: 'catches the literal and the fallback. Cannot tell whether the authority exists in the repo already, which is what makes the correct fix cheap - the rule answer is grep before typing, and that is a habit, not a gate. Incident write-up: lessons/numbers-that-cannot-fail.md'
+```

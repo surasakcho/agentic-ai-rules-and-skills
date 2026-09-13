@@ -94,3 +94,18 @@ over thousands of pixels," which destroyed up to 87.8% of a population age band 
 per-pixel values were fractions of a person. Committed unmeasured; caught only when an unrelated
 consumer-side guard aborted, and only after that abort was nearly dismissed as a too-strict
 threshold.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'a converted or compressed copy being committed, and whether its converter carries MEASURED loss figures - the downstream aggregate recomputed from both copies, broken down per category, plus a count of values that became exactly zero or null'
+trigger: 'pre-commit on the converted artifact'
+check: 'a converted artifact added or changed and its converter docstring carries no measured-loss table -> block; a claim of losslessness with no digest comparison -> block; a per-category loss figure absent while only a grand total is stated -> block'
+escape: 'state the numbers - the rule position is that a converter unable to state its measured loss has not verified the conversion'
+narrows: 'gates that the measurement EXISTS and is per category, which is exactly what the incident lacked - a docstring asserting the error washes out, against a single age band that lost 87.8 percent. Cannot gate the last guard in the rule: that a downstream check firing on converted data is evidence about the data rather than a threshold to relax. That one is a disposition, and it nearly went the other way'
+```

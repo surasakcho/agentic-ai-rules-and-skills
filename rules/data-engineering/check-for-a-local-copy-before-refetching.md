@@ -81,3 +81,18 @@ Every individual piece looks right, which is what makes it invisible:
 of them sat committed in the same repository via Git LFS, in a directory created specifically so
 they would not need re-downloading — found only when the data's owner asked why anything was
 being downloaded at all.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'the target of any fetch - URL basename, archive name, or the glob a downloader writes - against the set of paths already tracked in the repo, including LFS pointers and sibling directories named compressed, cache, subset or raw'
+trigger: 'PreToolUse(Bash/WebFetch) on download verbs, and an assertion at the top of any fetching pipeline'
+check: 'the fetch target basename or pattern matches a tracked path in this repo -> deny, naming the local copy and its size'
+escape: 'an explicit force-refetch flag carrying a reason; a genuine absence (the tracked path is an unmaterialised LFS pointer or empty), which the check reports rather than assumes'
+narrows: 'basename collision between an unrelated local file and the fetch target is the false positive, and the gate answers it by naming the candidate rather than silently blocking. The deeper half - which code PATH the pipeline resolves to - is checked by the runtime assertion, not by the PreToolUse hook'
+```

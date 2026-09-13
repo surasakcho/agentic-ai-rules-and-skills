@@ -90,3 +90,18 @@ money sat on the wrong unit; 128 units also received their correct row, so the t
 and the total silently inflated. A sibling script placed 56 of 276 city locations by the same
 fuzzy helper — without the length guard the first had — and 24.6% of all units took their distance
 measurement from one of those cities.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: interposed
+observable: 'fuzzy-matching symbols near a join - difflib, get_close_matches, cutoff=, threshold=, a ratio comparison, startswith or a substring test used to select a candidate - and any merge with no preceding assertion that the join key is unique in the reference'
+trigger: 'PreToolUse(Write/Edit) on code paths, with a pre-commit backstop'
+check: 'a fuzzy-match symbol within N lines of a merge or join call -> deny; a merge whose key has no preceding uniqueness assertion on the reference -> block; a computed match-method label that is never persisted to the output -> block'
+escape: 'declare a non-join use of the same helper; a key proven unique by the assertion the gate demands'
+narrows: 'the incident measured 142 of 154 wrong seats as EXACT matches on an under-specified key, so the fuzzy half of this gate addresses the minority case. The uniqueness assertion is the half that covers the majority, and it can be compelled to exist but not to name the right discriminating field'
+```

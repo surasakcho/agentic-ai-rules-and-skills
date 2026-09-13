@@ -110,3 +110,18 @@ One set intersection. It prints the answer immediately, and it was not run.
 blanked twelve rows, the loss exactly offset by gains elsewhere. Found only by diffing row by row
 against a baseline captured before the rebuild. The underlying defect was a lookup table inverted
 without checking that its targets were not also keys — six of them were.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a coverage or row-count change reported as a single signed number, in a commit message, status line or report artifact, with no gained/replaced/lost triple beside it; and a mapping table applied in reverse whose target values intersect the key space it is joined against'
+trigger: 'pre-commit on the report artifact and the commit message, plus a lint on the inversion'
+check: 'message or report contains a signed delta near coverage/rows/count and lacks all three of newly_filled, replaced, lost -> block; a dict built as dict(zip(target, source)) from a table declared source->target -> block unless set(target) and the reference keys are asserted disjoint'
+escape: 'report the three counts, which is the rule prescription; for the inversion, assert the disjointness the rule names - one set intersection'
+narrows: 'cannot compel the baseline capture that makes the triple computable. A rebuild that never copied the pre-change output can satisfy this gate with three numbers derived from itself, which is the check-shares-a-source failure one layer down'
+```

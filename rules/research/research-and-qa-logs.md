@@ -59,3 +59,18 @@ technically superior option.
 > material, with the clause potentially propagating to how the whole dataset could be
 > published. A weaker method was used instead, and the rejection was recorded **as a rejection
 > on licence** so nobody re-evaluates it as a quality question.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a session that made external fetches and produced no tracked write under the declared research log directory; and a log file against the sections the rule requires - the dated question, a source table with fetchable URLs and per-source access status, sources rejected with reasons, negative and blocked results, and open questions'
+trigger: 'Stop for the missing-log case, pre-commit for the format'
+check: 'fetch_count > 0 in this session and no tracked write under research/ -> refuse; a log file missing any required section -> block; a source row with no access status verified from this machine -> block'
+escape: 'a pass that found nothing is still logged - one line, dated - which the rule already treats as a valid outcome'
+narrows: 'gates that the log exists and carries its sections. Cannot gate that it logs the substance rather than the transcript, and cannot detect a finding that was answered in chat and never recognised as a finding. The sibling gate on write-it-down-when-you-read-it covers the same ground from the message side'
+```

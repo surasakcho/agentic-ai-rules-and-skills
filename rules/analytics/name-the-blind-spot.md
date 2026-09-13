@@ -97,3 +97,18 @@ producing 14,786 phantom mismatches, and a net coverage figure that read `+951` 
 and without a bug that blanked twelve rows. The two loudest were harmless. The two that shipped
 were found by an outside party and by a structural partition, not by anyone judging whether the
 number looked right.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'whether a check ran a positive control in the SAME invocation as the real check - a deliberately broken case that the check flagged - and whether an exoneration reported to a reader carries the size of the population it examined'
+trigger: 'CI over the check suite, plus Stop on messages reporting a clean result'
+check: 'a check whose output reports zero findings and whose run produced no flagged control case -> fail; message asserts a clean or zero result with no examined-count -> refuse'
+escape: 'run the control in the same invocation, or state that the control was not run - which is itself the finding'
+narrows: 'the rule asks for the null space to be written down BEFORE the result is read, and that ordering leaves no artifact. Gating the presence of the sentence would be a one-line ritual satisfiable without the judgement, so the gate is placed on the positive control and the examined-count instead - both artifacts that cannot be produced without doing the thing. The sentence stays prose'
+```

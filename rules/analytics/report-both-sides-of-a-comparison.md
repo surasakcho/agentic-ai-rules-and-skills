@@ -79,3 +79,18 @@ to be explained before it ships rather than being absorbed into a percentage.
 *Earned from:* a data pipeline compared against an independently-produced reference file. The
 headline "95.51% match" concealed that the single largest cause of disagreement was a defect on
 our side, and a separately-scoped "0 values changed" was read as a claim of full agreement.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'a comparison report artifact and the six fields the rule enumerates - both input populations, the join key, matched count over a denominator, unmatched count, left-only and right-only counted separately, the tolerance, and an explicit unexplained bucket; plus an agreement percentage appearing in prose with no unmatched count in the same sentence'
+trigger: 'pre-commit or CI on the report artifact, plus Stop on the outgoing message'
+check: 'report emits a match rate and lacks either direction of the one-sided counts or the unexplained bucket -> block; bucket counts moved since the last run with no accompanying cause -> fail; message contains a percentage agreement with no unmatched count adjacent -> refuse'
+escape: 'emit the fields - the rule states they are generatable from code, not written by hand'
+narrows: 'gates the shape of the report and the phrasing of the headline. Does not gate the scoping failure the incident actually turned on - a true statement about comparison A read as a statement about comparison B - which needs the two verdicts named in one sentence and is only partly detectable'
+```

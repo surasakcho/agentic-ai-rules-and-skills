@@ -93,3 +93,18 @@ The positive control is the whole difference between "the solver says no" and "n
 If a conclusion depends on *nothing else being possible*, it must rest on an enumeration or a
 certificate — never on a list of things you happened to try. And if a solver produced the
 certificate, state its status code and show the control that came back positive.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a negative conclusion (no such assignment exists, infeasible, nothing else can explain it) and what it rests on - a solver status code, a tolerance bound, and a positive control that came back feasible on the same harness; plus solver results branched on a convenience boolean rather than a status enum'
+trigger: 'pre-commit lint on the solver call, plus Stop on the conclusion'
+check: 'AST: a result truth-value or .success attribute used to conclude infeasibility -> block, require the status enum; message asserts an impossibility and cites no status code, no tolerance bound, and no positive control -> refuse'
+escape: 'cite the status (infeasible, not limit), the bound from a binary search on the tolerance, and the control case that returned feasible'
+narrows: 'gates the STRENGTH of a negative claim once a solve exists. Does not gate the decision to solve rather than sample - no observable distinguishes an enumerable space from one that merely looks enumerable, and that judgement is the rule opening move'
+```

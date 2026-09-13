@@ -42,3 +42,18 @@ if any value still begins with a known mojibake prefix.
 A line-oriented search misses the keyword when a call spans lines, and flags `Image.open(p)`
 and `p.open("rb")` as false positives. Acting on that output breaks working code. **Parse the
 AST**, or read the whole call before editing it.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'every text-mode open() with no encoding argument; subprocess.run with text=True and no encoding; Set-Content or Add-Content with no -Encoding; and committed text containing a known mojibake prefix'
+trigger: 'pre-commit AST lint, plus a byte scan on committed text'
+check: 'AST: Call to open with a mode not containing b and no encoding keyword -> block; subprocess.run(text=True) with no encoding -> block; a committed text file containing a known mojibake prefix -> block'
+escape: 'binary mode; a declared per-file exemption where the codec is genuinely chosen at runtime'
+narrows: 'PARSE THE AST, NEVER GREP - the rule states this and it is the gate design constraint, not a preference. A line-oriented search misses calls that span lines and flags Image.open(p) and p.open(rb); acting on that output breaks working code, which is the fires-on-correct-rows failure. The repair half - decoding per column, byte-preserving, with a post-condition - is code the gate cannot compel'
+```

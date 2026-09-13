@@ -84,3 +84,18 @@ incident below that came out at 4.4e-14, which is what made the rename safe to s
 from raster, one from an administrative register — shipped side by side for months so they
 could be benchmarked against each other, while differing in names, denominators, coverage and
 missing-value convention. Nobody had compared them, because comparing them did not work.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: deferred
+observable: 'the column sets of a declared variant family, compared modulo their source prefixes; a share or rate column holding 0 where its denominator is 0; and any classifier over the columns whose buckets do not partition the column set'
+trigger: 'CI, in the same self-test that asserts anything else about the block'
+check: 'set(cols_a) minus prefix != set(cols_b) minus prefix -> fail, naming both differences; a ratio column with a zero denominator written as 0 rather than null -> fail; classifier buckets do not partition the column set -> fail with the unclassified list'
+escape: 'declare an intentional asymmetry per column, with the reason, in the variant family declaration'
+narrows: 'needs a declared variant family - the same dependency as known-blast-radius-demands-scoped-fix-everywhere, and for the same reason: siblings by name are not siblings by contract. Enforcing the derivation through ONE prefixed function is the construction the rule prefers, and no gate can compel that shape, only detect its absence after the columns diverge'
+```

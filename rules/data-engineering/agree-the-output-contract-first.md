@@ -111,3 +111,18 @@ wanted this."
 became remediation commits after the work was declared finished — including a period-matching
 rule that mis-dated 136 units across 2 groups -- 48 by five periods and 88 by one, the larger of the two being the one every later summary dropped. The two structural questions that
 were actually asked were each settled in a sentence.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'a new or changed output-writing call (to_csv, to_parquet, write, COPY) in a pipeline module, against whether that module carries a contract block naming granularity, row count, column set and order, sort order, and the missing-value convention - and whether the contract is asserted in code'
+trigger: 'PreToolUse(Write/Edit) on pipeline paths, with a pre-commit backstop'
+check: 'an output-writing call added and the module has no contract block -> deny before the line is written; a contract block present with no corresponding assertions on row count, column order and key uniqueness -> block at commit'
+escape: 'write the contract block, which is the rule prescription; unspecified is a valid value for any field and must be written as unspecified rather than omitted'
+narrows: 'gates that a shape was STATED and asserted before the file was written. Cannot gate that the consumer agreed to it - the same limit as propose-xml-schema-before-strict-output, and in this rule incident the unagreed column layout shipped as a guess nobody ever challenged'
+```

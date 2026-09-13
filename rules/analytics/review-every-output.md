@@ -69,3 +69,19 @@ your own work.**
 
 A caption that overstates, understates, or describes something the figure does not draw is a
 defect of the same severity as a wrong number, **because the reader believes the caption**.
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'the count of artifacts produced against the count screened by the programmatic screen and the count actually opened; a handover message asserting the outputs were reviewed; and every caption claim against what the artifact draws'
+trigger: 'pre-commit or CI on the output directory, plus Stop on the handover message'
+check: 'artifacts changed and verify_outputs screen not run over them -> block; screen reports a flagged artifact that no later run cleared -> block; message asserts reviewed while the log shows screened-only -> refuse and require both numbers'
+escape: 'state both numbers - screened N, eyeballed M - which is the rule prescription; a declared exemption for artifacts that are not for a reader'
+implemented_by: skills/verify-outputs/
+narrows: 'the screen catches blank, single-colour, invisible-signal, inverted-colormap and low-ink renders. It cannot check that a caption matches its figure, that the magnitude is plausible, or that the sample eyeballed spanned mechanisms rather than being fourteen at random - all three stay prose, and the caption check is the one the incident cost most'
+```

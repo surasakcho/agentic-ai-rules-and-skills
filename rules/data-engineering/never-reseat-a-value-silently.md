@@ -90,3 +90,18 @@ dictionary lookup.
 
 *Earned from:* the user, on being shown the two-row table above — *"this kind of matching must
 send me a prompt."*
+
+---
+
+## Enforcement
+
+<!-- machine-readable; verdicts and rationale in docs/gateability.md -->
+
+```yaml
+verdict: narrowed
+observable: 'the reseat list a remap emits each run - source key, destination key, column, value, one row per reseat - and the diff of that list between runs; plus an assertion that the source row and the destination row are never both populated'
+trigger: 'CI on the build, and pre-commit on the committed reseat artifact'
+check: 'a remap present in the pipeline and no reseat artifact emitted -> block; the reseat artifact changed since the last run and the change is not acknowledged -> fail the build; a reseat that flips a coverage or quality flag on the vacated row -> block'
+escape: 'acknowledge the new reseat, which is the consent the rule demands and the point of the artifact; a remap applied to every sibling consumer rather than one'
+narrows: 'gates that every reseat is ENUMERATED and that a new one stops the build. Consent is reduced to acknowledgement of a diff - it cannot establish that the person who owns the data decided which row is the real one, and that attribution question is what the rule is actually about'
+```
