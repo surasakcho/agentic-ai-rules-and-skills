@@ -126,7 +126,7 @@ line count, files shipped, and the `description` line of each — plus **one ski
 
 | skill | verdict | reason |
 |---|---|---|
-| `wayfinder` | **adopt, when the chain is approved** | The one genuine gap: planning work too large for a session as decision tickets on a tracker. 128 lines, domain-agnostic, nothing here does it. **Caveat that changes its cost:** it resolves tracker operations through the abstraction that `setup-matt-pocock-skills` installs — the single most divergent file in the comparison — so adopting it pulls that decision forward with it. |
+| `wayfinder` | **ADOPTED 2026-09-13** | The one genuine gap: planning work too large for a session as decision tickets on a tracker. 128 lines, domain-agnostic, nothing here does it. **Caveat that changes its cost:** it resolves tracker operations through the abstraction that `setup-matt-pocock-skills` installs — the single most divergent file in the comparison — so adopting it pulls that decision forward with it. |
 | `to-spec` | **decline as duplicate** | We have `to-prd`, same job, different noun. |
 | `to-tickets` | **decline as duplicate** | We have `to-issues`, same job, different noun. |
 | `claude-handoff` | **decline for now** | Upstream `in-progress/`. We have `handoff` and `wrap`. |
@@ -136,7 +136,7 @@ line count, files shipped, and the `description` line of each — plus **one ski
 | `code-review` | not yet | 87 lines. Needs a real comparison against our `review`, which is not in the overlap set only because the names differ. |
 | `writing-for-agents` | not yet | 81 lines, overlaps `writing-great-skills`. Same comparison, same reason. |
 | `to-questionnaire` | not yet, worth a look | Turning a decision you cannot answer into a questionnaire is adjacent to `open-decisions-go-in-the-tracker` and may strengthen it rather than duplicate it. |
-| `research` | not yet | 12 lines. Thin against `rules/research/`, which covers the same ground at length. |
+| `research` | **ADOPTED 2026-09-13, merged** | Reversed. The first verdict called it thin against `rules/research/` — wrong reasoning: rules are prose and this skill *runs*, which is what this repo's own ranking asks for. It is also the invoker `wayfinder` calls by name. |
 | `wizard` | not yet | Ships `template.sh`. **Code-bearing under this repo's bar**, so adoption owes a self-test or a declared line in `_no-selftest.txt`. |
 | `wait-what` | not yet | 7 lines. |
 
@@ -146,3 +146,58 @@ chains with different nouns doing one job** into a flat namespace, and two imple
 agree today diverge after the next edit
 ([`parallel-variants-same-schema`](../rules/data-engineering/parallel-variants-same-schema.md)). If
 upstream's naming is preferred, the move is to **rename ours**, not to run both.
+
+---
+
+## Adoptions — 2026-09-13
+
+The operator named the chain: **grill-with-docs (or wayfinder) → spec → tickets → implement.** Two
+skills moved, one line merged, nothing else touched.
+
+**`wayfinder` — adopted, SKILL.md only.** Its `agents/openai.yaml` was deliberately left upstream:
+this corpus carries no cross-provider surface, and adopting one nobody here maintains is a cost with
+no consumer. Recorded so the omission reads as a decision rather than a slip.
+
+> **Correction to this file's earlier caveat.** It said adopting `wayfinder` pulls the
+> `setup-matt-pocock-skills` decision forward because the tracker abstraction is a dependency. Line
+> 25 of the skill gives a fallback — *"if no tracker has been provided, default to the local-markdown
+> tracker"* — so it is **not a hard dependency**, and the mechanism I named was wrong.
+>
+> **The cost is sharper than a block and it belongs to this estate rather than to upstream.** Without
+> the tracker wired, maps land in local markdown inside a container — and the standing directive here
+> is that the tracker is the memory and must be readable from a phone. A map in a file in a container
+> is the precise thing that directive exists to prevent. So the decision is still pulled forward,
+> for our reason and not upstream's.
+
+**`research` — adopted, merged.** `wayfinder`'s Research ticket type resolves by calling it by name
+via the Skill tool, twice, so adopting one without the other ships a map offering a ticket type that
+silently never resolves — a declared capability with no implementation, which this corpus has a rule
+against. The merge is one appended paragraph binding it to the three rules here that say more than
+its own three steps: primary sources, a log that records rejections and negative results and access
+status and licence, and reading the primary rather than a summary. **Those bind the findings file;
+the skill only spawns the agent that writes it.**
+
+**`grill-with-docs` — one line taken from upstream.** It was the only difference:
+
+    ours      Run a `/grilling` session, using the `/domain-modeling` skill.
+    upstream  Call the Skill tool twice, for "grilling" and "domain-modeling".
+
+**Theirs is better here, and it is a mechanism question rather than a preference.** Both callees are
+model-invocable in this corpus — neither sets `disable-model-invocation` — so the programmatic call
+resolves. Ours asks a human to type two commands, and a step a human must remember is a step that
+gets skipped; `writing-great-skills` puts predictability as the root virtue. The Skill tool loads
+into the current session, so the interview still has its human.
+
+**`implement` — stays ours, all three differences.** Two are the `PRD`/`issues` fork applied
+consistently, and the third points at `/review`, which exists here, against `/code-review`, which
+does not. Nothing to merge.
+
+### A consequence of adopting, fixed rather than worked around
+
+`wayfinder` documents its map format as a fenced markdown template containing
+`- [<closed ticket title>](link)`. The repo's link checker read the placeholder as a link and
+reported a broken one in a file that is correct. **Fenced blocks hold templates, not links**, so the
+fix went into the checker rather than into the adopted file — a checker that fires on correct rows
+gets switched off, and editing upstream's file to suit our tooling would have created divergence on
+day one for no reason. Verified both directions before landing: a real broken link outside a fence
+is still refused, the placeholder inside one is allowed, and the self-test passes.

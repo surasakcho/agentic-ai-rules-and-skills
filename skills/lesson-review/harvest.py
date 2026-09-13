@@ -192,6 +192,11 @@ def health(shared: Path, deny=()):
     broken = escaped = 0
     for p in md:
         txt = p.read_text(encoding="utf-8", errors="replace")
+        # Fenced blocks hold TEMPLATES, not links. `- [<title>](link)` inside a ```markdown
+        # example is a placeholder showing the shape a real entry takes, and resolving it
+        # reports a broken link in a file that is correct. A checker that fires on correct
+        # rows gets switched off, so the fences come out before the scan.
+        txt = re.sub(r"^(```|~~~).*?^\1", "", txt, flags=re.S | re.M)
         for target in re.findall(r"\]\(([^)#:]+?)(?:#[^)]*)?\)", txt):
             if target.startswith(("http://", "https://", "mailto:")):
                 continue
