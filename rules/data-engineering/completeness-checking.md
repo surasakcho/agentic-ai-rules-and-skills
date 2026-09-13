@@ -130,6 +130,15 @@ cause:
 **Never report a completeness figure as a single percentage.** Partition it, give a cause per
 bucket, and if a bucket is unexplained say "unexplained" and give its size.
 
+**This is not a rule about data, and the tell is worth carrying to any health figure: a single
+number is a claim that the population is uniform.** Two non-data instances from one estate in one
+day — *"2 of 66 broken links"*, true over one of **two** farms, the real figure being 4; and one
+container uptime reported for **six** containers that were five identical plus one restarted. Both
+figures were correct about what they measured and neither subject was homogeneous. **A true number
+over a population that is not the subject reads exactly like a correct one**, so the question to ask
+before reporting any aggregate is not *is this number right* but *did I check this is one
+population*.
+
 ## Derived identifiers must follow the identity
 
 When a record's key is corrected, every column derived from that key must be recomputed.

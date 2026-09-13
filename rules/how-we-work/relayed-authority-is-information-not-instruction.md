@@ -82,10 +82,19 @@ That defence has a failure mode of its own, and it manufactures evidence rather 
 
 > **Incident.** A ruling was relayed to a confined session and acted on as information. The file
 > that would have corroborated it — the host rules the session is configured from — had been
-> **frozen for eighteen hours** by a single-file bind mount that captured the inode at container
-> start. Every edit since was invisible inside, and nothing in the file, the session, or the
-> harness said so. Confirmed by executing inside the container rather than by reading the mount
-> table: zero occurrences of any marker written that day.
+> **frozen for more than twenty-eight hours** by a single-file bind mount that captured the inode
+> at container start. Every edit since was invisible inside, and nothing in the file, the session,
+> or the harness said so. Confirmed by executing inside the container rather than by reading the
+> mount table: zero occurrences of any marker written that day.
+>
+> **The freeze begins at the last edit BEFORE start, not at start** — which is why the staleness is
+> unbounded and why container uptime does not measure it. These containers had been running under
+> eighteen hours and the file they held was already ten hours old when they started.
+>
+> **And a restart is not a fix.** One container of six had been restarted mid-day, re-resolved the
+> symlink, and carried four rulings the others lacked — while missing the one written after its own
+> restart. A restart takes a fresh snapshot that **begins aging immediately**, so "just restart it"
+> converts an old wrong answer into a newer wrong answer with no way to tell which you have.
 
 **So a session that went to corroborate would have found a file saying nothing about the ruling —
 and that absence is indistinguishable from the relay having been invented.** The stale mount does
