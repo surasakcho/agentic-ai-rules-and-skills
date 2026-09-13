@@ -143,14 +143,55 @@ read-only `grep` whose **search pattern** contained a protected word beside a pr
 Nothing was being written; nothing could have been. This estate has already had to disarm one
 guard that fired on correct rows, so the next one to do it is on a short leash.
 
+**Then it refused this office, the same day, while this section was being written** — on a write
+to a scratch file in a temporary directory, because that file's *contents* were a list of test
+cases naming a verb beside a protected path. Two readers, independently, inside one day, both
+writing the specification for the thing that refused them.
+
+### Confirmed by execution, not by reading
+
+The guard's matcher was quoted to this office verbatim and replicated locally, and a corpus of 33
+command shapes was run through the replica rather than reasoned about. Three findings matter to
+this specification:
+
+- **Matching is over the whole segment string. There is no argv decomposition anywhere in the
+  Bash branch.** Segments come from a five-token split (`||`, `&&`, `;`, `|`, newline) and every
+  pattern is a regex search over the resulting text. This was an inference in the first draft of
+  this document and is now a confirmed fact.
+- **Exactly one construct is tested in a genuine write position today** — the target of a shell
+  redirect. That is the shape the rest of this section generalises, and it is already present for
+  one case.
+- **The destination-verb branch is positional by approximation**: it tests whether the protected
+  path is the *last token of the segment*. That is the middle ground between a text search and a
+  real operand model, and it fails in both directions depending on what follows the destination.
+
+**A divergence list — the specific shapes the deployed patterns admit or refuse against intent —
+was produced by that run and handed to the Core privately.** It is deliberately not in this
+document: see [what is deliberately absent](#what-is-deliberately-absent-from-this-document).
+
+Standing caveat: three helpers used by the matcher were not quoted, so every verdict from the
+replica is scoped to the patterns that were.
+
 ### The discriminator
 
 A command **writes** a protected path only when all three hold. Anything less is a **mention**,
 and a mention is not a violation.
 
-**Step 1 — decompose into simple commands.** Split on `;`, `&&`, `||`, `|` and newlines. Then
-strip the wrappers that hold another command as their argument, recursively: `env`, `sudo`,
-`nice`, `time`, `nohup`, `xargs`, `timeout`, `stdbuf`.
+**Step 0 — separate the command from its data, and do it first.** A quoted string, a search
+pattern, an `echo` argument and a heredoc body are payloads the command *carries*, not text the
+shell will run. Splitting on newlines without this turns every line of a heredoc body into
+something indistinguishable from a command, which is how a file's **contents** get convicted of
+being the command that writes it.
+
+A normaliser of this kind already exists in the deployed guard and did not prevent either
+observed refusal, which is the instructive part: **it recognises one input shape.** A payload
+stripper that handles heredocs but not quoted operands is not a smaller version of this step, it
+is a different step that happens to share a name. The requirement is *every* payload position, and
+where that cannot be decided the answer is **ask** — see the three outcomes below.
+
+**Step 1 — decompose what remains into simple commands.** Split on `;`, `&&`, `||`, `|` and
+newlines. Then strip the wrappers that hold another command as their argument, recursively: `env`,
+`sudo`, `nice`, `time`, `nohup`, `xargs`, `timeout`, `stdbuf`.
 
 **Step 2 — resolve the verb and classify it.**
 
@@ -167,6 +208,26 @@ always-writes verb; a redirect target (`>`, `>>`, `<>`); the argument of `-o`, `
 **Explicitly not write positions:** the pattern operand of a search verb; `--include` / `--exclude`
 / `-e` / `--regexp` values; a path inside a quoted string being searched *for*; a heredoc body not
 redirected at the path; a comment.
+
+### The second arm — and a property of the current guard that must survive
+
+The three steps above are **path-anchored**, and a path-anchored discriminator is blind to every
+command that names no path: a whole-tree restore, a hard reset, a `stash pop`, a `clean -fd`.
+The deployed guard already handles this with a branch that fires **unconditionally, before any
+protected path is looked for**, and that branch is correct precisely because it does not check a
+path.
+
+**A position-based rewrite must keep it as a separate arm, not fold it in.** The tempting mistake
+is specific: someone tightening this guard for false positives deletes the unconditional branch on
+the grounds that it does not even test a path, and removes the only cover against the commands
+with the largest blast radius. The rule is
+[`a-verb-list-is-not-a-boundary`](../rules/testing/a-verb-list-is-not-a-boundary.md), under *the
+second arm*.
+
+| arm | question | evaluated |
+|---|---|---|
+| scope-anchored | is the effect unbounded over the tree? | first, with no path test |
+| path-anchored | does this write *this* path? | after, per step 0–3 above |
 
 ### Deployment gate — both directions, before it ships
 
@@ -246,6 +307,16 @@ The instrument, in one line: **a checker reports three states and prints its den
 ---
 
 ## What is deliberately absent from this document
+
+**The divergence list.** Running the replica produced a specific inventory of command shapes the
+deployed patterns treat contrary to intent. The false-*positive* half is in this document, because
+a guard refusing correct work is a usability defect its users need to recognise. **The
+false-negative half is not**, and will not be: an enumerated list of what a live guard fails to
+stop is a working bypass for a control that is running right now, on a host holding credentials.
+[`sanitise-before-sharing`](../rules/how-we-work/sanitise-before-sharing.md) names four categories
+— people, places, paths and **findings** — and says the fourth needs a reader rather than a
+pattern. This is the fourth. It went to the Core directly, and the operator can publish it if they
+ever want it public; that is their call and not this office's.
 
 **No code, and nothing deployed.** These are specifications. Building the dispatcher, editing the
 settings that install the hooks, and putting any of it in front of a live session belong to the

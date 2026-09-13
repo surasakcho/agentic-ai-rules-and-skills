@@ -76,9 +76,14 @@ decoration; folding it into deny is how it starts firing on correct rows.
 When you do inspect a command, the discriminator that separates a command that **writes** a
 protected path from one that merely **names** it:
 
-1. **Decompose** the line into simple commands — split on `;`, `&&`, `||`, `|` and newlines, then
-   strip the wrappers that hold another command as their argument (`env`, `sudo`, `nice`, `time`,
-   `xargs`, `nohup`).
+0. **Separate the command from its data, first.** A quoted string, a search pattern, a heredoc
+   body and an `echo` argument are *payloads*: text the command carries, not text the shell will
+   run. Splitting on newlines without doing this converts every line of a heredoc body into
+   something indistinguishable from a command — which is how a file whose **contents** mention a
+   verb and a path gets convicted of being that command.
+1. **Decompose** what remains into simple commands — split on `;`, `&&`, `||`, `|` and newlines,
+   then strip the wrappers that hold another command as their argument (`env`, `sudo`, `nice`,
+   `time`, `xargs`, `nohup`).
 2. **Resolve the verb** of each, and classify it: *never writes* (`grep`, `cat`, `head`, `diff`,
    `git log`, `git show`), *writes only under a flag* (`sed -i`, `sort -o`, `awk > file`), *always
    writes* (`tee`, `patch`, `install`, `git apply`, `git am`, `git checkout -- <path>`).
@@ -87,8 +92,28 @@ protected path from one that merely **names** it:
    that appears only as a search pattern, a `--include`, a `-e` expression, or an operand of a
    verb that never writes is a **mention**, and a mention is not a violation.
 
-Every one of these three steps is a heuristic. They are worth having and they do not make the list
+Every one of these steps is a heuristic. They are worth having and they do not make the list
 closed — which is why they sit under the structural instrument rather than replacing it.
+
+## The second arm: a command that names no path can still write every path
+
+**Position-based gating assumes the command names its victim, and the most destructive ones do
+not.** `git checkout .`, `git restore` with no pathspec, `git reset --hard`, `git stash pop`,
+`git clean -fd`, an `rm -rf` on an ancestor directory — each rewrites or deletes a protected file
+while mentioning nothing a protected-path pattern can match. A discriminator built purely on write
+position is **blind to exactly the commands with the largest blast radius**, and tightening it
+makes that blindness worse.
+
+So a path guard needs two arms, evaluated independently:
+
+| arm | question | fires on |
+|---|---|---|
+| **path-anchored** | does this command write *this* path? | the protected path in a write position |
+| **scope-anchored** | is this command's effect unbounded over the tree? | whole-tree restores, resets, cleans — **before** any path test, because there is no path to test |
+
+The scope arm cannot be derived from the path arm and must not be folded into it. Getting this
+wrong is a specific, tempting mistake: a reviewer tightening a guard for false positives deletes
+the unconditional branch as "it doesn't even check the path", which is precisely why it is there.
 
 ## Guard
 
@@ -102,6 +127,9 @@ closed — which is why they sit under the structural instrument rather than rep
   false positive the operator can, and the operator's response is to switch the guard off.
 - **Three outcomes for anything that parses a command:** allow, deny, and **ask**. Ambiguity is a
   state, not a default.
+- **Strip the payload before you read the verbs, and keep the scope arm separate from the path
+  arm.** The first stops a file's contents being convicted as a command; the second catches the
+  commands that name nothing at all.
 - **Declare the residue in the gate's own clause.** An incomplete guard is acceptable; an
   incomplete guard presented as a boundary is not.
 
@@ -113,6 +141,14 @@ rewrites the gate dispatcher while the gate matches nothing — and the same gua
 read-only `grep` because a protected word appeared in its **search pattern**. Alongside them, a
 territory gate specified against `Write` and `Edit` whose own test file recorded, before it was
 built, that `Bash` reaches every territory without either.
+
+Then, while this rule was being written: **the same guard refused the author, on a write to a
+scratch file in a temporary directory, because the file's own contents were a list of test cases
+naming a verb beside a protected path.** No protected path was being written and none could have
+been. A normaliser to strip data payloads already existed in that guard and did not catch it — it
+recognises one input shape, and neither a search pattern nor this heredoc was that shape. Two
+independent discoveries of the same false positive inside one day, by two readers, both of whom
+were at that moment writing the specification for it.
 
 ---
 
