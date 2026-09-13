@@ -129,6 +129,38 @@ one.
 Naming that is the point. A rule that quietly exempts itself while demanding the gate from
 everyone else is the decoration it is written against.
 
+## The debt is honest only while something reports it — and that is one pipe away
+
+68 rules currently declare a gate that does not exist. What stops that from reading as coverage
+is a single non-zero exit code, and **a non-zero exit code is the most fragile signal in a shell.**
+
+Observed twice on 2026-09-13, by two readers independently, within minutes of each other:
+
+```sh
+$ check_rule_gates.py                 # exit 1  -- correct
+$ check_rule_gates.py | tail -40      # exit 0  -- while the output says FAILED
+$ set -o pipefail; … | tail -40       # exit 1  -- correct again
+```
+
+A pipeline reports the exit status of its **last** command, and the gate is never the last
+command — `tail`, `head`, `grep`, `tee` and a `| cat` for paging all succeed unconditionally. So
+the checker printed `RULE GATES FAILED` and the shell said everything was fine, in the same
+breath, to someone who was reading the failure text at the time.
+
+**Nothing was wrong with the checker.** Its exit codes are correct, deliberate and documented.
+The signal was discarded one layer out, by a habit — piping a long report through `tail` — that
+nobody would think of as a change to a control.
+
+The general shape is already a rule:
+[`silence-must-be-the-alarm`](silence-must-be-the-alarm.md), whose observable names *unchecked
+pipelines* and whose check now carries the predicate. Recorded here because this is the rule with
+something to lose: **every "classified" verdict in this corpus is backed by that one integer.**
+
+- **Run a gate unpiped, or set `pipefail`, or read `PIPESTATUS`.** In CI, never pipe a gate into a
+  formatter.
+- **A gate whose failure has only ever been read as text has not been observed refusing.** The
+  discharge condition above is about the exit code, not the message.
+
 ## Guard
 
 - **When you classify a rule as gateable, build the gate in the same change.** If you cannot,
@@ -162,7 +194,7 @@ clause, and 7 name a gate that runs.
 verdict: deferred
 observable: 'every Enforcement clause in this repo, against whether the gate it declares exists and has been observed refusing a known violation'
 trigger: 'check exit code over this repo, at the moment a rule lands'
-check: 'clause present and verdict is not irreducible and implemented_by absent -> fail; implemented_by names a path that does not exist -> fail; report the count of clauses backed by a running gate, never a colour'
+check: 'clause present and verdict is not irreducible and implemented_by absent -> fail; implemented_by names a path that does not exist -> fail; report the count of clauses backed by a running gate, never a colour; and the caller reads the exit code unpiped, or under pipefail, or via PIPESTATUS - a gate piped into tail or grep reports the exit status of tail'
 escape: 'a rule that genuinely does not reduce declares verdict: irreducible with its reason and its weaker instrument, and is counted as unavailable rather than owed. Absence of a clause means NOT YET EXAMINED and is reported as UNKNOWN, never as clean'
 note: 'commit time IS the moment this rule names - a rule lands at commit - so this is not fires_late. The check is specified and not yet implemented; 50 clauses exist and 7 name a running gate, so this rule is the first thing its own check would refuse, and that debt is stated in the rule rather than hidden by it'
 ```

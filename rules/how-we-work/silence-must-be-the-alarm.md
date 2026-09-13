@@ -89,7 +89,7 @@ health ping emitted before the step it was meant to be reporting on.
 verdict: deferred
 observable: 'a health ping ordered before the fallible step, a failure path that exits 0, unchecked pipelines, and a scheduled unit with no dead-man switch'
 trigger: 'pre-commit lint plus a registry check'
-check: 'ping_line before the last fallible line -> block; exit 0 on a failure path -> block; a unit with no switch -> fail'
+check: 'ping_line before the last fallible line -> block; exit 0 on a failure path -> block; a unit with no switch -> fail; a gate or checker invoked inside a pipeline with neither pipefail set nor PIPESTATUS read -> block, because the pipeline reports the exit code of its LAST command and the gate is never the last command'
 escape: 'a deliberately liveness-only ping is declared as such'
 note: 'alert on absence, not on error - logs are pull and nobody pulls'
 ```

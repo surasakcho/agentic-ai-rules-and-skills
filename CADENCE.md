@@ -58,6 +58,19 @@ The first three are gated by `harvest.py --check --deny …`; the fourth needs a
 **6. Publish.** Commit and push. A weekly pass that ends on an unpushed branch has not
 happened.
 
+> **The commit convention changed on 2026-09-13, and the history is deliberately not
+> consistent.** Commits **before** that date carry a `Claude-Session:` trailer and name the
+> machine they were written on. Commits **after** it carry neither: this is a public repo, and a
+> session URL and a host name are exactly the people-and-places the sanitise step above exists to
+> keep out.
+>
+> **Do not "fix" the old commits.** Rewriting the published history of a public repo is
+> destructive, it breaks every commit link anyone has ever quoted, and the exposure is already
+> indexed — so the rewrite costs more than it recovers. It is the operator's call and nobody
+> else's. The inconsistency is the record of a decision, not an oversight.
+>
+> Keep `Co-Authored-By:` — it names an author, not a place.
+
 ## What "done" looks like
 
 A pass is complete when:
