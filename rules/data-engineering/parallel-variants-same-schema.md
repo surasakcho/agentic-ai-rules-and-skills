@@ -64,6 +64,14 @@ A share is undefined when its denominator is zero. Write NULL.
   rename, twelve columns fell into an `unclassified` bucket and were invisible — caught only
   because a downstream consumer required its groups to *partition* the column set, not merely
   to match most of it.
+  **And a partition over a NULLABLE key partitions only the rows that have one.** That is the
+  same failure from the other side: here the bucket existed and nobody read it; there the bucket
+  never appears, because the grouping key is null and the aggregate drops the row — reported from
+  a live estate where nine of twenty-four rows had no owning session declared and a grouped view
+  rendered fifteen. The mechanism is written out in
+  [`read-the-authority-never-type-the-table`](read-the-authority-never-type-the-table.md): null
+  key, silent discard, **output keeps its exact shape and only the numbers change.** Assert the
+  row count survives the grouping, not just that every bucket is named.
 - **Never address parallel records by list position.** A caption that quoted example `[1]` from
   a results list kept rendering after a rename, with the right format and the wrong pair. Look
   up by name and raise when the name is absent.

@@ -40,6 +40,18 @@ outside the project that produced it. Ask:
 - Does it name a real incident with a cost?
 - Is it already covered by an existing rule here? (Then strengthen that rule, don't add one.)
 
+**Expect the answer to be yes, and expect the strengthening to be a cross-reference.** The corpus
+is now large enough that the same failure reaches two categories from two directions, and a
+candidate that feels new usually is the *other end* of something already written. Four candidates
+in one evening resolved that way — a split needing a partition check, already in
+`parallel-variants-same-schema`; a grouping key that is null, already in
+`read-the-authority-never-type-the-table`; and two more one category over.
+
+**So the corpus's gap is navigation before it is coverage.** A rule nobody can find from where they
+are standing is as absent as one nobody wrote — and adding the second copy is worse than either,
+because the two then drift. When a candidate resolves to an existing rule, **put the pointer where
+the person who raised it was looking**, not only in the rule that already knew.
+
 **3. Mechanise what can fail.** Before writing a rule as prose, ask whether it can be a
 check. `prose < checklist < test < gate`. If it can run, it goes to `skills/`.
 
