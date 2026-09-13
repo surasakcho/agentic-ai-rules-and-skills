@@ -49,7 +49,7 @@ invariant matches the domain, whether a caption matches its figure — needs a h
 agent that actually looks. Both halves are here. Neither pretends to be the other.
 
 **"About half" was an estimate, and two reduction passes have since measured it.** Across all
-**84** rules, **77 reduce to something a machine can check** and **7 genuinely do not** — and the
+**85** rules, **78 reduce to something a machine can check** and **7 genuinely do not** — and the
 seven say so in their own clause, because a judgement nobody can count is not a finding. Every
 rule carries an `## Enforcement` clause naming the observable and the moment it fires; a rule with
 *no* clause has not been triaged yet, and the corpus checker reports it as `UNKNOWN` rather than
@@ -59,7 +59,7 @@ as clean.
 `skills/check-rule-gates/` reads every clause and resolves the implementation it names:
 
 ```
-gated: 8   UNGATED: 69   unavailable: 7   UNKNOWN: 0     (2026-09-13)
+gated: 9   UNGATED: 69   unavailable: 7   UNKNOWN: 0     (2026-09-13)
 ```
 
 See **[docs/gateability.md](docs/gateability.md)** for the verdicts, the build order by recorded
@@ -79,6 +79,7 @@ damage, and why a gate on the remaining seven would be worse than the prose.
 | [how-we-work](rules/how-we-work/) | [A PR nobody is asked to review is invisible](rules/how-we-work/a-pr-nobody-is-asked-to-review-is-invisible.md) | A bot-authored PR its owner could not find; a sweep then found an outside contributor's PR lost the same way |
 | [how-we-work](rules/how-we-work/) | [Unexpected means stop and propose](rules/how-we-work/unexpected-means-stop-and-propose.md) | "I noticed X, so I did Y" -- a wrong fix shipped because a one-command check was never run |
 | [how-we-work](rules/how-we-work/) | [A remembered claim is not a checked one](rules/how-we-work/a-remembered-claim-is-not-a-checked-one.md) | Six assertions in one day, each falsified by a command under a minute long — one of them published and retracted |
+| [how-we-work](rules/how-we-work/) | [A blocked list is a fact about a moment](rules/how-we-work/a-blocked-list-is-a-fact-about-a-moment.md) | Turns ending with tidy lists of decisions owed by the operator, while work that could move sat untouched |
 | [how-we-work](rules/how-we-work/) | [Strict first, then the residual](rules/how-we-work/strict-first-then-the-residual.md) | A fallback built before the strict pass ever ran, so nobody learned how big the problem was |
 | [how-we-work](rules/how-we-work/) | [Watch the context budget](rules/how-we-work/watch-the-context-budget.md) | Post-compaction, four messages spent defending a table that had never been re-read |
 | [how-we-work](rules/how-we-work/) | [Publish lessons weekly](rules/how-we-work/publish-lessons-weekly.md) | Eleven reusable lessons that would have stayed in one repo |
@@ -159,6 +160,7 @@ they exist so the *mechanism* survives, not just the instruction.
 | [rules-in-force](skills/rules-in-force/) | Prints what a repo is actually bound by: every adopted rule's own statement, verbatim, grouped by category, read at the commit the repo pinned. Built because a rule that is a URL is not in front of you at the moment it applies. |
 | [retrieve-lessons](skills/retrieve-lessons/) | The other direction: adopts these rules into a repo that lacks them. Selects only the categories with evidence behind them, links rather than copies, and pins the commit so drift fails a check instead of going unnoticed. |
 | [check-rule-gates](skills/check-rule-gates/) | Reports which rules declare an enforcement gate that does not actually exist. A `verdict:` is a classification, not an implementation, and a clause with nothing behind it reads as coverage — so this separates gated from UNGATED from "the linkage could not be read". Exit 1 on a real gap, 2 on an unread one. |
+| [unblocked-loop](skills/unblocked-loop/) | Re-checks what is actually blocked, on a timer, and works everything else. A blocked list is a fact about a moment — blockers expire silently, so the remembered list is always longer than the real one. Carries the boundary that keeps "keep going" safe: a refusal is an answer, never an obstacle to route around. |
 
 Run both self-tests, and the health check, with an interpreter that has the requirements
 installed — a self-test that cannot run exits **2** and is reported as `CANNOT RUN`, never as
