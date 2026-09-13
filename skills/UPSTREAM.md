@@ -102,3 +102,47 @@ recorded, discovered later by someone who cannot tell it ever existed.
 
 So the default is ours, the disagreement is dated, and the comparison is re-asked when evidence
 arrives — not resolved now by whichever tool ran last.
+
+---
+
+## The thirteen upstream-only skills — first-pass verdicts, 2026-09-13
+
+**What these rest on, stated so they can be weighed:** the upstream tree read at the pin — category,
+line count, files shipped, and the `description` line of each — plus **one skill read in full**
+(`wayfinder`). They are survey verdicts, not reviews. Nothing is adopted.
+
+**Three facts from the tree that no name list carries, and all three bear on adoption:**
+
+1. **Four of the thirteen sit in upstream's own `in-progress/`** — `claude-handoff`,
+   `implement-spec`, `retro`, `setup-ts-deep-modules`. The author has filed them as unfinished. That
+   is a first-hand statement from the only person able to make it, and it settles those four without
+   a line of comparison.
+2. **Every upstream skill ships `agents/openai.yaml`** — a second-provider manifest. This corpus has
+   none, and adopting brings a cross-provider surface nobody here has asked for or maintains. It is
+   not a blocker; it is a cost that was invisible from the names.
+3. **Upstream's tree is nested by category; ours is flat**, deliberately — `~/.claude/skills` points
+   at `skills/`, so discovery stays flat. Every adoption is a move, not a copy, and `wizard` and
+   `setup-ts-deep-modules` ship sibling files that move with them.
+
+| skill | verdict | reason |
+|---|---|---|
+| `wayfinder` | **adopt, when the chain is approved** | The one genuine gap: planning work too large for a session as decision tickets on a tracker. 128 lines, domain-agnostic, nothing here does it. **Caveat that changes its cost:** it resolves tracker operations through the abstraction that `setup-matt-pocock-skills` installs — the single most divergent file in the comparison — so adopting it pulls that decision forward with it. |
+| `to-spec` | **decline as duplicate** | We have `to-prd`, same job, different noun. |
+| `to-tickets` | **decline as duplicate** | We have `to-issues`, same job, different noun. |
+| `claude-handoff` | **decline for now** | Upstream `in-progress/`. We have `handoff` and `wrap`. |
+| `implement-spec` | **decline for now** | Upstream `in-progress/`, 35 lines. We have `implement`. |
+| `retro` | **decline for now** | Upstream `in-progress/`. |
+| `setup-ts-deep-modules` | **decline for now** | Upstream `in-progress/`, and ships a `dependency-cruiser` config — a TypeScript-specific tool this corpus does not otherwise depend on. |
+| `code-review` | not yet | 87 lines. Needs a real comparison against our `review`, which is not in the overlap set only because the names differ. |
+| `writing-for-agents` | not yet | 81 lines, overlaps `writing-great-skills`. Same comparison, same reason. |
+| `to-questionnaire` | not yet, worth a look | Turning a decision you cannot answer into a questionnaire is adjacent to `open-decisions-go-in-the-tracker` and may strengthen it rather than duplicate it. |
+| `research` | not yet | 12 lines. Thin against `rules/research/`, which covers the same ground at length. |
+| `wizard` | not yet | Ships `template.sh`. **Code-bearing under this repo's bar**, so adoption owes a self-test or a declared line in `_no-selftest.txt`. |
+| `wait-what` | not yet | 7 lines. |
+
+**`to-spec` and `to-tickets` are the decision hiding inside the adoption question.** They are not
+free and they are not merely duplicates: adopting them beside `to-prd` and `to-issues` puts **two
+chains with different nouns doing one job** into a flat namespace, and two implementations that
+agree today diverge after the next edit
+([`parallel-variants-same-schema`](../rules/data-engineering/parallel-variants-same-schema.md)). If
+upstream's naming is preferred, the move is to **rename ours**, not to run both.

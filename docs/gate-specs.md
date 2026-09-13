@@ -418,6 +418,34 @@ can — and the operator's response to a guard that refuses correct work is to s
 
 ---
 
+## 3b. Refusal semantics the caller has to know — and nothing states them
+
+A property of these gates, learned by a builder getting the sequencing wrong rather than from any
+document:
+
+**A compound command is inspected and refused as a unit.** When a gate refuses a segment, the whole
+command is refused — so the steps *before* the offending verb never run either. A refusal partway
+through a script leaves **nothing done**, not half done.
+
+**That is the correct direction to fail and it should not change.** Half-applied state is the worse
+outcome, especially for a guard whose subject is the gate system's own files. But it is unstated
+anywhere a caller would look, and the caller's mental model is a shell's — left to right, stop where
+it breaks — which predicts the opposite. Two consequences follow, and both belong in whatever the
+refusal message or the estate's guidance says:
+
+- **Write multi-step commands so that being refused at step N is survivable**, because you will be
+  at step 0, not step N−1. Commands that clean up and then rebuild are the dangerous shape only if a
+  caller assumes the cleanup ran.
+- **A refusal is not evidence that nothing in the command was legitimate.** In the observed case the
+  refused verb was also *unnecessary* — a fresh clone was already at the pinned commit, so the
+  checkout satisfied a habit and nothing else. **The gate caught a redundant command as well as a
+  dangerous shape**, which is a thing worth noticing in a false-positive tally: not every refusal of
+  a correct-looking command is a false positive.
+
+The specification is to **state this in the refusal message**, one clause: that the whole command was
+refused and nothing ran. It costs a sentence and removes the single wrong inference a caller is most
+likely to make about their own half-finished state.
+
 ## 4. The absence case
 
 Specified as a rule rather than as a one-off guard, because it is a species rather than an
