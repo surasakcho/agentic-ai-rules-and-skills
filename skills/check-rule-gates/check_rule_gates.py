@@ -526,6 +526,7 @@ def main():
     gated = unavailable = 0
     claimed = set()
 
+    corpus_slugs, verdict_of = set(), {}
     for path in files:
         slug = os.path.splitext(os.path.basename(path))[0]
         cat = os.path.basename(os.path.dirname(path))
@@ -557,6 +558,8 @@ def main():
                     "Not in the vocabulary, so nothing is concluded.")
             continue
 
+        corpus_slugs.add(name.split("/")[-1])
+        verdict_of[name.split("/")[-1]] = verdict
         if verdict in UNAVAILABLE:
             unavailable += 1
             rep.ok("unavailable", "%s (%s)" % (name, verdict),
@@ -621,6 +624,35 @@ def main():
         else:
             rep.unk("%-52s %s is prose, not a locator" % (name, LINK_KEY))
 
+    # A BINDING NAMING A SLUG THIS CORPUS DOES NOT HAVE IS UNKNOWN, NOT ABSENT.
+    #
+    # The rule loop iterates over rule FILES, so a `satisfies` row whose slug matches none
+    # of them is never looked at -- `bound` is simply one lower and nothing says why.
+    # Measured by renaming each of 14 bound slugs in turn: 10 resurfaced under UNGATED, and
+    # 4 vanished entirely because they were ALSO gated in-corpus, so the corpus column
+    # covered for the estate column and the rule went on reporting green with a binding
+    # that resolved to nothing.
+    #
+    # That overlap is exactly where a broken binding hides, and it is the third mechanism
+    # today to render a stale name as a NARROWER answer rather than an unresolvable one.
+    # A binding that cannot be resolved is not a binding that is absent: it is a claim
+    # nobody can check, and by a-classification-is-not-a-gate it must read as neither
+    # covered nor uncovered.
+    unresolvable_binds = 0
+    for slug in sorted(by_slug):
+        if slug not in corpus_slugs:
+            unresolvable_binds += 1
+            rep.unk("%-52s names no rule in the corpus -- renamed or deleted?" % slug,
+                    "A binding is a claim about a rule. This one cannot be",
+                    "resolved, so it is counted nowhere rather than quietly",
+                    "lowering `bound`.")
+        elif verdict_of.get(slug) in UNAVAILABLE:
+            rep.unk("%-52s binding claims a gate for a rule declared %s"
+                    % (slug, verdict_of[slug]),
+                    "The rule says it cannot be gated and the estate says",
+                    "one enforces it. Both cannot be right; neither is",
+                    "assumed here.")
+
     # The inverse gap: gates that exist and that no rule points at. Reported as a
     # note, never a failure -- a gate may legitimately exist for a reason outside
     # this corpus, and failing on that would punish having built one.
@@ -670,8 +702,14 @@ def main():
     # must not share a value: rules/testing/absence-is-not-compliance.md
     other = ("gates no rule names: %d" % unclaimed if ids
              else "gates no rule names: not measured (no gate providers declared)")
-    print("\ngated: %d   bound: %d   UNGATED: %d   unavailable: %d   UNKNOWN: %d   |   %s"
-          % (gated, bound, rep.ungated, unavailable, rep.unknown, other))
+    # The binding table is a join too, so it owes both orphan sides. An unresolvable row
+    # was previously invisible: `bound` was simply one lower and nothing said why. This
+    # follows the provider branch above, which names an unreadable provider AND suppresses
+    # the number that depended on it rather than printing a wrong one.
+    binds_note = ("   bindings naming no rule: %d" % unresolvable_binds
+                  if unresolvable_binds else "")
+    print("\ngated: %d   bound: %d%s   UNGATED: %d   unavailable: %d   UNKNOWN: %d   |   %s"
+          % (gated, bound, binds_note, rep.ungated, unavailable, rep.unknown, other))
     if rep.ungated:
         print(red("RULE GATES FAILED -- %d rule(s) declare a gate that does not exist"
                   % rep.ungated))
