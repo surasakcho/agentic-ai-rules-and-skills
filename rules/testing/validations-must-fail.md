@@ -152,6 +152,20 @@ be green if the subject were already broken; here the honest answer was *"nothin
 reads as the check working hard. **`0 of 24` is not a measurement, it is a constant** — and a rate
 that no state of the world could change is reporting on the checker, not the subject.
 
+**A denominator that CAN move is allowed to sit at zero, and that is the false-positive shape of
+this corollary.** Not every all-red reading is a broken check — sometimes everything really is stale.
+The discriminator is not the number, it is whether any state of the world would change it.
+
+> **Demonstrated within the hour, by this corollary's own publication.** The rule file was committed,
+> which touched `rules/`, which made the auditing repo's pin genuinely stale. The audit printed the
+> same headline as the defect — `0 of 24 current` — about a completely different object: before the
+> repair it was a constant nothing could move; now it was a reading that happened to be zero because
+> a rule had moved an hour earlier. Repinning made it `1 of 24`.
+>
+> **Same number, same tool, same day, one broken and one correct.** So do not read a count and
+> conclude anything. Ask what would have to be true for it to differ, and then go and make one row
+> differ.
+
 **The fix is a different predicate, not a better measurement.** The object was right and the baseline
 was one the other end never writes. That distinguishes this from
 [`discriminate-by-executing-not-inspecting`](../how-we-work/discriminate-by-executing-not-inspecting.md),
