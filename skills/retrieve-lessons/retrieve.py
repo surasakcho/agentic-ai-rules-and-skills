@@ -454,14 +454,19 @@ def rules_changed(shared: Path, old_sha: str, new_sha: str, adopted=None):
 
     FILTER BY ADOPTED CATEGORY, NOT BY `rules/`. `rules/` is the CORPUS's population; the
     consumer's is the set of categories its block links, and `parse_block` already returns
-    it. Filtering on the corpus's set made every rule-touching commit stale every consumer.
-    Measured on one repo adopting 3 of 7 categories: **9% of rule-touching commits were
-    provably no-ops**, and the estate ranges 0-41%. (The first measurement said 25% over
-    the last 80 commits; 14 of those 20 were under category names that were RENAMED AWAY
-    and can never recur, so that window spanned a rename and overstated the forward rate.
-    The fix is unchanged; the size of the problem is not.) A false-refusal rate on a COMMIT
-    gate is how a checker gets muted. The function and its own docstring disagreed, and the
-    docstring was right.
+    it. Filtering on the corpus's set made every rule-touching commit stale every consumer,
+    and a false-refusal rate on a COMMIT gate is how a checker gets muted. The function and
+    its own docstring disagreed, and the docstring was right.
+
+    NO RATE IS QUOTED HERE, AND THAT IS THE THIRD ANSWER RATHER THAN AN OMISSION. Two were
+    published and both went stale within a day: the first spanned a category rename and
+    overstated the forward rate; the second was invalidated when the measured repo ADOPTED
+    the category whose commits had been counted as no-ops. **The denominator is the
+    consumer's adopted set, which the consumer controls** -- so a repo can drive its own
+    false-refusal rate to zero by adopting everything, and that is not an improvement in
+    the gate. A rate over an adopted set reads two things and only one of them is upstream.
+    The estate RANGE was always the more honest form because it visibly tracks adopted-set
+    size rather than anything about the gate.
 
     NOT BY LINKED FILE, and that is the trap that looks tidier. A new rule added to an
     adopted category is not in the block yet, so a file-level filter reports "no rule
