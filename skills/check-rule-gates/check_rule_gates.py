@@ -657,9 +657,11 @@ def main():
     # note, never a failure -- a gate may legitimately exist for a reason outside
     # this corpus, and failing on that would punish having built one.
     unclaimed = 0
+    by_owner = {}
     for pid, owner in sorted(ids.items()):
         if pid not in claimed:
             unclaimed += 1
+            by_owner[owner] = by_owner.get(owner, 0) + 1
             rep.note(GROUP_ORDER[5], "%s: %s" % (owner, pid[:52]),
                      "Exists, and no rule names it. Not a failure --",
                      "possibly enforcing something written down",
@@ -700,7 +702,23 @@ def main():
     # A bare 0 here would carry two meanings -- "no gate is orphaned" and "no second
     # inventory was ever declared to me" -- and the second is the usual one. Two states
     # must not share a value: rules/testing/absence-is-not-compliance.md
-    other = ("gates no rule names: %d" % unclaimed if ids
+    # ONE NUMBER OVER SEVERAL UNRELATED POPULATIONS IS A UNIFORM CLAIM ABOUT A SET THAT
+    # IS NOT. Measured on a live estate: 94 unclaimed gate ids, of which 81 were layer-1
+    # deny globs that no rule will ever quote verbatim, and the two genuinely interesting
+    # rows -- a tamper guard and a force-push guard that exist and that nothing in the
+    # corpus names -- were buried under them. The per-id lines below always carried the
+    # owner label; it was the SUMMARY that was uniform, which is the line people read.
+    # See rules/data-engineering/completeness-checking.md on partitioning an aggregate.
+    #
+    # AND THE COUNTS EITHER SIDE OF THE `|` HAVE DIFFERENT DENOMINATORS, which is why they
+    # are separated rather than listed. Left: corpus RULES. Right: provider gate IDS. They
+    # are the two sides of one join and summing them means nothing -- a reader who found
+    # the left-hand counters summing to the right-hand total went looking for a duplicated
+    # variable and found a coincidence, which is an hour nobody should spend twice.
+    split = ", ".join("%s %d" % (o, n) for o, n in
+                      sorted(by_owner.items(), key=lambda kv: (-kv[1], kv[0])))
+    other = ("gates no rule names: %d (%s)" % (unclaimed, split) if ids and split
+             else "gates no rule names: %d" % unclaimed if ids
              else "gates no rule names: not measured (no gate providers declared)")
     # The binding table is a join too, so it owes both orphan sides. An unresolvable row
     # was previously invisible: `bound` was simply one lower and nothing said why. This
