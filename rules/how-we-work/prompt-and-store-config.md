@@ -103,5 +103,6 @@ trigger: 'check exit code, before publishing'
 check: 'harvest.py --check fails on any absolute path in a shared rule or skill; skillconfig.py check fails on a tracked or un-ignored .env'
 escape: 'a placeholder segment is deliberately not a hit'
 implemented_by: 'skills/lesson-review/harvest.py and skills/lib/skillconfig.py'
+invoked_by: 'nothing in this repo - needs a pre-commit hook or a CI step in the adopting repo, and this corpus repo has no core.hooksPath and no hooks directory (checked 2026-09-13)'
 narrows: 'whether a skill ASKS rather than silently defaulting is not gated - the rule says so itself, and it stays a review question'
 ```

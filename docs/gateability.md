@@ -72,8 +72,35 @@ check: the predicate
 escape: how a legitimate case gets through
 narrows: what the gate does NOT cover   # only when verdict is narrowed
 fires_late: true                        # only when the trigger is later than the rule's moment
-implemented_by: skills/<name>/          # only when it already runs
+implemented_by: skills/<name>/          # the thing that EXISTS and can refuse
+invoked_by: <what causes it to run>     # mandatory whenever implemented_by is present
+assisted_by: skills/<name>/             # a checklist that helps and CANNOT refuse
 ```
+
+**`implemented_by` and `invoked_by` are two different claims, and collapsing them is how this
+corpus overstated its own coverage.**
+
+> ⛔ **CORRECTION, 2026-09-13, found by a reader verifying the count rather than relaying it.** This
+> document reported **9 gated rules**. Every one of the nine named a real file that exists — and
+> *existence* is the whole of what `implemented_by` asserts, which this repo's own checker states in
+> its header. Nothing in this repo invokes any of them: `core.hooksPath` is unset here, there is no
+> hooks directory, and `.git/hooks` holds only samples. **A gate nobody runs is prose with an exit
+> code.**
+>
+> The diagnosis is sharper than "they point at skills", and it is structural: **`implemented_by` is
+> a fact about the corpus, and whether anything invokes it is a fact about the adopting repo.** One
+> field cannot carry both, so the portable half stayed and the local half was never asked for.
+> `invoked_by` asks for it, and its honest value in this repo today is *nothing*.
+>
+> One of the nine was worse and is withdrawn entirely: a rule claiming a **prose skill** as its
+> implementation. A checklist cannot refuse, however faithfully it is followed, so it can never
+> discharge a clause — it is now `assisted_by`, which asserts help and not enforcement. It had been
+> claimed for two hours, by the office that wrote the rule saying not to.
+
+**So a report over this corpus owes three states, never one `ok`:** the implementation **exists**,
+something **invokes** it, and it has been **observed refusing**. Collapsing them produces a passing
+value that arrives free — [`absence-is-not-compliance`](../rules/testing/absence-is-not-compliance.md)
+aimed at the instrument that measures compliance.
 
 **Why not YAML frontmatter:**
 

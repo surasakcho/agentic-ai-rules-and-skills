@@ -55,7 +55,11 @@ So the obligation is discharged by three things, not one:
 
 1. the gate **exists** and runs where the rule's moment is,
 2. it has been **observed refusing** a real violation,
-3. the rule's clause **names it** — `implemented_by:` pointing at the thing that runs.
+3. the rule's clause **names it** — `implemented_by:` pointing at the thing that can refuse, and
+   `invoked_by:` pointing at what causes it to run. **Those are two claims and the second is the
+   one that gets skipped**: a checker that exists, is correct, and is wired to nothing is not a
+   control, and it reports exactly as green as one that is. A skill that is prose cannot satisfy
+   either — it cannot refuse, so it is `assisted_by:`, never `implemented_by:`.
 
 Without the third, the rule and its enforcement drift apart, which is the failure the clause
 format exists to prevent.
@@ -195,6 +199,7 @@ verdict: deferred
 observable: 'every Enforcement clause in this repo, against whether the gate it declares exists and has been observed refusing a known violation'
 trigger: 'check exit code over this repo, at the moment a rule lands'
 check: 'clause present and verdict is not irreducible and implemented_by absent -> fail; implemented_by names a path that does not exist -> fail; report the count of clauses backed by a running gate, never a colour; and the caller reads the exit code unpiped, or under pipefail, or via PIPESTATUS - a gate piped into tail or grep reports the exit status of tail'
+assisted_by: 'skills/ship-a-rule/ - the authoring checklist. Prose: it cannot refuse, and it is not this clause implementation'
 escape: 'a rule that genuinely does not reduce declares verdict: irreducible with its reason and its weaker instrument, and is counted as unavailable rather than owed. Absence of a clause means NOT YET EXAMINED and is reported as UNKNOWN, never as clean'
 note: 'commit time IS the moment this rule names - a rule lands at commit - so this is not fires_late. The check is specified and not yet implemented; 50 clauses exist and 7 name a running gate, so this rule is the first thing its own check would refuse, and that debt is stated in the rule rather than hidden by it'
 ```

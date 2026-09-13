@@ -87,5 +87,6 @@ trigger: 'check exit code'
 check: 'retrieve.py --check nonzero on drift; age(log) > 7 -> fail'
 escape: 'read the diff, then advance the pin'
 implemented_by: 'skills/retrieve-lessons/retrieve.py'
+invoked_by: 'nothing in this repo - needs a pre-commit hook or a CI step in the adopting repo, and this corpus repo has no core.hooksPath and no hooks directory (checked 2026-09-13)'
 note: 'advancing the pin to silence the check is the retrieval equivalent of deleting a failing test'
 ```

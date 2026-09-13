@@ -59,8 +59,14 @@ as clean.
 `skills/check-rule-gates/` reads every clause and resolves the implementation it names:
 
 ```
-gated: 9   UNGATED: 70   unavailable: 7   UNKNOWN: 0     (2026-09-13)
+gated: 8   UNGATED: 71   unavailable: 7   UNKNOWN: 0     (2026-09-13)
 ```
+
+**And read `gated` narrowly, because it means less than it looks.** It asserts that the named
+implementation **exists** — not that anything invokes it. Checked in this repo on 2026-09-13:
+`core.hooksPath` is unset, there is no hooks directory, and `.git/hooks` holds only samples, so
+**nothing here runs any of the eight.** They are gates in a repo that wires them up, and prose with
+an exit code in one that does not. Each clause now carries `invoked_by:` saying so.
 
 See **[docs/gateability.md](docs/gateability.md)** for the verdicts, the build order by recorded
 damage, and why a gate on the remaining seven would be worse than the prose.
@@ -162,6 +168,7 @@ they exist so the *mechanism* survives, not just the instruction.
 | [retrieve-lessons](skills/retrieve-lessons/) | The other direction: adopts these rules into a repo that lacks them. Selects only the categories with evidence behind them, links rather than copies, and pins the commit so drift fails a check instead of going unnoticed. |
 | [check-rule-gates](skills/check-rule-gates/) | Reports which rules declare an enforcement gate that does not actually exist. A `verdict:` is a classification, not an implementation, and a clause with nothing behind it reads as coverage — so this separates gated from UNGATED from "the linkage could not be read". Exit 1 on a real gap, 2 on an unread one. |
 | [unblocked-loop](skills/unblocked-loop/) | Re-checks what is actually blocked, on a timer, and works everything else. A blocked list is a fact about a moment — blockers expire silently, so the remembered list is always longer than the real one. Carries the boundary that keeps "keep going" safe: a refusal is an answer, never an obstacle to route around. |
+| [ship-a-rule](skills/ship-a-rule/) | The authoring checklist for a rule or skill: check it does not exist, name the incident, assign a three-valued verdict where a blank is not one of them, specify the gate, name what INVOKES it as well as what implements it, and verify by watching it refuse. Written after this corpus reported 9 gated rules that nothing ran. |
 
 Run both self-tests, and the health check, with an interpreter that has the requirements
 installed — a self-test that cannot run exits **2** and is reported as `CANNOT RUN`, never as

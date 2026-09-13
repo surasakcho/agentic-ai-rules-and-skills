@@ -136,5 +136,6 @@ trigger: 'check exit code, plus PreToolUse(Bash) on a push to a public remote'
 check: 'harvest.py --check --deny; and push to a public remote whose diff matches the denylist -> deny'
 escape: 'placeholder segments are not hits'
 implemented_by: 'skills/lesson-review/harvest.py'
+invoked_by: 'nothing in this repo - needs a pre-commit hook or a CI step in the adopting repo, and this corpus repo has no core.hooksPath and no hooks directory (checked 2026-09-13)'
 narrows: 'people, places and paths gate; findings need a reader, and the rule already says only a reader can tell whether a number is a result'
 ```

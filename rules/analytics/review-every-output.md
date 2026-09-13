@@ -83,5 +83,6 @@ trigger: 'pre-commit or CI on the output directory, plus Stop on the handover me
 check: 'artifacts changed and verify_outputs screen not run over them -> block; screen reports a flagged artifact that no later run cleared -> block; message asserts reviewed while the log shows screened-only -> refuse and require both numbers'
 escape: 'state both numbers - screened N, eyeballed M - which is the rule prescription; a declared exemption for artifacts that are not for a reader'
 implemented_by: skills/verify-outputs/
+invoked_by: 'nothing in this repo - needs a pre-commit hook or a CI step in the adopting repo, and this corpus repo has no core.hooksPath and no hooks directory (checked 2026-09-13)'
 narrows: 'the screen catches blank, single-colour, invisible-signal, inverted-colormap and low-ink renders. It cannot check that a caption matches its figure, that the magnitude is plausible, or that the sample eyeballed spanned mechanisms rather than being fourteen at random - all three stay prose, and the caption check is the one the incident cost most'
 ```

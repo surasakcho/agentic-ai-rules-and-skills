@@ -80,5 +80,6 @@ trigger: 'pre-commit'
 check: 'for row in registry - hits = grep(row.pattern) minus marked_superseded; any hits -> block'
 escape: 'marker vocabulary (superseded, revised, rescinded, no longer) near the figure, or a file-level exempt marker for a file that is the worked example'
 implemented_by: 'skills/stale-claim-check/'
+invoked_by: 'nothing in this repo - needs a pre-commit hook or a CI step in the adopting repo, and this corpus repo has no core.hooksPath and no hooks directory (checked 2026-09-13)'
 note: 'green means the registry is clean, never that the repo is - report coverage, not colour'
 ```

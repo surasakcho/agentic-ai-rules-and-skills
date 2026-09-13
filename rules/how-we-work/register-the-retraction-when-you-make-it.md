@@ -121,5 +121,6 @@ trigger: 'pre-commit - which is the moment the rule names'
 check: 'doc_claim_changed and no registry row added -> block; and report N registered claims rather than the word clean'
 escape: 'a no-retraction trailer for typos and formatting'
 implemented_by: 'skills/stale-claim-check/ reads this registry'
+invoked_by: 'nothing in this repo - needs a pre-commit hook or a CI step in the adopting repo, and this corpus repo has no core.hooksPath and no hooks directory (checked 2026-09-13)'
 note: 'without this, the stale-claim gate reports green over a population nobody sized - a sweep denominator is memory, a commit denominator is the log'
 ```

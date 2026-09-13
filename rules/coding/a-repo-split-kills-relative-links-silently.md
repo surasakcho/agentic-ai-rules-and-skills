@@ -69,4 +69,5 @@ trigger: 'check exit code, in the same commit as the split'
 check: 'dest resolves outside root -> problem; drive the escaping-link count to zero before pushing'
 escape: 'rewrite escaping links to absolute URLs in the split commit'
 implemented_by: 'skills/lesson-review/harvest.py'
+invoked_by: 'nothing in this repo - needs a pre-commit hook or a CI step in the adopting repo, and this corpus repo has no core.hooksPath and no hooks directory (checked 2026-09-13)'
 ```

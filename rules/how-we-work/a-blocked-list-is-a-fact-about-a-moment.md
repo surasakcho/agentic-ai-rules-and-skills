@@ -106,6 +106,6 @@ observable: 'the turn itself: whether a durable write or a tracker entry was pro
 trigger: 'Stop, plus a session-start check that the timer is armed'
 check: 'msg is majority requests-to-the-user and the turn produced no durable write and no tracker entry -> refuse; a blocker named in the message with no read of the tracker this session -> advise, naming the item; no recurring job scheduled in this session -> advise once at session start'
 escape: 'a turn whose honest output IS a filed blocker passes - the tracker entry is the durable write the check looks for. A session with genuinely nothing unblocked says so with the count it re-checked'
-implemented_by: skills/unblocked-loop/
+assisted_by: 'skills/unblocked-loop/ - a checklist, NOT an implementation. It is prose: it cannot refuse, so it cannot discharge this clause however faithfully it is followed. Withdrawn from implemented_by on 2026-09-13, hours after being claimed there, because a skill that cannot refuse reported as a gate is the exact defect a-classification-is-not-a-gate names'
 narrows: 'gates the SHAPE of an idle turn and the presence of the timer. It cannot tell a re-checked blocker from a remembered one unless the check happened to touch the tracker in the same session, and it cannot see the failure this rule most cares about - a session that quietly works around a refusal instead of filing it, which produces a turn that looks productive by every observable here'
 ```
