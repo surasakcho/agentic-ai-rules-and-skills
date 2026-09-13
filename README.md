@@ -49,7 +49,7 @@ invariant matches the domain, whether a caption matches its figure — needs a h
 agent that actually looks. Both halves are here. Neither pretends to be the other.
 
 **"About half" was an estimate, and two reduction passes have since measured it.** Across all
-**90** rules, **83 reduce to something a machine can check** and **7 genuinely do not** — and the
+**91** rules, **84 reduce to something a machine can check** and **7 genuinely do not** — and the
 seven say so in their own clause, because a judgement nobody can count is not a finding. Every
 rule carries an `## Enforcement` clause naming the observable and the moment it fires; a rule with
 *no* clause has not been triaged yet, and the corpus checker reports it as `UNKNOWN` rather than
@@ -59,7 +59,7 @@ as clean.
 `skills/check-rule-gates/` reads every clause and resolves the implementation it names:
 
 ```
-gated: 8   UNGATED: 75   unavailable: 7   UNKNOWN: 0   |   gates no rule names: not measured   (2026-09-13)
+gated: 8   UNGATED: 76   unavailable: 7   UNKNOWN: 0   |   gates no rule names: not measured   (2026-09-13)
 ```
 
 **And read `gated` narrowly, because it means less than it looks.** It asserts that the named
@@ -125,6 +125,7 @@ damage, and why a gate on the remaining seven would be worse than the prose.
 | [testing](rules/testing/) | [An absent subject is not a passing check](rules/testing/absence-is-not-compliance.md) | A credential check that passed an agent wired to no credential, and a link check that accepted a regular file where a symlink was the requirement |
 | [testing](rules/testing/) | [A verb list is not a boundary](rules/testing/a-verb-list-is-not-a-boundary.md) | A tamper guard that matched `patch` but not `git apply` — and refused a read-only `grep` whose search pattern contained a protected word |
 | [testing](rules/testing/) | [Detecting it afterwards is not preventing it](rules/testing/detect-after-is-not-prevent-before.md) | Four false refusals that left no record, 8 controls reported in place with 0 invoked, and an auditor whose charter lives in a repo the audited party owns |
+| [testing](rules/testing/) | [What the harness supplies, it cannot test](rules/testing/what-the-harness-supplies-it-cannot-test.md) | A suite committed 100644 that returned 126 while passing 24/24, and three scripts whose loop failed Permission denied every cycle for a day |
 | [how-we-work](rules/how-we-work/) | [Monitor the number, not just the job](rules/how-we-work/monitor-the-number-not-just-the-job.md) | 59 days green, no errors, no missed runs — booking one eighth of the income |
 | [data-engineering](rules/data-engineering/) | [Text encoding](rules/data-engineering/text-encoding.md) | 164 mojibake labels from a locale-codec fallback |
 | [data-engineering](rules/data-engineering/) | [Completeness checking](rules/data-engineering/completeness-checking.md) | A whole province silently locked in as "done" by a caching bug |
