@@ -11,7 +11,7 @@ Run every new validation against input you **know** is broken, and confirm it fa
 that only ever passes is worthless, and worse than worthless: it produces the *feeling* of
 verification without the substance.
 
-Five corollaries, each earned:
+Six corollaries, each earned:
 
 ### 1. Prove the branch fires
 
@@ -130,6 +130,42 @@ What to do instead, in order:
 the evidence is genuinely unavailable by the direct route, which makes routes 1 to 3 mandatory
 rather than optional.
 
+### 6. A check that has never passed is as untested as one that has never failed
+
+**The mirror of corollary 1, and the half nobody runs.** That corollary says prove the failing branch
+fires. This one says **prove the passing branch fires, on real input** — because both ends of the
+range are untested, and the all-red end does not look like a defect. It looks like diligence.
+
+> **Incident.** An audit compared each repository's recorded pin for **equality** against the newest
+> commit touching `rules/`. The tool that writes those pins records the clone's remote HEAD instead,
+> so the two coincide only when HEAD happens to be a `rules/` commit. Result across 24 repositories:
+> **0 current, 13 stale.** Every row of the worklist it produced was unearned, and it had been that
+> way for four days.
+>
+> The proof was the auditing repo itself, reported stale at a pin **newer** than the newest `rules/`
+> commit — the correct state for anything repinned after a skills-only change. An independent
+> checker on the same repo at the same moment: *"pin is behind but NO RULE MOVED — holding is
+> correct"*, exit 0.
+
+**The tell is not a colour, it is a denominator nothing can move.** Corollary 5 asks what would still
+be green if the subject were already broken; here the honest answer was *"nothing is green"*, which
+reads as the check working hard. **`0 of 24` is not a measurement, it is a constant** — and a rate
+that no state of the world could change is reporting on the checker, not the subject.
+
+**The fix is a different predicate, not a better measurement.** The object was right and the baseline
+was one the other end never writes. That distinguishes this from
+[`discriminate-by-executing-not-inspecting`](../how-we-work/discriminate-by-executing-not-inspecting.md),
+which is a true number about an *adjacent* object.
+
+**Validate by join, not by argument.** The repaired check was confirmed by running an independent
+implementation over the same 13 repositories and comparing: **13 agree, 0 disagree.** Before the
+repair, the single disagreement *was* the entire "current" column — so the join found it where
+re-reading the code had not, for four days.
+
+And this class costs other people rather than you: see
+[`a-pinned-reference-is-checked-at-its-pin`](../how-we-work/a-pinned-reference-is-checked-at-its-pin.md)
+on why a loud check is obeyed and a silent one is audited.
+
 ## When an invariant fails at scale, suspect the invariant
 
 > **Incident.** A validation asserted that no unit may be closer to a deep-sea port than to
@@ -159,7 +195,7 @@ of the parts that never complain**.
 verdict: deferred
 observable: 'for every guard, assertion or acceptance check that is added or changed: whether the test suite contains a case that makes it FAIL, proven by removing the guard body and observing a test go red; and for every defensive branch, whether any test makes its condition true'
 trigger: 'pre-commit on changed guard paths, plus CI over the whole guard set'
-check: 'for each changed guard: delete its body, run the suite - if nothing goes red, block; a conditional whose true branch is never entered under the suite -> block; and for a guard with more than one arm reaching the same verdict, disable each arm separately - a case that survives removal of the arm believed to cover it is covered by accident, and the report names which arm actually fired'
+check: 'for each changed guard: delete its body, run the suite - if nothing goes red, block; a check whose pass branch is exercised by no test case, or whose live run has never returned a pass for any subject, -> block: a rate no state of the world can move is reporting on the checker; a conditional whose true branch is never entered under the suite -> block; and for a guard with more than one arm reaching the same verdict, disable each arm separately - a case that survives removal of the arm believed to cover it is covered by accident, and the report names which arm actually fired'
 escape: 'a guard genuinely impossible to exercise in test declares itself unexercised with a reason, and that declaration is counted and reported rather than hidden'
 narrows: 'guard-removal proves the check CAN fail, and per-arm removal proves WHICH line does the work. It does not prove the check fails on the RIGHT input - a guard written against an imagined failure shape passes its own removal test while missing every real defect, which is why a-check-that-shares-a-source-is-not-a-check sits beside this one and is recorded there as irreducible'
 ```
