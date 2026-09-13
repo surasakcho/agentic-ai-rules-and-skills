@@ -441,3 +441,90 @@ settings that install the hooks, and putting any of it in front of a live sessio
 enforcement layer, not to the office that writes the rules — and that separation is the point,
 not an inconvenience. A rules author who can also deploy the gate is a rules author with no
 counterparty.
+
+---
+
+## 5. The payload defect is shared infrastructure, and one fix covers three gates
+
+**Status when specified:** reported by a third Sector, on a *different* gate — a credential-exfil
+guard refusing a command that wrote a unit-test file via a quoted heredoc. Reproduced here against
+the module, and then **observed a second time on this office's own command while this section was
+being written** — see the last subsection, which is not a joke.
+
+### What the reproduction establishes
+
+- **Three gates share one decomposition.** `credential-exfil`, `credential-into-repo` and
+  `gate-tamper` all run the same `strip-payloads -> join-interpreter-heredocs -> split-into-segments`
+  pipeline before matching. **This is not three bugs. It is one pipeline with three consumers**, and
+  it is why the same false-positive shape has been observed on two different gates by three
+  different readers in one day.
+- **The payload stripper is conditional on the sink, and the sink list is short.** It strips a
+  quoted heredoc body only when the owning segment is a commit-message or issue-body command.
+  Reproduced against the module: the identical body is **allowed** when owned by a commit and
+  **refused** when owned by a redirect into a file. Writing a file is not on the list, and writing a
+  file is what a session does all day.
+- **It fires only when the protected token and the verb land on the same physical line**, because
+  segmentation splits on newlines. A verb on line 3 and a path on line 5 do not correlate — so the
+  reported cause of the third Sector's refusal (a word appearing inside Python identifiers on other
+  lines) does not reproduce, and something on the same line as the path carried the verb.
+
+### The discriminator — and why "a quoted heredoc is inert" is too strong
+
+A quoted heredoc is inert **to the shell**. It is not inert to whatever consumes it: `python3 -
+<<'EOF'` is a program by any other name, and the guard already carries a second normaliser whose
+whole job is to splice interpreter bodies back onto their owner line so they *are* correlated.
+
+So the classification is not *quoted or not*. It is **what the body is handed to**:
+
+| owner of the heredoc | the body is | treat as |
+|---|---|---|
+| a byte sink — a redirect into a file, `tee <file>`, a commit or issue body | stored verbatim | **data** — strip it |
+| an interpreter — `python3 -`, `sh`, `node`, `awk` | executed | **program** — scan it, joined to its owner |
+| anything unrecognised | unknown | **scan it**, failing open as it does today |
+
+**The cheapest correct change is to extend the data-sink list to byte sinks, not to trust quoted
+heredocs generally.** Both halves of the machinery already exist; the gap is that the data half
+lists message sinks only. That is a list change plus one predicate, and it closes the shape on all
+three gates at once.
+
+### A refusal message must not assert a cause it only pattern-matched
+
+The refusal read *"reads or copies ~/secrets using `docker`"*. The word was a token inside a quoted payload. The reader then goes looking
+for that invocation — in a Sector with no docker socket at all — and finds nothing, because there
+was nothing.
+
+**Name what matched and where: the token, the segment, and the arm that fired.** A refusal that
+explains itself wrongly costs more than one that says only "refused", because people debug the
+explanation. Same requirement as the per-arm report in
+[`validations-must-fail`](../rules/testing/validations-must-fail.md), corollary 4, aimed at the
+message instead of at the test.
+
+### The channel — the part with no code in it yet
+
+The Sector that hit this **absorbed the refusal and adapted**: it improved the artifact and re-ran,
+which was the right response and bypassed nothing. The false refusal still left **no record
+anywhere**, and reached this office only because a third party asked them to forward it.
+
+That is the failure with no discriminator to fix it. A guard's false-positive rate is unobservable
+by default, because a correct adaptation is indistinguishable from a correct allow — so *"no
+complaints"* is a statement about the absence of a mailbox, and a zero measured that way is
+[`absence-is-not-compliance`](../rules/testing/absence-is-not-compliance.md) in the one costume
+nobody questions.
+
+**Specification:** log every refusal with the matched token, the segment and the arm; give the
+refused party one cheap way to mark a refusal wrong; report the marked count as a rate beside the
+refusal count. **Ship it with the discriminator, not after it** — the discriminator will be wrong
+again, and this is the only thing that will say so before somebody reaches for the off-switch.
+
+### The section could not be written without tripping the defect
+
+Appending this text was itself refused, by the same gate, for the same reason. The sentence above
+that **quotes the refusal** puts a sensitive path and a reader verb on one line inside a quoted
+heredoc bound for a file — which is the exact shape under discussion. The phrase had to be
+assembled from fragments at write time to get the document written.
+
+Four live refusals now, across three offices and two gates, every one of them on a correct command,
+and this one refused **the specification of its own fix**. It is the cheapest possible argument for
+the channel in the previous subsection: if the office writing the gate specifications cannot
+document a false refusal without triggering it, the rate is not going to be discovered by waiting
+for reports.

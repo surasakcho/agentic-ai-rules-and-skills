@@ -49,6 +49,38 @@ being written. Nothing could have been written.
 > worse off than if it had never been built, because the disarming is quiet and the guard is still
 > in the config where the next reader will count it as coverage.
 
+### The disarming is usually silent accommodation, not an off-switch
+
+Switching a guard off is the *visible* end of this, and it is the rarer one. The common case leaves
+no trace at all: the person refused **changes their command and moves on.**
+
+> **Incident.** A guard refused a correct command. The refused party did the right thing — they did
+> not re-spell the command, split the write, or reach for another tool to get past it; they
+> improved the underlying artifact and re-ran. Nothing was bypassed and nothing was disabled.
+> **And the false refusal still left no record anywhere.** It reached the office that owned the
+> discriminator only because a third party happened to ask them to forward it.
+>
+> Four such refusals were observed across three offices and two guards in a single day — a count
+> that exists only because those three offices happened to be talking to each other that day. The
+> fourth refused the document specifying the fix, at the sentence quoting the refusal text.
+
+Every property that makes that an appropriate response also makes it invisible. So:
+
+- **The false-refusal rate is unobservable by default**, because a correct adaptation and a
+  correct allow look identical from outside.
+- **A guard with no channel for reporting a false refusal reads as having none** — and a
+  false-positive rate of zero, measured by a system that cannot receive the reports, is
+  [`absence-is-not-compliance`](absence-is-not-compliance.md) wearing the one costume nobody
+  questions, because it is the number everybody wants.
+- **The accumulation is what kills it.** No single silent accommodation justifies action. The
+  twentieth one, by an operator with a deadline, is the off-switch — and by then nobody can say
+  how many there were.
+
+**So a guard owes a channel, not just a discriminator.** Log every refusal with the segment that
+matched and the arm that fired; give the refused party one cheap way to mark a refusal wrong; and
+report the marked count as a rate. Until that exists, *"we have had no complaints"* is a statement
+about the absence of a mailbox.
+
 The two failures are the same mistake seen twice: **the discriminator is on the wrong axis.** A
 command's name is not what makes it dangerous, and a string's contents are not what makes it a
 write.
@@ -139,6 +171,12 @@ the unconditional branch as "it doesn't even check the path", which is precisely
   commands that name nothing at all.
 - **Declare the residue in the gate's own clause.** An incomplete guard is acceptable; an
   incomplete guard presented as a boundary is not.
+- **Ship a channel for false refusals with the guard, and report the rate.** A guard that cannot
+  receive the report that it was wrong will be told so exactly once — by being switched off.
+- **Never let a refusal message assert a cause it only pattern-matched.** *"…using `docker`"* when
+  `docker` was a word inside a quoted payload sends the reader hunting for a call that was never
+  made. Name what matched and where — the token, the segment, the arm — not what it was assumed to
+  mean. A wrong explanation costs more than a bare refusal, because people debug the explanation.
 
 ---
 
