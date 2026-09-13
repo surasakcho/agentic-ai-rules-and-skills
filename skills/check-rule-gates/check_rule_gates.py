@@ -341,6 +341,12 @@ GROUP_ORDER = [
 # this report format exists to avoid. Said once per group, each finding stays one
 # line and the whole thing fits on a phone.
 PREAMBLE = {
+    "bound by the estate": [
+        "An estate declared that one of ITS gates enforces this rule.",
+        "OVERLAPS `gated`, deliberately: a rule can ship an in-corpus",
+        "implementation AND be enforced by a local gate. The two counts",
+        "answer different questions and must not be added together.",
+    ],
     GROUP_ORDER[1]: [
         "Each declares a gateable verdict and names no implementation,",
         "so the clause reads as coverage and nothing was shown to",
@@ -534,25 +540,30 @@ def main():
                    "Declares it cannot be gated. Nothing is owed.")
             continue
 
+        # BINDINGS ARE EVALUATED FOR EVERY RULE, INCLUDING ONE ALREADY GATED IN-CORPUS.
+        # `gated` and `bound` are not competing verdicts about a rule -- they answer two
+        # different questions (this corpus ships an implementation; this estate runs a
+        # gate) and a rule can honestly be both. Resolving the overlap by precedence
+        # DROPPED the estate half: four such rules were the only claimants of three gates,
+        # so those gates were reported "no rule names it" by a run that had just read a
+        # file naming them. The orphan count was wrong in the direction that looks clean.
+        rows = by_slug.get(name.split("/")[-1], [])
+        good = [r for r in rows if ids.get(r[1]) == r[0]]
+        if good:
+            bound += 1
+            for prov, gid, obs in good:
+                claimed.add(gid)          # claimed regardless of which bucket the rule lands in
+            seen = ", ".join(sorted({r[2] for r in good if r[2]})) or "never observed refusing"
+            rep.ok("bound by the estate", "%-52s %s (%s)"
+                   % (name, ", ".join(sorted(r[1][:40] for r in good)), seen))
+        if rows and not good:
+            rep.ungate("%-52s BINDING NAMES NO SUCH GATE: %s"
+                       % (name, ", ".join("%s/%s" % (r[0], r[1][:28]) for r in rows)))
+            continue
+
         link = fields.get(LINK_KEY, "").strip()
         if not link:
-            # No in-corpus implementation. The estate may still enforce it: a binding is
-            # its claim that one of ITS gates does. The claim is checked, never taken --
-            # a binding naming a gate the inventory does not contain is a failure, because
-            # a declared control that does not exist is the defect this tool exists to find.
-            rows = by_slug.get(name.split("/")[-1], [])
-            good = [r for r in rows if ids.get(r[1]) == r[0]]
-            if good:
-                bound += 1
-                for prov, gid, obs in good:
-                    claimed.add(gid)
-                seen = ", ".join(sorted({r[2] for r in good if r[2]})) or "never observed refusing"
-                rep.ok("bound by the estate", "%-52s %s (%s)"
-                       % (name, good[0][1][:40], seen))
-            elif rows:
-                rep.ungate("%-52s BINDING NAMES NO SUCH GATE: %s"
-                           % (name, ", ".join("%s/%s" % (r[0], r[1][:28]) for r in rows)))
-            else:
+            if not good:
                 rep.ungate("%-52s %s" % (name, verdict))
             continue
 

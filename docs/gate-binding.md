@@ -58,9 +58,28 @@ So a binding is a statement in the estate's config:
 
 ```
 # satisfies <rule-slug> <provider> <gate-id>
-satisfies  a-pinned-reference-is-checked-at-its-pin  commit-gates  "the shared-rules pin is not stale"
-satisfies  nothing-leaves-git-without-permission     deny-list     "Bash(git update-index:*)"
+satisfies  retrieve-lessons-weekly                commit-gates  "the shared-rules pin is not stale"
+satisfies  nothing-leaves-git-without-permission  deny-list     "Bash(git update-index:*)"
 ```
+
+> ⛔ **The first row was originally written as
+> `a-pinned-reference-is-checked-at-its-pin`, and that binding was false.** It was bound off
+> the rule's **title** — both are about pins, so it reads right. The rule's `observable` is
+> *"any reference resolver in the repo, and whether it extracts a version before resolving"*,
+> and that gate inspects no resolver: it **runs** one, and asks whether this repo's recorded
+> pin is stale. That is `retrieve-lessons-weekly`, which was already correctly bound to the
+> same gate on the next line.
+>
+> **So: bind against the `observable` and `check` lines, never the headline.** A binding read
+> off a title is the cheapest possible wrong row, it survives every mechanical check in this
+> design, and the two rules most likely to be confused are the two whose titles rhyme.
+>
+> The tempting half, recorded so nobody re-binds it: that gate invokes a script whose
+> link-verifier *does* resolve every link at its sha, and which refused a real commit. That
+> satisfies the rule's escape clause for one artifact class. It does nothing about the rule's
+> actual subject — resolvers in this repo that check a pinned reference against now — and the
+> one such defect found today was found **by hand**, which is the evidence that nothing gates
+> it.
 
 **The gate-id is the id as the CHECKER ENUMERATES it, which is not always the name a human would
 use.** Each provider kind yields ids differently: a `regex` provider yields its capture group, so
@@ -150,6 +169,21 @@ write the row honestly:
 Then the claim is not "someone watched it once" but "this input still gets refused", and CI can
 re-run it. A binding whose replay stops refusing has become false, and says so on the day the gate
 changes rather than at the next audit.
+
+**Some gates must not have their fixture written down, and that is a third state rather than an
+excuse.** A violating input for a credential gate is a credential-shaped payload; writing it into a
+repository to prove the gate refuses it puts the thing the gate exists to stop into the artifact the
+gate is meant to protect, permanently and in history. The same holds for any gate whose violation is
+itself the harm — see
+[`discard-secret-output-never-filter-it`](../rules/how-we-work/discard-secret-output-never-filter-it.md)
+and the boundary in
+[`validations-must-fail`](../rules/testing/validations-must-fail.md) for controls whose only direct
+test is performing the act they prevent.
+
+So a binding is in one of **three** evidence states, and they must be distinguishable: *replayable*,
+*observed once and dated*, and **`fixture-unsafe`, with the reason** — which is an honest finding and
+not a gap to be closed. A gate marked `fixture-unsafe` is verified the way that boundary prescribes:
+against the predicate as data, against a decoy, or from outside a session.
 
 **Still optional, for the same reason as above** — a mandatory fixture per binding produces an empty
 binding file. But `observed:<date>` should be read as the weak form and a replayable case as the
