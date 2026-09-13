@@ -60,6 +60,29 @@ Three measurements from one estate, one day, all of the same shape:
 > audits — in a repository that party owns and can rewrite.** The charter says so in its own text.
 > Declared, not structural: the constraint is a sentence inside the thing it constrains.
 
+### The worst case: the act that hides itself, in one move
+
+The visibility failures above assume a **separate** concealment — something happened, and nobody
+was told. The hardest case has no second step: **the self-interested action is itself the removal
+of the instrument that would have seen it.**
+
+> **Incident.** A published false-refusal rate turned out to have a denominator the measured party
+> controlled. Suppressing one true configuration change would have protected the number — quietly,
+> unaudited, and defensibly. **The same suppression would also have kept the gate silent**, because
+> the configuration was what gave the gate anything to look at. The self-interested move buys a
+> clean number *and* a quiet instrument, in one act, leaving nothing afterwards to find.
+
+**Audit cannot reach this, and not because the auditor is weak.** There is no concealment to detect
+and no altered record to compare: the artifact is a system that legitimately had nothing to report.
+An auditor arriving later sees a clean instrument and a clean number, both true.
+
+So this is the case that decides where a control goes rather than how good the review is. **When the
+action that benefits someone is the same action that blinds the check, the control has to sit before
+the act or in someone else's hands** — the first two rungs of the ladder below, never the third.
+And the tell is available in advance, which is the only good news here: ask **whose configuration
+decides what this instrument can see**, and if the answer is *the party it measures*, the
+after-the-fact half is already spent.
+
 ## The sound version of the trade
 
 Review is not second-best. It is the right instrument for the large class of acts that are

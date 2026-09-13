@@ -76,6 +76,13 @@ blocker, that is the thing to fix first; it is cheaper than the rebuild.
 
 - **Read the primary before building from a relayed specification.** Once, at the start. It is
   minutes against a rebuild.
+- **When the relay names a CHANGE, the primary is the commit — not the file you were pointed at.**
+  A relay names what the sender thought was the point. Observed: an addendum was relayed as landing
+  in one rule; it touched two, and the second carried a clause the citing party needed. `git show
+  --stat` or `git log -S` over the named commit is one command, and it is the difference between
+  citing what you were told about and citing what actually changed. **Both parties missed it** —
+  the sender did not offer the reach and the receiver did not ask for it, which is the shape of
+  every relay loss on this page.
 - **When you relay a specification, link the primary rather than replacing it.** The relay is an
   index, not a substitute — and say plainly that it is compressed.
 - **When you receive one and cannot reach the primary, name that in the work**, so the assumption
