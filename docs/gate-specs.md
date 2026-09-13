@@ -143,10 +143,25 @@ read-only `grep` whose **search pattern** contained a protected word beside a pr
 Nothing was being written; nothing could have been. This estate has already had to disarm one
 guard that fired on correct rows, so the next one to do it is on a short leash.
 
-**Then it refused this office, the same day, while this section was being written** — on a write
-to a scratch file in a temporary directory, because that file's *contents* were a list of test
-cases naming a verb beside a protected path. Two readers, independently, inside one day, both
-writing the specification for the thing that refused them.
+**Then it refused this office twice, the same day, while this section was being written.**
+
+- On a **write to a scratch file in a temporary directory**, because that file's *contents* were a
+  list of test cases naming a verb beside a protected path.
+- On a **read** — `wc -l` over three filenames — because one of the protected files is called
+  `install-<dispatcher>.py`, and `install` is itself a verb in the destination list. The verb
+  pattern and the protected-path pattern matched *the same token*, and the destination heuristic
+  then found that token in last position. **The file cannot be counted, catted or listed by name
+  at the end of a command.**
+
+The second one is the sharper of the two, because it does not need a payload at all: **the
+protected file's own name supplies the verb.** Any protected path whose name contains `cp`,
+`install`, `ln`, `rm`, `mv`, `dd` or `tee` as a word will do the same, and the more
+self-describing the filename, the likelier it is. It also blocks precisely the command an operator
+reaches for first — *let me look at the installer* — which is the shape most likely to end with
+the guard being switched off.
+
+Two readers, independently, inside one day, both writing the specification for the thing that
+refused them.
 
 ### Confirmed by execution, not by reading
 
@@ -154,16 +169,31 @@ The guard's matcher was quoted to this office verbatim and replicated locally, a
 command shapes was run through the replica rather than reasoned about. Three findings matter to
 this specification:
 
-- **Matching is over the whole segment string. There is no argv decomposition anywhere in the
-  Bash branch.** Segments come from a five-token split (`||`, `&&`, `;`, `|`, newline) and every
-  pattern is a regex search over the resulting text. This was an inference in the first draft of
-  this document and is now a confirmed fact.
+- **The tamper arm matches over the whole segment string.** Segments come from a five-token split
+  (`||`, `&&`, `;`, `|`, newline) and every tamper pattern is a regex search over the resulting
+  text.
+
+  > ⛔ **CORRECTION.** This bullet previously read *"there is no argv decomposition anywhere in the
+  > Bash branch"*, which was written from quoted excerpts and is **false**. Read against the file
+  > itself: the **version-control arm tokenises properly** — `shlex.split`, falling back to a
+  > whitespace split on unbalanced quotes, then dispatching on subcommand with flags and
+  > positionals separated. So the guard already contains a working argv model; it is applied to one
+  > arm and not the other. That changes this document's recommendation from *"build a decomposer"*
+  > to *"the decomposer exists — extend its reach"*, which is a materially cheaper instruction, and
+  > it was wrong for exactly one exchange because the excerpt that would have shown it was never
+  > quoted.
 - **Exactly one construct is tested in a genuine write position today** — the target of a shell
   redirect. That is the shape the rest of this section generalises, and it is already present for
   one case.
 - **The destination-verb branch is positional by approximation**: it tests whether the protected
   path is the *last token of the segment*. That is the middle ground between a text search and a
   real operand model, and it fails in both directions depending on what follows the destination.
+
+**Re-run against the real file once it could be read: the replica and the deployed gate diverged
+on 3 of 37 shapes, and all three were inside the region the caveat below had flagged as
+unverifiable.** That is the caveat doing its job rather than decorating the finding — the replica
+was right everywhere it claimed to be right, and wrong only where it had already said it could not
+see.
 
 **A divergence list — the specific shapes the deployed patterns admit or refuse against intent —
 was produced by that run and handed to the Core privately.** It is deliberately not in this
@@ -239,11 +269,40 @@ second arm*.
 Per [`validations-must-fail`](../rules/testing/validations-must-fail.md), this is not deployable
 on the strength of passing. It ships with, at minimum:
 
-- **must refuse:** `tee`, `patch`, `git apply`, `sed -i`, `> protected`, `cp src protected`, each
-  wrapped once in `sudo` and once behind `&&`.
-- **must allow:** the exact command that produced the false positive — a `grep` whose search
-  pattern contains a protected verb and whose path operand is a protected file — plus
-  `git log -- <protected>`, `cat <protected>`, and `sed 's/patch/x/' <protected>` with no `-i`.
+**The corpus, as intent.** This is a specification of desired behaviour, not a report of current
+behaviour — which shape is currently refused is deliberately not recorded here, per the disclosure
+split at the end of this document. `P` is a protected path; `INST` is a protected path whose *name*
+contains a verb.
+
+| must ALLOW | why it is a correct row |
+|---|---|
+| `grep -n "…patch…" P` | the verb is in a **search pattern** — the refusal that started this |
+| `grep -c "rm" P` · `echo "do not rm P"` | a verb inside a quoted payload |
+| `cat P` · `wc -l P` · `ls -la P` | reads |
+| `wc -l INST` · `cat INST` | a read whose **only** verb comes from the protected filename |
+| `git log -- P` · `git diff P` | history reads |
+| `sed -n '1,50p' P` | `sed` with no `-i` |
+| `cat > /tmp/notes <<EOF … P … EOF` | the path named in a **heredoc body**, written elsewhere |
+| `cp P /tmp/backup` | copying the protected file **out** is harmless — direction matters |
+| `git stash list` · `git checkout -b x` | inspection and navigation |
+| `python3 -c "print(1)" && cat P` | a verb in a **different segment** from the path |
+
+| must REFUSE | arm that should own it |
+|---|---|
+| `tee P` · `patch P` · `rm -f P` · `chmod 777 P` · `dd if=… of=P` | verb list |
+| `sed -i … P` · `perl -pi -e … P` | in-place |
+| `python3 -c "open('P','w')…"` | interpreter |
+| `echo x > P` · `awk … > P` | redirect target |
+| `cp /tmp/evil P` · `install -m 644 /tmp/evil P` | destination |
+| `cp /tmp/evil P extra` | destination **not** in last position |
+| `ed P < script` | a writer in no list — stands for the open set |
+| `git apply` · `git am` | writes that name no path and are in no arm |
+| `git checkout … -- P` · `git restore … P` · `git reset --hard` | scope arm |
+| `git rm P` | **must be owned by the git arm**, not caught incidentally by the verb list |
+
+Each row is one case. A guard that passes the left column and refuses the right column is doing
+the job; one that has only ever been run against the right column is unverified in the direction
+that gets guards switched off.
 
 A refusal case that has never been observed refusing, and an allow case that has never been
 observed allowing, are both unverified.
