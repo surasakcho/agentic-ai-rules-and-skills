@@ -28,14 +28,24 @@ No incident, no rule. A rule from an instruction rather than a failure is allowe
 
 ## 3. Assign a verdict — three values, and a blank is not one of them
 
-| verdict | meaning | what it owes |
+| state | how it is written | what it owes |
 |---|---|---|
-| **gateable** (`interposed` / `deferred` / `narrowed`) | a machine can check it | everything in steps 4–6 |
-| **irreducible** | no artifact exists to look at | a reason, and the weaker instrument that still applies |
-| **not yet examined** | you have not decided | say so, in the clause, in those words |
+| **gateable** — `interposed` / `deferred` / `narrowed` | a `verdict:` in the clause | everything in steps 4–6 |
+| **irreducible** — or `structural`, where the capability itself is removed | a `verdict:` in the clause | a `reason:`, and a `weaker:` instrument that still applies |
+| **not yet examined** | **no clause at all** | nothing — but it is counted, and it is not clean |
 
-**An absent clause means *not yet examined*. It has never meant irreducible** — that convention was
-tried here and failed, because a deliberate judgement became indistinguishable from an omission.
+**Take the vocabulary from the checker, never from memory.** The five accepted values live in
+`skills/check-rule-gates/check_rule_gates.py`, and that file is the authority: a verdict it does not
+know is reported `UNKNOWN`, not assumed gateable. **Do not invent a sixth spelling.** Two
+vocabularies for one field is the drift this step exists to prevent, and `structural` is the one
+most often left out of a list written from recollection — it is rare, it is real, and the corpus
+defines it.
+
+**An absent clause means *not yet examined*, and that is the only way to say it.** It has never
+meant irreducible — that convention was tried here and failed, because a deliberate judgement became
+indistinguishable from an omission. There is no `verdict: not-yet-examined`: the absence already
+carries it without ambiguity now that irreducible is declared, and a third spelling would put two
+ways of saying one thing into a field a machine reads.
 
 **Choosing `irreducible` must stay cheap.** A process that makes it expensive produces invented
 gates, which are worse than recorded debt: debt is counted, a fake gate reports green. If the honest
@@ -96,7 +106,17 @@ Say it plainly, with a number: *"N rules classified, M gated."* **Do not ship th
 intention together** — the clause reads as coverage to the next person, who then stops enforcing it
 by hand and is replaced by nothing.
 
-## 8. Update the index and run the corpus checks
+## 8. Reuse the corpus's own parser — never write a second one
+
+If you are building a check **over these clauses**, import the vocabulary and the path resolver
+from `check_rule_gates.py`. Do not restate them.
+
+`implemented_by` values are not all single clean paths — some name two files, some carry a trailing
+phrase — and the existing resolver has deliberate tokenising logic for that, arrived at once. **A
+second parser of one field agrees with the first on the day it is written and drifts silently
+afterwards**, and the first symptom is a gate refusing a clause its sibling checker accepts.
+
+## 9. Update the index and run the corpus checks
 
 The rule table, the counts, and every check the repo ships — read their exit codes.
 
