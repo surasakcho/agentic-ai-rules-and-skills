@@ -18,9 +18,19 @@ deployed and defective. The general rule extracted from all three is
 
 ## 1. Locality — an agent writes only inside its own territory
 
-**Status when specified:** classified, with 11 executable cases already written, and no gate
-built. The test file records a known gap before the gate exists: the classification discriminates
-on `Write` and `Edit`, and `Bash` reaches every territory on the machine without either.
+**Status when specified:** classified, with 11 cases already written, and no gate built. The
+classification discriminates on `Write` and `Edit`; `Bash` reaches every territory on the machine
+without either, and the test file records that gap before the gate exists.
+
+> **Corrected 2026-09-13, after the two relevant fragments were quoted to this office verbatim.**
+> This section originally assumed the known gap was a comment. It is not: the Bash case is real and
+> carries a genuine trespassing payload. **But its expected verdict is *allow*.** So the suite does
+> not merely fail to cover `Bash` — it currently *asserts that Bash trespass is permitted*, and
+> that assertion is green today and will stay green. See "the residue must be a debt, not a
+> permission" below, which is the part of this specification that changed.
+>
+> Standing caveat: this office has read two quoted fragments of that file and not the file. Every
+> claim here is scoped to what was quoted.
 
 ### The ruling: the residue is acceptable as a *layer*, and not as the *boundary*
 
@@ -47,6 +57,48 @@ part of this specification rather than advice attached to it:
    controlled, and that blindness is named in the clause rather than left implicit.
 3. **The tool-input check declares its residue.** Verdict `narrowed`, with `narrows:` naming
    `Bash` explicitly. Not `interposed`.
+
+### The residue must be a debt, not a permission
+
+Condition 3 above says the residue is *declared*. That is necessary and it is not sufficient, and
+the existing suite shows why.
+
+A case whose expected verdict is **allow** is indistinguishable from a case that documents correct
+behaviour. The suite has two values available — *deny* and *not-deny* — and `not-deny` is being
+asked to carry two incompatible meanings: **"this is permitted"** and **"this is a hole we have
+not closed"**. A reader who did not write the file cannot tell them apart, and the one who did
+will not always be the reader. It is the same defect as a deliberate blank standing where an
+untriaged one would look identical, and the remedy is the same one:
+[`absence-is-not-compliance`](../rules/testing/absence-is-not-compliance.md) — **three states, not
+two.**
+
+So the specification is a third expected-verdict value, not a change of sign:
+
+| expected verdict | meaning | goes red when |
+|---|---|---|
+| `deny` | the gate must refuse this | the gate stops refusing |
+| `allow` | the gate must permit this — a **decision** | the gate starts refusing |
+| `known_gap` | the gate does **not** cover this, and should | the gate starts covering it |
+
+`known_gap` passes today, exactly as `allow` does. The difference is that it is **countable**: the
+suite prints *"N cases, M known gaps"* every run, so the residue appears in the output of the
+thing that reports coverage rather than only in a comment above one line. It keeps the property
+the current case already has — the day someone closes the gap, the case goes red and forces the
+change to be deliberate — and it drops the property nobody wants, which is a green assertion,
+read cold, that a trespass is fine.
+
+**One more distinction, and it is this document's own standard applied one level down.** These
+cases sit in a pending set: they are declared, not executed. A declared case is a
+*specification*; only an executed one is evidence. So the residue is **counted and addressable,
+and not yet observed** — which is
+[`a-classification-is-not-a-gate`](../rules/how-we-work/a-classification-is-not-a-gate.md)'s
+distinction between a verdict and an implementation, arriving inside the test suite instead of
+inside the rule.
+
+**This office does not make that edit and has not asked for it.** The file defines what the gate
+must do; the population it governs includes writes made this week; and the layer that owns a spec
+editing it in response to a question from the layer that writes the specs is the shape both
+offices should refuse. The specification is above; applying it is the Core's call and its timing.
 
 ### Discriminator
 

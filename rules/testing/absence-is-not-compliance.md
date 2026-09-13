@@ -100,6 +100,29 @@ worklist 30 long of which 6 were already done. The fix is the one this rule stat
 irreducible verdict is written down as a verdict, and absence goes back to meaning *not yet
 examined*.
 
+### A test suite that asserts the gap is permitted
+
+The same defect, in the place most likely to be trusted: a gate's own test file, where a known
+hole was recorded as an **expected verdict of allow**.
+
+The case is real — a genuine trespassing payload, written deliberately, with a comment above it
+explaining that the hole is recorded rather than closed and that claiming coverage would be worse
+than the line. Every judgement in it is correct. **The vocabulary is what fails.** The suite has
+two expected verdicts, *deny* and *not-deny*, so `not-deny` carries two incompatible meanings:
+
+- **this is permitted** — a decision, and the suite should go red if it changes; and
+- **this is not covered yet** — a debt, and the suite should go red when it *is* covered.
+
+Both pass today. Both stay green. Read cold by anyone who did not write the file, the case asserts
+that the trespass is fine — and the comment that says otherwise is not something the suite counts,
+prints, or can lose track of, which is precisely the gap between prose and a control.
+
+**The fix is a third value, not a change of sign.** A `known_gap` verdict passes exactly as
+`allow` does, and is *counted*: the run prints "N cases, M known gaps". It keeps what the original
+case had — closing the hole turns it red, forcing the change to be deliberate — and drops the
+green assertion that the hole is correct. **A gap the reporting layer cannot count is a gap only
+its author knows about.**
+
 ## Why it survives review
 
 - **It passes.** Nobody investigates a green result, and the green is produced by the same line
@@ -141,9 +164,10 @@ been reporting on nothing for as long as it has existed.
 
 *Earned from:* two checkers found on one day — a credential verifier that passed an agent
 configured with no credential, and a link checker that accepted a regular file where a symlink was
-the entire requirement — and this corpus's own irreducible convention, which recorded six
-deliberate "cannot be gated" judgements as an absence its own checker could not tell from the 24
-rules nobody had looked at.
+the entire requirement — this corpus's own irreducible convention, which recorded six deliberate
+"cannot be gated" judgements as an absence its own checker could not tell from the 24 rules nobody
+had looked at, and a gate's test suite carrying a real, deliberately-written trespass case whose
+expected verdict was *allow*, so a recorded debt and a recorded permission were the same green.
 
 ---
 
@@ -155,7 +179,7 @@ rules nobody had looked at.
 verdict: deferred
 observable: 'for each checker in the repo: whether its passing branch is reachable with an empty population, whether it prints the size of the population it examined, and whether its self-test contains a case that removes the subject and asserts a non-pass'
 trigger: 'pre-commit on checker paths, plus CI over the checker suite'
-check: 'AST: a function returning a pass value from a path where the iterated population is empty, with no separate not-examined state -> block; a checker whose output carries no examined-count -> block; a checker whose tests contain no subject-absent case -> block'
+check: 'AST: a function returning a pass value from a path where the iterated population is empty, with no separate not-examined state -> block; a checker whose output carries no examined-count -> block; a checker whose tests contain no subject-absent case -> block; a test suite whose expected-verdict vocabulary has no value distinct from pass for a recorded gap, while a comment in the file names one -> block'
 escape: 'a defect-hunter whose correct answer on an empty population IS pass - declare it (a marker naming the population as the defect set, not the subject set), and it still owes the examined-count'
 narrows: 'gates the shape, not the semantics - whether a given population is the defect set or the subject set is a judgement the marker records rather than proves. And no lint can tell that a check asserted the wrong property (existence where a symlink was required); only the subject-absent self-test catches that, and the gate can compel the test to exist, not to be correct'
 ```
