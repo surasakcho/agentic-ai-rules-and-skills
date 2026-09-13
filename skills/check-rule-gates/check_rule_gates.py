@@ -238,8 +238,17 @@ PROVIDERS = {
 # Relative paths resolve against the CONFIG FILE's directory, so a config can sit
 # beside the estate it describes and travel with it.
 # ---------------------------------------------------------------------------
+# A binding is the ESTATE's claim that one of its gates enforces one corpus rule.
+# It is declared here and not in the rule, because only the estate knows its gates and a
+# rule naming a private path publishes it to every consumer. The rule's SLUG is the
+# identifier: it is unique (enforced by harvest.py) and it is the part that survives
+# reorganisation -- 4dacbe9 moved two categories wholesale at 100% rename similarity.
+# Full reasoning: docs/gate-binding.md
+BIND_RE = re.compile(r'^satisfies\s+(\S+)\s+(\S+)\s+(?:"([^"]*)"|(\S+))(?:\s+observed:(\S+))?\s*$')
+
+
 def read_config(path):
-    roots, provs, errs = [], [], []
+    roots, provs, binds, errs = [], [], [], []
     base = os.path.dirname(os.path.abspath(path))
     with open(path, "r", encoding="utf-8", errors="replace") as fh:
         for n, raw in enumerate(fh, 1):
@@ -249,6 +258,11 @@ def read_config(path):
             # likely to need one.
             line = re.split(r"(?:^|\s)#", raw, maxsplit=1)[0].strip()
             if not line:
+                continue
+            m = BIND_RE.match(line)
+            if m:
+                binds.append((m.group(1), m.group(2), m.group(3) or m.group(4),
+                              m.group(5) or ""))
                 continue
             parts = line.split(None, 3)
             kind = parts[0]
@@ -265,7 +279,7 @@ def read_config(path):
                 provs.append((label, pkind, os.path.normpath(os.path.join(base, ppath)), arg))
             else:
                 errs.append(f"line {n}: unrecognised directive '{line[:40]}'")
-    return roots, provs, errs
+    return roots, provs, binds, errs
 
 
 # ---------------------------------------------------------------------------
@@ -315,6 +329,10 @@ GROUP_ORDER = [
     "gated",
     "unavailable",
     "gates no rule claims",
+    # Appended, never inserted: the indices above are referenced positionally
+    # (GROUP_ORDER[5] is the orphan group), so inserting here silently retargets
+    # them. Caught by the self-test, which is what it is for.
+    "bound by the estate",
 ]
 
 # The reasoning belongs to the GROUP, not to each finding. The first draft
@@ -411,7 +429,7 @@ def main():
     # matters more than it looks: someone adopting this skill runs it first
     # against their own corpus, and a tool that cannot demonstrate a clean pass
     # does not get trusted when it starts failing.
-    roots, provs, cfg_errs = [], [], []
+    roots, provs, binds, cfg_errs = [], [], [], []
     if args.config:
         if not os.path.isfile(args.config):
             rep.unk("config file does not exist", os.path.basename(args.config),
@@ -419,9 +437,13 @@ def main():
                     "linkage below was resolved against the default",
                     "root alone.")
         else:
-            roots, provs, cfg_errs = read_config(args.config)
+            roots, provs, binds, cfg_errs = read_config(args.config)
             for e in cfg_errs:
                 rep.unk("config line not understood", e)
+    by_slug = {}
+    for slug, prov, gid, obs in binds:
+        by_slug.setdefault(slug, []).append((prov, gid, obs))
+    bound = 0
     for spec in args.root:
         if "=" in spec:
             lbl, _, p = spec.partition("=")
@@ -514,7 +536,24 @@ def main():
 
         link = fields.get(LINK_KEY, "").strip()
         if not link:
-            rep.ungate("%-52s %s" % (name, verdict))
+            # No in-corpus implementation. The estate may still enforce it: a binding is
+            # its claim that one of ITS gates does. The claim is checked, never taken --
+            # a binding naming a gate the inventory does not contain is a failure, because
+            # a declared control that does not exist is the defect this tool exists to find.
+            rows = by_slug.get(name.split("/")[-1], [])
+            good = [r for r in rows if ids.get(r[1]) == r[0]]
+            if good:
+                bound += 1
+                for prov, gid, obs in good:
+                    claimed.add(gid)
+                seen = ", ".join(sorted({r[2] for r in good if r[2]})) or "never observed refusing"
+                rep.ok("bound by the estate", "%-52s %s (%s)"
+                       % (name, good[0][1][:40], seen))
+            elif rows:
+                rep.ungate("%-52s BINDING NAMES NO SUCH GATE: %s"
+                           % (name, ", ".join("%s/%s" % (r[0], r[1][:28]) for r in rows)))
+            else:
+                rep.ungate("%-52s %s" % (name, verdict))
             continue
 
         status, evidence = resolve(link, roots, ids)
@@ -577,8 +616,8 @@ def main():
     # must not share a value: rules/testing/absence-is-not-compliance.md
     other = ("gates no rule names: %d" % unclaimed if ids
              else "gates no rule names: not measured (no gate providers declared)")
-    print("\ngated: %d   UNGATED: %d   unavailable: %d   UNKNOWN: %d   |   %s"
-          % (gated, rep.ungated, unavailable, rep.unknown, other))
+    print("\ngated: %d   bound: %d   UNGATED: %d   unavailable: %d   UNKNOWN: %d   |   %s"
+          % (gated, bound, rep.ungated, unavailable, rep.unknown, other))
     if rep.ungated:
         print(red("RULE GATES FAILED -- %d rule(s) declare a gate that does not exist"
                   % rep.ungated))

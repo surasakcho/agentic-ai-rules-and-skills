@@ -218,7 +218,19 @@ def health(shared: Path, deny=()):
     no_incident = [p.relative_to(shared).as_posix() for p in rules
                    if not re.search(r"(?i)incident|cost|what happened|earned from",
                                     p.read_text(encoding="utf-8", errors="replace"))]
-    print(f"  rules: {len(rules)}; without a named incident: {len(no_incident)}")
+    # A rule's FILENAME is its portable identity: estates bind local gates to it by slug
+    # (docs/gate-binding.md), and the slug is the part that survives reorganisation --
+    # 4dacbe9 moved two whole categories into how-we-work at 100% rename similarity, so a
+    # category-qualified id would have broken every binding written before it. That only
+    # works while slugs are unique, and nothing enforced it until this line.
+    from collections import Counter
+    dupes = sorted(n for n, c in Counter(r.name for r in rules).items() if c > 1)
+    for n in dupes:
+        where = ", ".join(sorted(str(r.relative_to(shared)) for r in rules if r.name == n))
+        log_problem(f"duplicate rule slug {n!r} -- the slug is the binding identifier and "
+                    f"must be unique across categories: {where}")
+    print(f"  rules: {len(rules)}; without a named incident: {len(no_incident)}; "
+          f"duplicate slugs: {len(dupes)}")
     for r in no_incident:
         log_problem(f"rule names no incident: {r}")
 
