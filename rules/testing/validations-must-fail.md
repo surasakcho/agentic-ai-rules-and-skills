@@ -171,6 +171,18 @@ was one the other end never writes. That distinguishes this from
 [`discriminate-by-executing-not-inspecting`](../how-we-work/discriminate-by-executing-not-inspecting.md),
 which is a true number about an *adjacent* object.
 
+**Splitting an existing bucket needs more than this corollary, and the extra check is already
+written down.** When you refine one measure into several, every new branch firing on real input is
+necessary and not sufficient — a row dropped, or counted twice, leaves both branches non-empty and
+both looking exercised. What settles it is that the parts **partition** the whole the old code
+reported: same population, no gaps, no overlaps. That is
+[`parallel-variants-same-schema`](../data-engineering/parallel-variants-same-schema.md)'s *"assert
+that any classifier covers all of them"* — earned when twelve columns fell into an `unclassified`
+bucket and were invisible — and
+[`completeness-checking`](../data-engineering/completeness-checking.md)'s input-versus-output
+population count. Corollary 6 checks each branch against the world; a partition check checks the
+branches against each other, and a refinement owes both.
+
 **Validate by join, not by argument.** The repaired check was confirmed by running an independent
 implementation over the same 13 repositories and comparing: **13 agree, 0 disagree.** Before the
 repair, the single disagreement *was* the entire "current" column — so the join found it where
