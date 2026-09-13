@@ -49,7 +49,7 @@ invariant matches the domain, whether a caption matches its figure — needs a h
 agent that actually looks. Both halves are here. Neither pretends to be the other.
 
 **"About half" was an estimate, and two reduction passes have since measured it.** Across all
-**91** rules, **84 reduce to something a machine can check** and **7 genuinely do not** — and the
+**92** rules, **85 reduce to something a machine can check** and **7 genuinely do not** — and the
 seven say so in their own clause, because a judgement nobody can count is not a finding. Every
 rule carries an `## Enforcement` clause naming the observable and the moment it fires; a rule with
 *no* clause has not been triaged yet, and the corpus checker reports it as `UNKNOWN` rather than
@@ -59,7 +59,7 @@ as clean.
 `skills/check-rule-gates/` reads every clause and resolves the implementation it names:
 
 ```
-gated: 8   UNGATED: 76   unavailable: 7   UNKNOWN: 0   |   gates no rule names: not measured   (2026-09-13)
+gated: 8   UNGATED: 77   unavailable: 7   UNKNOWN: 0   |   gates no rule names: not measured   (2026-09-13)
 ```
 
 **And read `gated` narrowly, because it means less than it looks.** It asserts that the named
@@ -135,6 +135,7 @@ damage, and why a gate on the remaining seven would be worse than the prose.
 | [data-engineering](rules/data-engineering/) | [Agree the output contract first](rules/data-engineering/agree-the-output-contract-first.md) | Four unstated assumptions about an output table's shape; three became remediation commits after the work was called done |
 | [coding](rules/coding/) | [Shell expansion silently deletes published content](rules/coding/shell-expansion-silently-deletes-published-content.md) | A financial threshold removed from a decision-maker's message by a backtick, in a comment about not dropping things |
 | [coding](rules/coding/) | [Surgical, verified change](rules/coding/surgical-verified-change.md) | Fixes that introduced more defects than they closed |
+| [coding](rules/coding/) | [An additive change is not additive](rules/coding/an-additive-change-is-not-additive.md) | A documented amber class left a failure-setting line printing in the not-a-blocker colour, and a checker printed "a hook" until cron was added |
 | [coding](rules/coding/) | [Scratch code lives outside the repo](rules/coding/scratch-code-lives-outside-the-repo.md) | 150+ undeleted probe scripts, none of them the reusable tool the task actually needed |
 | [coding](rules/coding/) | [Sanity-check test cases, hand-traced](rules/coding/sanity-check-test-cases.md) | Proactive practice, no incident yet — added on user instruction |
 | [coding](rules/coding/) | [BAU artifacts are built permanent](rules/coding/bau-artifacts-are-built-permanent.md) | A live host's cron rewrite *and its rollback* both staged in a `tmpfs` scratchpad |
