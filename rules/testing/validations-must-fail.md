@@ -86,6 +86,22 @@ one that works.
 **When a probe refuses, read the reason it printed, not the fact that it refused** — and be most
 suspicious when moving the fixture was the only thing that changed.
 
+**And the operational half, because knowing the corollary did not prevent the next one.** The same
+author, in the same file, hit it twice more — layer one, every provider path unreadable at once;
+layer two, the same defect surviving in a `root` row they had not thought to absolutise. **Each
+layer looked exactly like the previous one being fixed**, and the "finding" it produced named
+plausibly-related rules both times.
+
+> **A fixture is itself an instrument, so it owes a null test before anything is measured through
+> it: absolutise every path-bearing row, then assert the UNMODIFIED copy reproduces the real run's
+> output line for line.** Only then does a variant built from it mean anything.
+
+That is a positive control on the harness rather than on the subject — `name-the-blind-spot`'s
+guard 4 pointed one level out. **What makes it worth stating separately is that knowledge did not
+substitute for it:** the person who hit this had written the corollary above, recognised the shape,
+and still needed the mechanical assertion to catch layer two. A fixture that differs from
+production in *one* respect you know about usually differs in a second you do not.
+
 **The mechanical form is per-arm mutation, and it is a small extension of guard removal.** Disable
 *the arm you believe covers this case* — not the whole guard — and re-run. If the case still
 passes, your coverage is attributed to the wrong mechanism and your map of the system is wrong in
