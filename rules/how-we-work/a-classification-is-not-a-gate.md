@@ -75,6 +75,27 @@ feeling new.
 If the gate cannot ship in the same change as the rule, the rule is not finished. Say that
 plainly, with a count, rather than shipping the clause and the intention together.
 
+## A gate whose reference moves is HELD, not installed
+
+Before discharging the obligation by installing a gate everywhere, ask what it does in a repository
+nobody is tending.
+
+> **Measured across an estate:** a pre-commit gate requiring a repository's recorded pin to be
+> current was run against all four states a repo can be in — no config file, config without the
+> block, a stale pin, and **a pin written three minutes earlier.** All four exit 1. The last one
+> failed because the shared corpus moved while the measurement was running.
+
+**That is not a defect in the gate; it is a property of what it checks.** A pass condition that
+depends on a moving external reference is a state you *hold*, not one you reach — so the gate is
+only safe where a session is actively holding it, which is a fact about the session and not about
+the repository.
+
+**Installing it in the repositories that have none would make every commit in them fail forever**,
+and a control that is permanently red is disabled, not obeyed — see
+[`a-verb-list-is-not-a-boundary`](../testing/a-verb-list-is-not-a-boundary.md) on silent
+accommodation. "Roll it out everywhere" is the tempting discharge of this rule's obligation and it
+is the wrong one for this class of gate.
+
 ## Where a gate genuinely cannot be built, record that instead
 
 **Honest "this does not reduce" is fine. Unimplemented "interposed" is not.**
