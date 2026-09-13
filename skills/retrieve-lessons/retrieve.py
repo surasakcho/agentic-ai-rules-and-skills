@@ -407,9 +407,26 @@ def build_block(shared: Path, sha: str, selected, rules):
     return "\n".join(lines)
 
 
-def rules_changed(shared: Path, old_sha: str, new_sha: str):
-    """Which rule files differ between two SHAs. Empty list = the pin is behind but
-    NOTHING A CONSUMER LINKS TO has moved.
+def rules_changed(shared: Path, old_sha: str, new_sha: str, adopted=None):
+    """Which rule files THIS CONSUMER adopts differ between two SHAs. Empty list = the
+    pin is behind but NOTHING A CONSUMER LINKS TO has moved.
+
+    FILTER BY ADOPTED CATEGORY, NOT BY `rules/`. `rules/` is the CORPUS's population; the
+    consumer's is the set of categories its block links, and `parse_block` already returns
+    it. Filtering on the corpus's set made every rule-touching commit stale every consumer:
+    measured on one repo adopting 3 of 7 categories, 20 of the last 80 rule-touching
+    commits were provably no-ops -- a 25% false-refusal rate on a COMMIT gate, which is
+    how a checker gets muted. The function and its own docstring disagreed, and the
+    docstring was right.
+
+    NOT BY LINKED FILE, and that is the trap that looks tidier. A new rule added to an
+    adopted category is not in the block yet, so a file-level filter reports "no rule
+    moved" and the consumer never picks it up -- under-reporting, the direction that does
+    not announce itself. Category-level over-reports slightly and that is the correct side
+    to err on.
+
+    `adopted=None` means the caller could not determine the set, so NOTHING is filtered.
+    Cannot-tell must never render as a narrower answer.
 
     This distinction is the whole point and it was learned the expensive way. `--check`
     used to compare repo HEAD, so a commit touching only `skills/` marked every consumer
@@ -426,7 +443,11 @@ def rules_changed(shared: Path, old_sha: str, new_sha: str):
         # An unknown SHA is not "no change" -- it is "cannot tell", and those must not
         # look the same. Returning None forces the caller to say so.
         return None
-    return [l for l in r.stdout.splitlines() if l.strip()]
+    paths = [l for l in r.stdout.splitlines() if l.strip()]
+    if adopted is None:
+        return paths
+    return [p for p in paths
+            if len(p.split("/")) > 2 and p.split("/")[1] in adopted]
 
 
 def parse_block(text: str):
@@ -533,7 +554,7 @@ def main():
         if pin == sha and not args.force:
             print(f"already pinned at {sha} -- nothing to do")
             return 0
-        changed = rules_changed(shared, pin, sha) if pin else None
+        changed = rules_changed(shared, pin, sha, adopted=set(old_rules)) if pin else None
         if pin and changed is None and not args.force:
             raise SystemExit(f"ERROR: cannot read the diff {pin}..{sha} -- refusing to re-pin "
                              f"on an unverifiable comparison. Use --force only if you know why.")
@@ -635,7 +656,15 @@ def main():
         if pin == sha:
             print(f"\nPin is current ({sha}).")
             return 0
-        changed = rules_changed(shared, pin, sha)
+        parsed = parse_block(existing)
+        adopted = set(parsed["rules"]) if parsed else None
+        if adopted is None:
+            # A block with no readable links is not "adopts nothing" -- it is "cannot
+            # tell", so nothing is filtered and the report says which it was.
+            print(f"\n  NOTE: the block in {cm.name} is present but no rule links could be "
+                  f"read from it, so the comparison below is NOT narrowed to what this "
+                  f"repo adopts. Fix the block, or read the result as an upper bound.")
+        changed = rules_changed(shared, pin, sha, adopted=adopted)
         if changed is None:
             # Cannot tell is not the same as no change, and they must not print the same.
             print(f"\nPROBLEM: pinned at {pin}, shared repo is at {sha}, and the diff "
