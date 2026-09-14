@@ -85,6 +85,18 @@ check not yet run.
 - **A refusal is filed, never routed around.**
 - **Re-arm the timer at session start.** A reminder that depends on remembering to re-read it is
   the weakest instrument there is, and a scheduled job does not survive the session that made it.
+- **And give it a stop, on an unchanged STREAK rather than on one blocked reading.** A loop with no
+  stop condition re-prints a constant: six consecutive firings of one, measured, returned a
+  byte-identical reading while every remaining item needed an act only the operator could take.
+  **One blocked sweep is a normal result; the same sweep N times is the finding** — so compare the
+  signals rather than the verdict, because *"still blocked"* is the same sentence every time and the
+  readings behind it are what say whether anything moved.
+- **Back off before stopping, and make the stop loud.** A bare stop on the first blocked reading
+  contradicts this rule — blockers expire while you are not looking, and a loop that deleted itself
+  at 22:00 cannot see the answer that arrives at 02:00. And a loop that simply goes quiet is
+  indistinguishable from one that died
+  ([`silence-must-be-the-alarm`](silence-must-be-the-alarm.md)), so the last turn names the streak,
+  the constant reading, what re-arms it, and what would change any signal.
 
 ---
 

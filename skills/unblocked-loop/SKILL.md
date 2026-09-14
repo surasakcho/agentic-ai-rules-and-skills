@@ -25,6 +25,11 @@ again.** Checking costs one command.
 **Completion criterion:** a recurring job exists in *this* session, confirmed by listing them, not
 by remembering that you armed one.
 
+**There is no pause — only arm and delete.** Stopping this loop deletes the job, so it is
+destructive to the schedule, and re-arming means invoking this skill again rather than resuming
+anything. Say that out loud whenever you stop, because a reader who thinks they paused it will wait
+for a firing that is never coming.
+
 ## 2. Enumerate the open work from the tracker, not from memory
 
 Read the tracker itself. Whatever the repo declares — an issue list, a board file, a task file.
@@ -87,15 +92,64 @@ not hardcode one estate's repository into a shared skill.
 2. **What is blocked** — with the check that established it, and the entry id where it is filed.
 3. **What you are doing next**, which is the unblocked item you are returning to.
 
+## 7. Stop on an unchanged streak — never on a single blocked reading
+
+**A fully-blocked sweep is a normal result. The same fully-blocked sweep N times is a finding**, and
+it is the one this step exists for: six consecutive firings once produced a byte-identical reading
+— same tracker comment, same patches applying, same counts, same two peers already relayed to —
+while every remaining item needed an act only the operator could take. **Six firings, one result,
+zero state change: the loop was spending attention to re-print a constant.**
+
+**Compare the SIGNALS, not the verdict.** Record what each check returned this sweep — the newest
+tracker timestamp, the counts, the peer states, the pin — and compare against the last sweep's
+record. *"Still blocked"* is a verdict and it is the same sentence every time; the readings behind
+it are what tell you whether anything moved.
+
+- **Any signal differs** → the streak resets to zero. Something moved, even if nothing unblocked.
+- **Every signal identical** → the streak increments, and **the interval doubles.**
+- **The interval reaches its ceiling** → stop, and say so in the terms below.
+
+**Back off before you stop, and stop only at the ceiling.** A bare stop on the first blocked reading
+contradicts this skill's own premise — blockers expire while you are not looking, and a loop that
+deleted itself at 22:00 cannot notice the answer that arrives at 02:00. Doubling keeps an observer
+alive at a cost that halves each time, so the founding premise survives and the constant stops being
+re-printed.
+
+### The stop is LOUD, or it is indistinguishable from a crash
+
+**A loop that goes quiet and a loop that died look identical from outside**, which is this estate's
+signature failure — see
+[`silence-must-be-the-alarm`](../../rules/how-we-work/silence-must-be-the-alarm.md). So the final
+turn carries four things and is not finished without them:
+
+1. **that it stopped, and after how many identical sweeps**
+2. **the constant reading** — the signals that did not change, in full
+3. **the one command that re-arms it**, said plainly, with the note that this was a delete and not a
+   pause
+4. **the acts that would change any signal** — which is the list of what is owed and by whom
+
+**Completion criterion:** a reader who sees only your last message can tell the loop stopped on
+purpose, what it was seeing when it did, and what to do about it.
+
 ## The one forbidden output
 
 > **A correct, well-organised list of the decisions you need from someone else is not a turn's
 > work.** It is a status report on your own idleness, and producing it feels productive because it
 > is genuinely difficult to write well.
 
-If a turn is about to end with only that list, the turn is not finished. Go back to step 3: the list
-is evidence you have not re-checked the blockers, because a list that long is rarely all true at
-once.
+**Unless you re-checked and nothing moved — then it is the answer.** Three outcomes, and only the
+middle one is forbidden:
+
+| what you produced | verdict |
+|---|---|
+| the list, having **re-checked** the signals this sweep | **correct** — and if the signals are unchanged, it is step 7's input |
+| the list, **without** re-checking, because it was true last time | **forbidden** — this is the idleness report |
+| work moved, or a blocker newly named and filed | good |
+
+**The discriminator is whether the re-check happened, not how the answer looks.** Earlier wording
+sent a blocked turn back to step 3 unconditionally, which told a session that had done the work
+correctly to disbelieve a true answer and do it again — right most of the time, and wrong exactly
+when the estate is genuinely and completely blocked, which is the moment the instruction matters.
 
 ## ⚠️ Boundary — "keep going" never means working past a refusal
 
