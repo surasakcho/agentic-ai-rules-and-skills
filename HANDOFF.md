@@ -89,6 +89,28 @@ and was treated as a relay** — see the second precondition in
 this: a corroborating artifact can be stale without saying so, and its silence is
 indistinguishable from the relay having been invented.
 
+### Known blockers — these bite immediately
+
+- **`harvest.py --check` exits 1 in this container**, and it is *not* a repo defect:
+  `verify-outputs/test_self.py` reports `CANNOT RUN — missing matplotlib, numpy, pandas`.
+  Pre-dates the session. **`CANNOT RUN` is not a pass** and the check is right to fail; install
+  the requirements or run the health check somewhere that has them before reading its exit code
+  as a verdict on the corpus.
+- **Nothing in this repo invokes any gate.** `core.hooksPath` unset, no hooks dir. Any coverage
+  number read here is about existence, never enforcement.
+
+### Caught at wrap, worth knowing before editing a rule's statement
+
+`fe1ad49` made `write-the-prd-before-the-code` vocabulary-neutral — *"a written statement of
+intent"* where it had said *"a written PRD"* — and `rules-in-force`'s self-test asserts that
+sentence **verbatim**, to prove the hook injects the statement and not just the rule's name. It
+went red on a change that touched no code, and stayed green all day because nothing re-ran it.
+Fixed in `ac38301` by asserting the stable stem.
+
+**That is `an-additive-change-is-not-additive` with this office as the defect**, nine hours after
+publishing it. **Before rewording any rule statement, grep the repo for the old wording** — tests,
+skills and docs quote them, and the diff cannot show you that.
+
 ### Suggested skills for the next session
 
 `rules-in-force` at start · `check-rule-gates` before trusting any coverage number ·
