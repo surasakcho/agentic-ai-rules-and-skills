@@ -53,7 +53,7 @@ Remember whether you started inside or outside the home repo. Step 5 depends on 
 
 Do this before committing, so a `CLAUDE.md` change goes into the same commit.
 
-**Started inside the home repo, on its default branch:** make sure the home repo's root `CLAUDE.md` contains this line, and add it only once:
+**Started inside the home repo:** make sure the home repo's root `CLAUDE.md` contains this line, and add it only once:
 
 > **Start of session:** read the newest file in `handoffs/` before doing anything else. Its "Next session focus" is the plan.
 
@@ -77,7 +77,7 @@ If there is no `CLAUDE.md`, create one. If the repo has an `AGENTS.md`, put `@AG
 
 Tell the user:
 - the home repo and the file path
-- where the pointer went (`CLAUDE.md`, the pinned `handoff` issue, or the memory entry for which directory)
+- where the pointer went (`CLAUDE.md`, or the memory entry for which directory)
 - the commit SHA
 - whether the push was verified
 
