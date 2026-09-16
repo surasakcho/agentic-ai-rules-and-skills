@@ -174,7 +174,7 @@ General workflow tools, not code-specific.
 **User-invoked**
 
 - **[grill-me](./grill-me/SKILL.md)** — Get relentlessly interviewed about a plan or design until every branch of the decision tree is resolved.
-- **[handoff](./handoff/SKILL.md)** — Write a handoff document into the repo's `handoffs/` folder as a new dated file, then commit and push it, so it survives a reboot and reaches any machine.
+- **[handoff](./handoff/SKILL.md)** — Write a handoff document as a new dated file in a repo's `handoffs/` folder, commit and push it, and leave a pointer the next session loads automatically. Works inside or outside a repo.
 - **[rotate-session](./rotate-session/SKILL.md)** — Refresh the current session in place: hand off, wrap, then drop and relaunch a fresh same-name successor with an empty context window. Only rotates the session you're inside, and only in a repo that opted in with a committed `.claude/rotate.conf`.
 - **[teach](./teach/SKILL.md)** — Teach the user a new skill or concept over multiple sessions, using the current directory as a stateful teaching workspace.
 - **[writing-great-skills](./writing-great-skills/SKILL.md)** — Reference for writing and editing skills well: the vocabulary and principles that make a skill predictable.
