@@ -442,3 +442,19 @@ same board format.
   layout that shipped as an unagreed guess and was never challenged. Rules 28 → 29;
   health check green.
 - 2026-08-20 — published `rules/how-we-work/default-to-silence.md` (a message to the person you work for needs one of four reasons to exist — a decision only they can make, a result that changes what happens next, a blocker only they can clear, or a correction to something wrong they were already told; carrying none of the four is not a short message but a message that should not be sent). Earned from a direct user instruction after a day in which six several-hundred-word process reports on a single four-word decision buried the three open questions only that user could answer — the cost recorded is that volume *hid* the decision-relevant part, which is why it is filed as a routing rule rather than a style preference. Names the mechanism explicitly: the material that feels most worth sending is usually what was just committed, so the second copy is the one that cannot be searched or corrected in place — if it is committed, it has been reported. Cross-linked to `shut-up-and-work` (that rule governs how to write a report once you have decided to send one; this decides whether it should exist), to `research-and-qa-logs` (where the unsent material goes), and to `close-your-own-gaps` (silence must not become a way to sit on a gap). Two opposite failure modes guarded in-file, since the rule is dangerous read one-sidedly: suppressing a decision that is genuinely the user's is the *more* expensive error, and dropping set counts to be brief is the same defect `shut-up-and-work` already warns about — completeness wins the tie-break in both. Not mechanised: which of the four reasons applies is a judgement, and a checker that counted message length would reward exactly the lossy compression the rule forbids. Sanitise pass: leak gate run on the new file and the README row against person, org, project, path and domain terms — clean; the incident is told as "one principal", "a multi-day task" and "a four-word decision", with no product, venture, currency or repository identifiers.
+- 2026-09-13/14 — **not a review pass; a continuous authoring session** under the Rules Sector
+  brief, recorded here because rules were published and the log is where published rules are
+  recorded. Five rules added — `absence-is-not-compliance`, `a-verb-list-is-not-a-boundary`,
+  `detect-after-is-not-prevent-before`, `a-remembered-claim-is-not-a-checked-one`,
+  `a-blocked-list-is-a-fact-about-a-moment`, `find-free-then-generate-then-ask`,
+  `a-faithful-relay-loses-the-clause-that-matters`, `a-pinned-reference-is-checked-at-its-pin`,
+  `count-the-join-not-the-inventories`, `what-the-harness-supplies-it-cannot-test`,
+  `an-additive-change-is-not-additive` — and the four domain categories triaged, taking the
+  corpus from 81 to 92 rules with every clause carrying a verdict. **Nine further candidates were
+  raised and NOT written**: each resolved to a rule that already existed, one category over, and
+  the resolution was a cross-reference rather than a new file. That ratio is the finding of the
+  session and it is recorded in `CADENCE.md`: **this corpus's gap is navigation before it is
+  coverage.** Two of the nine repaired an unstated assumption inside an existing rule, which is
+  the only kind of near-duplicate worth the traffic. Sanitise: leak gate run on every commit,
+  clean; the Core's gate internals were deliberately withheld — see `docs/gate-specs.md`.
+
