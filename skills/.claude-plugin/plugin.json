@@ -21,6 +21,7 @@
     "./retrieve-lessons",
     "./rotate-session",
     "./verify-outputs",
+    "./pickup",
     "./wrap",
     "./wrap-all",
     "./global-guidelines",
