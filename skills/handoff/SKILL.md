@@ -59,11 +59,7 @@ Do this before committing, so a `CLAUDE.md` change goes into the same commit.
 
 If there is no `CLAUDE.md`, create one. If the repo has an `AGENTS.md`, put `@AGENTS.md` on the first line so its instructions still load.
 
-**Work lives on a branch other than the default branch** (`gh repo view --json defaultBranchRef`): a `CLAUDE.md` or `handoffs/` committed there disappears on `git switch <default>` or in a fresh clone. The pointer has to be something a new session can see from any branch:
-
-- **A pinned issue labelled `handoff`** in the home repo, titled "Handoff: where the next session starts". Look for an open one first (`gh issue list --label handoff`) and edit it; create and pin one only if none exists. Its body gives the branch, the `git switch` command, and a link to the newest handoff file on that branch. If the host's rules say so, sign it as session-written.
-- **Plus the memory pointer below.** Sessions don't read issues on their own, so the memory entry is what gets loaded automatically on this machine.
-- Don't add a `CLAUDE.md` to the default branch unless the user allows commits there.
+**Checked out on a branch other than the default branch:** stop and ask the user before committing. A `CLAUDE.md` pointer or handoff committed on that branch is invisible from the default branch and from a fresh clone. The simple fix is to commit the handoff to the default branch. Don't build pointer issues or branch-switching instructions around it.
 
 **Started outside the home repo:** a `CLAUDE.md` in the home repo won't load in the directory you're in. Use the working directory's memory instead, because Claude Code loads it automatically in any directory:
 
