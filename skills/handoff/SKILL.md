@@ -53,7 +53,7 @@ Remember whether you started inside or outside the home repo. Step 5 depends on 
 
 Do this before committing, so a `CLAUDE.md` change goes into the same commit.
 
-**Started inside the home repo:** make sure the home repo's root `CLAUDE.md` contains this line, and add it only once:
+**Started inside the home repo, on its default branch:** make sure the home repo's root `CLAUDE.md` contains this line, and add it only once:
 
 > **Start of session:** read the newest file in `handoffs/` before doing anything else. Its "Next session focus" is the plan.
 
