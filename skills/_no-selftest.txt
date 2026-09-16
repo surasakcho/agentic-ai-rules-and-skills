@@ -14,8 +14,6 @@ worktree-sync            # auto-merges a side branch into main and PUSHES it. Hi
 session-sandbox          # kills tmux sessions and installs cron; its whole value IS the
                          # sbx-* guard, and nothing proves the guard refuses a bad target.
                          # Its sibling rotate-session ships exactly that test — copy it.
-git-guardrails-claude-code  # installs hooks that BLOCK dangerous git commands; if the hook
-                         # silently fails to match, the block is gone and nothing says so.
 global-guidelines        # ships check-encoding.py, which is a checker — and an unverified
                          # checker is the failure mode it exists to prevent.
 diagnosing-bugs          # ships a helper script; lowest risk of the four.

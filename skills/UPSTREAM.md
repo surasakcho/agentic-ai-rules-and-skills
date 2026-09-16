@@ -231,3 +231,20 @@ design doc, a ticket with acceptance criteria; the four things are the rule — 
 **If a rule slug ever must change**, it wants the old slug recorded where the join can see it, or a
 pass over every estate's binding file in the same commit. Neither exists today, which is itself a
 reason not to start.
+
+---
+
+## 2026-09-16 — unmodified copies removed; the plugin supplies them
+
+The operator's instruction: **everything copied verbatim from upstream is removed.** Nine skills had
+no edit of ours since the fork (their only commits here are upstream's own history, the flatten move
+`98b2405`, and `f574f40` taking upstream's line). Four were byte-identical to `mattpocock-skills`
+1.2.3 apart from `agents/openai.yaml`: `grill-with-docs`, `migrate-to-shoehorn`, `scaffold-exercises`,
+`wayfinder`. Five differed only by upstream's later edits, never ours: `git-guardrails-claude-code`,
+`grill-me`, `resolving-merge-conflicts`, `setup-pre-commit`, `implement`.
+
+They are deleted, with their `README.md`, `plugin.json` and `_no-selftest.txt` entries. The
+`mattpocock-skills` plugin stays enabled and provides all nine as `mattpocock-skills:<name>`, so the
+chain **grill-with-docs (or wayfinder) → to-spec → to-tickets → implement** still resolves: the two
+ends from the plugin, the middle from here. The 19 skills we rewrote stay, and still share a name
+with the plugin's copy.

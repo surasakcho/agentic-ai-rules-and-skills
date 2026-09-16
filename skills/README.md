@@ -55,8 +55,8 @@ This is just the same in the AI age. There is a communication gap between you an
 
 **The Fix** is to use:
 
-- [`/grill-me`](./grill-me/SKILL.md) - for non-code uses
-- [`/grill-with-docs`](./grill-with-docs/SKILL.md) - same as [`/grill-me`](./grill-me/SKILL.md), but adds more goodies (see below)
+- `/grill-me` (from Matt Pocock's `mattpocock-skills` plugin) - for non-code uses
+- `/grill-with-docs` (from Matt Pocock's `mattpocock-skills` plugin) - same as `/grill-me`, but adds more goodies (see below)
 
 These are my most popular skills. They help you align with the agent before you get started, and think deeply about the change you're making. Use them _every_ time you want to make a change.
 
@@ -86,7 +86,7 @@ This concision pays off session after session.
 
 </details>
 
-This is built into [`/grill-with-docs`](./grill-with-docs/SKILL.md). It's a grilling session, but that helps you build a shared language with the AI, and document hard-to-explain decisions in ADR's.
+This is built into `/grill-with-docs`. It's a grilling session, but that helps you build a shared language with the AI, and document hard-to-explain decisions in ADR's.
 
 It's hard to explain how powerful this is. It might be the single coolest technique in this repo. Try it, and see.
 
@@ -150,7 +150,6 @@ Skills I use daily for code work.
 **User-invoked**
 
 - **[ask-matt](./ask-matt/SKILL.md)** — Ask which skill or flow fits your situation. A router over the user-invoked skills in this repo.
-- **[grill-with-docs](./grill-with-docs/SKILL.md)** — Grilling session that also builds your project's domain model, sharpening terminology and updating `CONTEXT.md` and ADRs inline.
 - **[triage](./triage/SKILL.md)** — Move issues through a state machine of triage roles.
 - **[improve-codebase-architecture](./improve-codebase-architecture/SKILL.md)** — Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
 - **[setup-matt-pocock-skills](./setup-matt-pocock-skills/SKILL.md)** — Configure this repo for the engineering skills (issue tracker, triage labels, domain doc layout). Run once per repo before using the other engineering skills.
@@ -173,7 +172,6 @@ General workflow tools, not code-specific.
 
 **User-invoked**
 
-- **[grill-me](./grill-me/SKILL.md)** — Get relentlessly interviewed about a plan or design until every branch of the decision tree is resolved.
 - **[handoff](./handoff/SKILL.md)** — Write a handoff document as a new dated file in a repo's `handoffs/` folder, commit and push it, and leave a pointer the next session loads automatically. Works inside or outside a repo.
 - **[rotate-session](./rotate-session/SKILL.md)** — Refresh the current session in place: hand off, wrap, then drop and relaunch a fresh same-name successor with an empty context window. Only rotates the session you're inside, and only in a repo that opted in with a committed `.claude/rotate.conf`.
 - **[teach](./teach/SKILL.md)** — Teach the user a new skill or concept over multiple sessions, using the current directory as a stateful teaching workspace.
@@ -193,7 +191,3 @@ General workflow tools, not code-specific.
 
 Tools I keep around but rarely use.
 
-- **[git-guardrails-claude-code](./git-guardrails-claude-code/SKILL.md)** — Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, etc.) before they execute.
-- **[migrate-to-shoehorn](./migrate-to-shoehorn/SKILL.md)** — Migrate test files from `as` type assertions to @total-typescript/shoehorn.
-- **[scaffold-exercises](./scaffold-exercises/SKILL.md)** — Create exercise directory structures with sections, problems, solutions, and explainers.
-- **[setup-pre-commit](./setup-pre-commit/SKILL.md)** — Set up Husky pre-commit hooks with lint-staged, Prettier, type checking, and tests.
