@@ -11,7 +11,7 @@ A handoff only matters if the next session **finds it** and it **survives**:
 
 - Never save it to OS temp. `/tmp` is RAM-backed on some hosts, so a reboot deletes it.
 - Never write it into `CONTEXT.md`. That file is a domain glossary, and session notes don't belong there.
-- Nothing reads `handoffs/` on its own. Step 5 leaves the pointer that makes the next session read it.
+- Nothing reads `handoffs/` on its own. Step 6 leaves the pointer that makes the next session read it.
 
 ## 1. Pick the repo
 
@@ -21,16 +21,33 @@ Run `git rev-parse --show-toplevel` in the working directory.
 - **Outside a repo:** ask the user which repo this session's work belongs to, and suggest the repos the session actually edited. Their answer is the home repo.
 - **The work belongs to no repo:** the home repo is `~/projects/obsidian-vault`.
 
-Remember whether you started inside or outside the home repo. Step 5 depends on it.
+Remember whether you started inside or outside the home repo. Step 6 depends on it.
 
 ## 2. Pick the file
 
 - Write to `<home repo>/handoffs/YYYY-MM-DD-HHMM.md`, using the current UTC time. Create `handoffs/` if it doesn't exist.
 - Always create a **new** file. Never overwrite an earlier handoff, because it is the record of what the previous session knew.
-- If `handoffs/` already has files, name the most recent one in a **Supersedes** line, and say which of its points are now out of date.
 - If you started outside the home repo, include a **Working directory** line naming where the session ran, so the next agent knows where to start.
 
-## 3. Write it
+**Open handoffs.** A handoff is **open** until a later handoff names it in its `**Supersedes:**` line. Usually only the newest one is open. Parallel sessions can leave several open at once.
+
+## 3. Close the open handoffs
+
+List the open handoffs in `handoffs/`: every file that no other handoff's `**Supersedes:**` line names. Read each one, whether or not this session started from it.
+
+Account for **every** item under their "State now" and "Next session focus":
+
+- **carried forward:** still open, so it goes into this handoff;
+- **done:** say so, with evidence (a commit, a closed issue, a URL);
+- **dropped:** say so, with the reason, and who decided.
+
+Put the done and dropped items in a short **Closed since last handoff** section.
+
+Open the new handoff with `**Supersedes:** handoffs/<file>, handoffs/<file>`, naming every open handoff you read, by filename. That closes them and merges parallel threads back into one.
+
+**Done when:** every item in every open handoff is carried forward, done or dropped, and the Supersedes line names all of them. If there are no earlier handoffs, skip this step.
+
+## 4. Write it
 
 - **Next session focus.** If the user passed arguments, they describe what the next session will work on, so tailor the whole document to that. This is the first section.
 - **State now.** Say what is done, what is in progress, and what is blocked or on hold, with the reason for each.
@@ -41,21 +58,21 @@ Remember whether you started inside or outside the home repo. Step 5 depends on 
 - **Redact** secrets and personal information: API keys, passwords, tokens, private keys, email addresses.
 - **Carry over stranded facts.** If this session learned something that exists nowhere durable yet (a research result, a measurement), write it into the handoff or post it where it belongs, then link it. A handoff is often the only place such a fact would otherwise survive.
 
-## 4. Commit and push
+## 5. Commit and push
 
 1. **Check the home repo's rules first.** Read its `CLAUDE.md` and any earlier handoff. If they limit commits or pushes (for example "no commits to main" or "WIP branch only"), follow those limits. If committing isn't allowed, leave the file uncommitted. If committing is allowed but pushing isn't, commit without pushing. Either way, tell the user the handoff exists only on this machine.
-2. **Stage only the files this skill wrote:** the handoff, plus `CLAUDE.md` if step 5 changed it. Never run `git add -A`. Some repos hold local-only files that must not be swept in.
+2. **Stage only the files this skill wrote:** the handoff, plus `CLAUDE.md` if step 6 changed it. Never run `git add -A`. Some repos hold local-only files that must not be swept in.
 3. Commit with `docs: handoff YYYY-MM-DD-HHMM`.
 4. Push to the current branch's upstream. If the branch has no upstream, report that and don't create one without asking.
 5. **Verify the push actually reached the remote.** `git status -sb` should show nothing ahead, or `git ls-remote` should show the new SHA. A push command returning is not proof.
 
-## 5. Leave a pointer the next session loads
+## 6. Leave a pointer the next session loads
 
 Do this before committing, so a `CLAUDE.md` change goes into the same commit.
 
-**Started inside the home repo:** make sure the home repo's root `CLAUDE.md` contains this line, and add it only once:
+**Started inside the home repo:** make sure the home repo's root `CLAUDE.md` contains this line, and add it only once. Replace an older start-of-session handoff line rather than adding a second:
 
-> **Start of session:** read the newest file in `handoffs/` before doing anything else. Its "Next session focus" is the plan.
+> **Start of session:** use the `pickup` skill. It reads the open handoffs in `handoffs/` before doing anything else, and their "Next session focus" is the plan.
 
 If there is no `CLAUDE.md`, create one. If the repo has an `AGENTS.md`, put `@AGENTS.md` on the first line so its instructions still load.
 
@@ -69,7 +86,7 @@ If there is no `CLAUDE.md`, create one. If the repo has an `AGENTS.md`, put `@AG
   `- [Latest handoff](latest-handoff.md) — read <absolute path> before doing anything else`.
 - Update the existing file and line. Never add a second one.
 
-## 6. Report back
+## 7. Report back
 
 Tell the user:
 - the home repo and the file path
