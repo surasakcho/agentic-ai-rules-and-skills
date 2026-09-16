@@ -247,7 +247,11 @@ def _():
         ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
         # The statement itself must be present -- injecting only names would rebuild the
         # exact problem the hook exists to solve.
-        assert "No implementation begins without a written PRD" in ctx, ctx[:400]
+        # The stable STEM of the statement, not its noun. The full sentence read
+        # "...without a written PRD" until the rule was made vocabulary-neutral, and this
+        # assertion is an old caller of that vocabulary -- it went red on a change that
+        # touched no code. See rules/coding/an-additive-change-is-not-additive.md.
+        assert "No implementation begins without a written" in ctx, ctx[:400]
     finally:
         import shutil
         shutil.rmtree(d, ignore_errors=True)
