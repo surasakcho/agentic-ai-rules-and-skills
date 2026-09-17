@@ -82,8 +82,14 @@ fi
 
 # --- the repo is the memory: it must be committed AND pushed before the conversation is discarded
 git_state_ok(){
-  local why=""
-  [[ -z "$(git -C "$REPO_DIR" status --porcelain 2>/dev/null)" ]] || why="uncommitted changes"
+  local why="" dirty
+  dirty="$(git -C "$REPO_DIR" status --porcelain 2>/dev/null)"
+  if [[ -n "$dirty" ]]; then
+    # Name the files. A gate that fires without saying what tripped it gets worked around rather
+    # than fixed, and an untracked machine-local file (.claude/settings.local.json and friends)
+    # will otherwise block every rotation with an error that sounds like lost work.
+    why="uncommitted changes: $(printf '%s' "$dirty" | awk '{printf "%s%s", sep, $0; sep="; "}' | cut -c1-300)"
+  fi
   local ahead; ahead="$(git -C "$REPO_DIR" rev-list --count '@{upstream}..HEAD' 2>/dev/null || echo unknown)"
   if [[ "$ahead" == "unknown" ]]; then why="${why:+$why; }no upstream branch to compare against"
   elif [[ "$ahead" != "0" ]]; then why="${why:+$why; }$ahead commit(s) not pushed"; fi
