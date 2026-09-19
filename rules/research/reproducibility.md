@@ -6,9 +6,9 @@
 
 ## The rule
 
-Every output file — table, figure, model, panel — must be regenerable by running a script
-committed to the repo. No manual, undocumented or one-off steps. If a figure was exported by
-hand, add a script that regenerates it, so it cannot drift from the data.
+> Every output file — table, figure, model, panel — must be regenerable by running a script
+> committed to the repo. No manual, undocumented or one-off steps. If a figure was exported by
+> hand, add a script that regenerates it, so it cannot drift from the data.
 
 ## Commit the raw inputs, not just the URL
 

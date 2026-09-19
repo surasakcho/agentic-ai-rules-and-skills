@@ -6,9 +6,9 @@
 
 ## The rule
 
-Windows Python decodes and encodes text with the **locale codec** (cp1252, or cp874 on a
-Thai-locale machine); Linux and macOS use UTF-8. Code written on one and run on the other
-breaks. Make encoding explicit **as the code is written**, not after a crash:
+> Windows Python decodes and encodes text with the **locale codec** (cp1252, or cp874 on a
+> Thai-locale machine); Linux and macOS use UTF-8. Code written on one and run on the other
+> breaks. Make encoding explicit **as the code is written**, not after a crash:
 
 - `open(...)` → pass `encoding="utf-8"` unless the mode is binary
 - `subprocess.run(..., text=True)` → pass `encoding="utf-8"`, usually with `errors="replace"`

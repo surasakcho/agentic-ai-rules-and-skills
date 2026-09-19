@@ -7,9 +7,9 @@
 
 ## The rule
 
-Run every new validation against input you **know** is broken, and confirm it fails. A check
-that only ever passes is worthless, and worse than worthless: it produces the *feeling* of
-verification without the substance.
+> Run every new validation against input you **know** is broken, and confirm it fails. A check
+> that only ever passes is worthless, and worse than worthless: it produces the *feeling* of
+> verification without the substance.
 
 Six corollaries, each earned:
 

@@ -7,9 +7,9 @@ A/B variants of a derived measure.
 
 ## The rule
 
-When the same quantity is measured from more than one source, or produced in more than one
-variant, **every variant ships the same set of variables** — same names modulo the source
-prefix, same derivations, same units, same missing-value convention.
+> When the same quantity is measured from more than one source, or produced in more than one
+> variant, **every variant ships the same set of variables** — same names modulo the source
+> prefix, same derivations, same units, same missing-value convention.
 
 A variant that carries a column its sibling lacks is not a richer variant. It is a broken
 comparison.

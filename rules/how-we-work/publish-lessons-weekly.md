@@ -6,8 +6,10 @@ Canonical cadence: [CADENCE.md](../../CADENCE.md). Executed by [lesson-review](.
 
 ---
 
-**Lessons, rules and reusable checkers that are true outside this project belong in the
-shared repo, not stranded here.** Review and publish **at least once a week**.
+## The rule
+
+> **Lessons, rules and reusable checkers that are true outside this project belong in the
+> shared repo, not stranded here.** Review and publish **at least once a week**.
 
 **Shared repo:** <https://github.com/surasakcho/agentic-ai-rules-and-skills>
 **Skill:** `lesson-review` — runs the harvest and the health check.

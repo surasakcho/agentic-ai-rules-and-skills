@@ -13,10 +13,10 @@ discipline once the check is trustworthy.
 
 ## The rule
 
-Every check has a **null space**: the set of changes to the data that leave its output
-unchanged. **Write that sentence down before you read the result.** If the defect you actually
-care about lives in the null space, the check is not evidence about it — no matter what number
-it returns, and no matter how reassuring the number is.
+> Every check has a **null space**: the set of changes to the data that leave its output
+> unchanged. **Write that sentence down before you read the result.** If the defect you actually
+> care about lives in the null space, the check is not evidence about it — no matter what number
+> it returns, and no matter how reassuring the number is.
 
 ## Why a broken check hides a defect instead of revealing one
 

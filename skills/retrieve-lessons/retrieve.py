@@ -102,6 +102,11 @@ SKIP = {".git", "node_modules", ".venv", "venv", "__pycache__", "dist", "build",
         ".obsidian", "site-packages", ".mypy_cache", ".pytest_cache"}
 
 
+import sys as _sys
+_sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "lib"))
+import rulestatement  # noqa: E402  -- the ONE statement parser, shared with refresh-rules
+
+
 def run(*args, cwd=None):
     return subprocess.run(args, cwd=cwd, capture_output=True, encoding="utf-8",
                           errors="replace")
@@ -402,14 +407,43 @@ def rules_for(shared: Path, sha: str, cats):
     return out
 
 
+
+def statements_at(shared: Path, sha: str, rules):
+    """Each rule's quotable statement, read from the tree being pinned to.
+
+    REFUSES on any rule with no statement rather than falling back to a bare link. The
+    fallback is the defect: a block of ~90 URLs and no rule text was adopted, pinned,
+    read aloud -- and did not fire. See
+    rules/how-we-work/a-rule-states-itself-in-one-line.md
+    """
+    out, missing = {}, []
+    for cat in rules:
+        for name in rules[cat]:
+            r = run("git", "-C", str(shared), "show", f"{sha}:rules/{cat}/{name}")
+            st = rulestatement.extract(r.stdout) if r.returncode == 0 else None
+            if st is None:
+                missing.append(f"rules/{cat}/{name}")
+            else:
+                out[(cat, name)] = (rulestatement.title(r.stdout, name[:-3]), st)
+    if missing:
+        raise SystemExit(
+            f"ERROR: {len(missing)} rule(s) carry no machine-extractable statement at {sha} "
+            f"-- refusing to adopt them as bare links:\n"
+            + "\n".join(f"         {m}" for m in missing)
+            + "\n         Fix the rule file in the shared repo; the fallback is deliberately absent.")
+    return out
+
+
 def build_block(shared: Path, sha: str, selected, rules):
+    stmts = statements_at(shared, sha, rules)
     lines = [BEGIN,
              "",
              "## Shared working rules",
              "",
              f"Adopted from [agentic-ai-rules-and-skills]({SHARED_WEB.rsplit('/blob', 1)[0]}) "
-             f"at `{sha}`. **Linked, not copied** — a copied rule drifts out of agreement with "
-             f"its source and nobody notices. Refresh with `/retrieve-lessons`.",
+             f"at `{sha}`. Each rule is its own **statement** plus a link to the full text — a "
+             f"bare link is not in context at the moment the rule applies, and a full copy "
+             f"drifts out of agreement with its source. Refresh with `/retrieve-lessons`.",
              ""]
     # Mandatory categories lead, in declared order; detected ones follow alphabetically.
     order = ([c for c in MANDATORY if c in rules]
@@ -423,8 +457,9 @@ def build_block(shared: Path, sha: str, selected, rules):
                          f"({', '.join(selected[cat])}).")
         lines.append("")
         for name in rules[cat]:
-            title = name[:-3].replace("-", " ")
-            lines.append(f"- [{title}]({SHARED_WEB}/{sha}/rules/{cat}/{name})")
+            title, statement = stmts[(cat, name)]
+            lines.append(f"- **{title}** — {statement}")
+            lines.append(f"  [full rule]({SHARED_WEB}/{sha}/rules/{cat}/{name})")
         lines.append("")
     lines += ["*The pin is the point: if the shared repo has moved on, "
               "`retrieve.py --check` fails and you re-read what changed.*", "", END]

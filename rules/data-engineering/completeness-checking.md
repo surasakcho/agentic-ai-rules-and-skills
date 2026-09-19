@@ -7,8 +7,8 @@
 
 ## The rule
 
-Enumerate what the output *should* contain from the **source of truth** — the raw inputs, the
-authoritative entity list, the spec — and prove every expected item is present.
+> Enumerate what the output *should* contain from the **source of truth** — the raw inputs, the
+> authoritative entity list, the spec — and prove every expected item is present.
 
 **Never validate completeness against a previous output.** A prior run cannot reveal something
 that was never ingested; if the last version was missing a province, comparing against it

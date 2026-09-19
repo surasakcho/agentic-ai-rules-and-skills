@@ -5,6 +5,13 @@ what comes back.
 
 ---
 
+## The rule
+
+> **Expensive reasoning for silent failures; cheap execution for loud ones.** Delegate
+> execution against a known plan, where mistakes surface immediately. Keep novel
+> algorithmic work, architecture spanning modules, and any edit to an existing test's
+> assertions or tolerances. **Agent output is evidence to check, never a result to relay.**
+
 ## Match effort to failure mode
 
 **Expensive reasoning for silent failures; cheap execution for loud ones.**

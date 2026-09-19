@@ -11,9 +11,9 @@ a caveat instead of finished.
 
 ## The rule
 
-Every artifact you produce — figure, table, or a number in a sentence — gets reviewed for
-**accuracy, sanity and readability** before it reaches a reader. Producing an output is not
-finishing it.
+> Every artifact you produce — figure, table, or a number in a sentence — gets reviewed for
+> **accuracy, sanity and readability** before it reaches a reader. Producing an output is not
+> finishing it.
 
 These are three separate properties and only the first one is self-evident:
 
