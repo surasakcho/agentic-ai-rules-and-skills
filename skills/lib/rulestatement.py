@@ -53,6 +53,41 @@ def title(text: str, fallback: str = "") -> str:
     return fallback
 
 
+# --- adoption policy shared by every adopter -------------------------------------
+# A block of ~90 URLs was adopted, pinned, quoted back, and did not fire. Volume is
+# part of that failure: attention thins across the excess. The ceiling is therefore
+# a REFUSAL, never a silent truncation -- which of N rules to keep is a judgement,
+# and slicing an alphabetical list makes it for nobody.
+RULE_CEILING = 25
+
+
+MANDATORY_CATEGORY = "how-we-work"
+
+
+def over_ceiling(counts: dict, ceiling: int = RULE_CEILING):
+    """A refusal message when the OPTIONAL selection is too big, or None.
+
+    The ceiling binds the domain categories only. `how-we-work` is mandatory and is
+    54 rules on its own, so a ceiling counting it would refuse every repo forever --
+    "adopt it always" and "cap at 25" can only both hold if the cap binds what is
+    optional. ASSUMPTION, recorded here so it can be overruled in one place.
+    """
+    total = sum(n for c, n in counts.items() if c != MANDATORY_CATEGORY)
+    if total <= ceiling:
+        return None
+    lines = ["REFUSED -- %d rules selected from domain categories, ceiling is %d."
+             % (total, ceiling), "",
+             "  (%s is mandatory and is not counted against the ceiling)"
+             % MANDATORY_CATEGORY, ""]
+    for cat in sorted(counts, key=lambda c: -counts[c]):
+        lines.append("  %-22s %d" % (cat, counts[cat]))
+    lines += ["",
+              "Narrow the categories and run again. Truncating for you would pick which",
+              "rules bind this repo by filename order, which is a judgement nobody made.",
+              "See rules/how-we-work/a-rule-states-itself-in-one-line.md"]
+    return "\n".join(lines)
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print(__doc__, file=sys.stderr)

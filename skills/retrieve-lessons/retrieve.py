@@ -436,6 +436,9 @@ def statements_at(shared: Path, sha: str, rules):
 
 def build_block(shared: Path, sha: str, selected, rules):
     stmts = statements_at(shared, sha, rules)
+    over = rulestatement.over_ceiling({c: len(rules[c]) for c in rules})
+    if over:
+        raise SystemExit(over)
     lines = [BEGIN,
              "",
              "## Shared working rules",

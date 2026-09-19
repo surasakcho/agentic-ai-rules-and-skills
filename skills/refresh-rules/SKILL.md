@@ -101,10 +101,34 @@ The shape is specified in
 first non-empty line under `## The rule`, blockquote or bold. One parser implements it for both
 scripts — [`skills/lib/rulestatement.py`](../lib/rulestatement.py). **Never write a second one.**
 
+## ⚠️ Read the exit code UNPIPED
+
+Every refusal here is an exit code, and **a pipeline reports the status of its last command** —
+the gate is never the last command. Reproduced on this tool while building it:
+
+```sh
+python3 refresh_rules.py --statements coding          # exit 1  -- correct
+python3 refresh_rules.py --statements coding | head   # exit 0  -- while printing REFUSED
+set -o pipefail; python3 refresh_rules.py … | head    # exit 1  -- correct again
+```
+
+Run it unpiped, set `pipefail`, or read `PIPESTATUS`.
+See [`a-classification-is-not-a-gate`](../../rules/how-we-work/a-classification-is-not-a-gate.md).
+
 ## The cap, and why it is reported
 
-`how-we-work` always, plus the detected domain categories, to a ceiling of **25 rules**. Over the
-ceiling the run says what it dropped and why. A silent cap reads as coverage —
+`how-we-work` always, plus the detected domain categories, with the **domain** categories capped
+at **25 rules**.
+
+⚠️ **The ceiling binds the OPTIONAL categories only, and that is an assumption worth knowing.**
+`how-we-work` is mandatory and is **54 rules on its own**, so a ceiling counting it would refuse
+every repo forever. "Adopt it always" and "cap at 25" can only both hold if the cap binds what is
+optional. The assumption lives in one place —
+[`skills/lib/rulestatement.py`](../lib/rulestatement.py) — so it can be overruled in one edit.
+
+**Over the ceiling the run REFUSES; it never truncates.** Slicing an alphabetical list would
+decide which rules bind a repo by filename order, which is a judgement nobody made. A silent cap
+reads as coverage —
 [`a-classification-is-not-a-gate`](../../rules/how-we-work/a-classification-is-not-a-gate.md).
 
 ## What this skill does not do

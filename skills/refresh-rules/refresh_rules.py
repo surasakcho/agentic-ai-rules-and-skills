@@ -31,7 +31,7 @@ GLOBAL_SRC = REPO / "global" / "CLAUDE.md"
 
 # how-we-work is never optional; the cap binds the domain categories
 ALWAYS = "how-we-work"
-MAX_RULES = 25
+MAX_RULES = rulestatement.RULE_CEILING
 
 
 # ---------------------------------------------------------------- machine facts
@@ -143,10 +143,13 @@ def statements(categories, pin):
         print("See rules/how-we-work/a-rule-states-itself-in-one-line.md", file=sys.stderr)
         return None, 1
 
-    dropped = []
-    if len(picked) > MAX_RULES:
-        dropped = picked[MAX_RULES:]
-        picked = picked[:MAX_RULES]
+    counts = {}
+    for cat, _f, _st in picked:
+        counts[cat] = counts.get(cat, 0) + 1
+    msg = rulestatement.over_ceiling(counts)
+    if msg:
+        print(msg, file=sys.stderr)
+        return None, 1
 
     out = ["## Rules in force", ""]
     out.append("<!-- adopted by skills/refresh-rules at pin %s -->" % pin)
@@ -161,13 +164,6 @@ def statements(categories, pin):
         url = ("https://github.com/surasakcho/agentic-ai-rules-and-skills/blob/%s/%s" % (pin, rel))
         out.append("- **%s** — %s" % (title_of(f), st))
         out.append("  [full rule](%s)" % url)
-        out.append("")
-    if dropped:
-        out.append("> ⚠️ **%d rule(s) were NOT adopted** — over the %d ceiling. Not silently: "
-                   "%s. Raise the ceiling or drop a category deliberately."
-                   % (len(dropped), MAX_RULES,
-                      ", ".join(f.stem for _, f, _ in dropped[:6])
-                      + (" …" if len(dropped) > 6 else "")))
         out.append("")
     return "\n".join(out), 0
 
