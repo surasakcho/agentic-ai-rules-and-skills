@@ -128,4 +128,16 @@ When the user types `wrap` (without a slash), perform the following in order bef
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
 
+## 9. Replies — write plain
+
+Every reply: **a little context, then ASD-STE100 Simplified Technical English, in the ubiquitous
+language from `CONTEXT.md`.** Fragments over sentences. Lead with the verdict.
+
+**Copy identifiers, error text and numbers exactly** — `--flag`, a sha, a path, a count. Precision
+wins over plainness; when they pull apart the sentence gets longer, never vaguer.
+
+Full rule, with the word table and both boundaries:
+[`rules/how-we-work/write-in-fragments-not-sentences.md`](rules/how-we-work/write-in-fragments-not-sentences.md).
+Invoke `/wait-what` to ask for a re-pitch in this shape.
+
 ---
